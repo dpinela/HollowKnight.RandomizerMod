@@ -10,14 +10,23 @@ namespace RandomizerMod.Randomization
     public class ProgressionManager
     {
         public int[] obtained;
+        
+        private ItemManager im;
+        private TransitionManager tm;
+
         private Dictionary<string, int> grubLocations;
         private Dictionary<string, int> essenceLocations;
         private bool temp;
         private bool share = true;
         public HashSet<string> tempItems;
 
-        public ProgressionManager(RandomizerState state, int[] progression = null, bool addSettings = true, bool concealRandomItems = false)
+        public ProgressionManager(RandomizerState state, ItemManager im = null, TransitionManager tm = null, int[] progression = null, bool addSettings = true, bool concealRandomItems = false)
         {
+            this.im = im;
+            this.tm = tm;
+
+            if (im == null) share = false;
+
             obtained = new int[LogicManager.bitMaskMax + 1];
             if (progression != null) progression.CopyTo(obtained, 0);
 
@@ -92,14 +101,14 @@ namespace RandomizerMod.Randomization
 
         private void Share(string item)
         {
-            if (ItemManager.recentProgression != null)
+            if (im != null && im.recentProgression != null)
             {
-                ItemManager.recentProgression.Add(item);
+                im.recentProgression.Add(item);
             }
 
-            if (TransitionManager.recentProgression != null)
+            if (tm != null && tm.recentProgression != null)
             {
-                TransitionManager.recentProgression.Add(item);
+                tm.recentProgression.Add(item);
             }
         }
 
@@ -200,8 +209,8 @@ namespace RandomizerMod.Randomization
                     break;
 
                 case RandomizerState.Validating when RandomizerMod.Instance.Settings.RandomizeGrubs:
-                    grubLocations = ItemManager.nonShopItems.Where(kvp => LogicManager.GetItemDef(kvp.Value).pool == "Grub").ToDictionary(kvp => kvp.Value, kvp => 1);
-                    foreach (var kvp in ItemManager.shopItems)
+                    grubLocations = im.nonShopItems.Where(kvp => LogicManager.GetItemDef(kvp.Value).pool == "Grub").ToDictionary(kvp => kvp.Value, kvp => 1);
+                    foreach (var kvp in im.shopItems)
                     {
                         if (kvp.Value.Any(item => LogicManager.GetItemDef(item).pool == "Grub"))
                         {
@@ -242,14 +251,14 @@ namespace RandomizerMod.Randomization
                 case RandomizerState.Completed when RandomizerMod.Instance.Settings.RandomizeWhisperingRoots && concealRandomItems:
                     break;
                 case RandomizerState.Validating when RandomizerMod.Instance.Settings.RandomizeWhisperingRoots:
-                    foreach (var kvp in ItemManager.nonShopItems)
+                    foreach (var kvp in im.nonShopItems)
                     {
                         if (LogicManager.GetItemDef(kvp.Value).pool == "Root")
                         {
                             essenceLocations.Add(kvp.Key, LogicManager.GetItemDef(kvp.Value).geo);
                         }
                     }
-                    foreach (var kvp in ItemManager.shopItems)
+                    foreach (var kvp in im.shopItems)
                     {
                         foreach (string item in kvp.Value)
                         {

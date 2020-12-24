@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RandomizerMod.Randomization
 {
-    class DirectedTransitions
+    public class DirectedTransitions
     {
         public List<string> leftTransitions;
         public List<string> rightTransitions;

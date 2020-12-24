@@ -9,7 +9,7 @@ namespace RandomizerMod.Randomization
 {
     internal static class SpanningTree
     {
-        public static void BuildAreaSpanningTree()
+        public static void BuildAreaSpanningTree(TransitionManager tm, Random rand, string startTransition)
         {
             List<string> areas = new List<string>();
             Dictionary<string, List<string>> areaTransitions = new Dictionary<string, List<string>>();
@@ -37,10 +37,10 @@ namespace RandomizerMod.Randomization
                 if (def.oneWay == 0 && areas.Contains(areaName)) areaTransitions[areaName].Add(transition);
             }
 
-            BuildSpanningTree(areaTransitions);
+            BuildSpanningTree(tm, rand, areaTransitions);
         }
 
-        public static void BuildRoomSpanningTree()
+        public static void BuildRoomSpanningTree(TransitionManager tm, Random rand, string startTransition)
         {
             List<string> rooms = new List<string>();
             Dictionary<string, List<string>> roomTransitions = new Dictionary<string, List<string>>();
@@ -69,10 +69,10 @@ namespace RandomizerMod.Randomization
                 if (def.oneWay == 0 && rooms.Contains(roomName)) roomTransitions[roomName].Add(transition);
             }
 
-            BuildSpanningTree(roomTransitions);
+            BuildSpanningTree(tm, rand, roomTransitions);
         }
 
-        public static void BuildCARSpanningTree()
+        public static void BuildCARSpanningTree(TransitionManager tm, Random rand, string startTransition)
         {
             List<string> areas = new List<string>();
             Dictionary<string, List<string>> rooms = new Dictionary<string, List<string>>();
@@ -103,7 +103,7 @@ namespace RandomizerMod.Randomization
                 if (!areas.Contains(def.areaName) || !areaTransitions[def.areaName].ContainsKey(def.sceneName)) continue;
                 areaTransitions[def.areaName][def.sceneName].Add(t);
             }
-            foreach (string area in areas) BuildSpanningTree(areaTransitions[area]);
+            foreach (string area in areas) BuildSpanningTree(tm, rand, areaTransitions[area]);
             var worldTransitions = new Dictionary<string, List<string>>();
             foreach (string area in areas)
             {
@@ -117,10 +117,10 @@ namespace RandomizerMod.Randomization
                     worldTransitions[LogicManager.GetTransitionDef(t).areaName].Add(t);
                 }
             }
-            BuildSpanningTree(worldTransitions);
+            BuildSpanningTree(tm, rand, worldTransitions);
         }
 
-        public static void BuildSpanningTree(Dictionary<string, List<string>> sortedTransitions, string first = null)
+        public static void BuildSpanningTree(TransitionManager tm, Random rand, Dictionary<string, List<string>> sortedTransitions, string first = null)
         {
             List<string> remaining = sortedTransitions.Keys.ToList();
             while (first == null)
@@ -141,8 +141,7 @@ namespace RandomizerMod.Randomization
                 if (failsafe > 500 || !directed[0].AnyCompatible())
                 {
                     Log("Triggered failsafe on round " + failsafe + " in BuildSpanningTree, where first transition set was: " + first + " with count: " + sortedTransitions[first].Count);
-                    randomizationError = true;
-                    return;
+                    throw new RandomizationError();
                 }
 
                 string nextRoom = remaining[rand.Next(remaining.Count)];

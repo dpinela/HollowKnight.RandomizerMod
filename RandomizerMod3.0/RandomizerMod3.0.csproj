@@ -97,6 +97,9 @@
     <Compile Include="Actions\ChangeShinyIntoSoul.cs" />
     <Compile Include="BenchHandler.cs" />
     <Compile Include="GiveItemActions.cs" />
+    <Compile Include="MultiWorld\ClientConnection.cs" />
+    <Compile Include="MultiWorld\ConnectionState.cs" />
+    <Compile Include="Randomization\RandomizationError.cs" />
     <Compile Include="StartSaveChanges.cs" />
     <Compile Include="RandoLogger.cs" />
     <Compile Include="Components\RandomizerTinkEffect.cs" />
@@ -390,5 +393,14 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\ShopIcons\Focus.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MultiWorldProtocol\MultiWorldProtocol.csproj">
+      <Project>{646d3716-fe32-4f72-839a-942be24e6978}</Project>
+      <Name>MultiWorldProtocol</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy RandomizerMod3.0.dll "C:\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\Mods"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

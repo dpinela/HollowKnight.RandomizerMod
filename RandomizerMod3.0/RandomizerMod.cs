@@ -153,7 +153,8 @@ namespace RandomizerMod
 
             try
             {
-                Randomizer.Randomize();
+                Randomizer rando = new Randomizer(Settings);
+                rando.Randomize();
 
                 RandoLogger.UpdateHelperLog();
             }

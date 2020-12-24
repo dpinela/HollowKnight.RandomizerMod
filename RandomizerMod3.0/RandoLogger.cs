@@ -25,7 +25,7 @@ namespace RandomizerMod
         private static void MakeHelperLists()
         {
             {
-                randomizedLocations = ItemManager.GetRandomizedLocations();
+                randomizedLocations = ItemManager.GetRandomizedLocations(RandomizerMod.Instance.Settings);
                 obtainedLocations = new HashSet<string>(RandomizerMod.Instance.Settings.GetLocationsFound());
                 uncheckedLocations = new HashSet<string>();
                 pm = new ProgressionManager(RandomizerState.Completed, concealRandomItems: true);

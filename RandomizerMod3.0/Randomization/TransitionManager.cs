@@ -6,13 +6,13 @@ using static RandomizerMod.LogHelper;
 
 namespace RandomizerMod.Randomization
 {
-    class TransitionManager
+    public class TransitionManager
     {
         public DirectedTransitions dt;
         public ProgressionManager pm;
 
-        public static Dictionary<string, string> transitionPlacements;
-        public static HashSet<string> recentProgression; // accessed by the progression manager whenever Add is called
+        public Dictionary<string, string> transitionPlacements;
+        public HashSet<string> recentProgression; // accessed by the progression manager whenever Add is called
 
         public List<string> unplacedTransitions;
         public Dictionary<string, string> standbyTransitions;
@@ -26,7 +26,7 @@ namespace RandomizerMod.Randomization
 
         private Random rand;
 
-        public TransitionManager(Random rnd)
+        public TransitionManager(Random rnd, SaveSettings settings)
         {
             rand = rnd;
             dt = new DirectedTransitions(rnd);
@@ -49,7 +49,7 @@ namespace RandomizerMod.Randomization
             standbyTransitions = new Dictionary<string, string>();
             reachableTransitions = new HashSet<string>();
             recentProgression = new HashSet<string>();
-            vanillaProgression = VanillaManager.GetVanillaProgression();
+            vanillaProgression = VanillaManager.GetVanillaProgression(settings);
             checkProgression = new HashSet<string>();
 
             dt.Add(unplacedTransitions);
@@ -59,13 +59,9 @@ namespace RandomizerMod.Randomization
         {
             reachableTransitions = new HashSet<string>();
         }
-        public void UpdateReachableTransitions(string newThing = null, bool item = false, ProgressionManager _pm = null)
+        public void UpdateReachableTransitions(string newThing, bool item = false, ProgressionManager _pm = null)
         {
             if (_pm != null) pm = _pm;
-            if (newThing == null)
-            {
-                newThing = Randomizer.startTransition;
-            }
 
             Queue<string> updates = new Queue<string>();
 
@@ -131,13 +127,9 @@ namespace RandomizerMod.Randomization
             }
         }
 
-        private HashSet<string> FakeUpdateReachableTransitions(string newThing = null, ProgressionManager _pm = null)
+        private HashSet<string> FakeUpdateReachableTransitions(string newThing, ProgressionManager _pm = null)
         {
             if (_pm != null) pm = _pm;
-            if (newThing == null)
-            {
-                newThing = Randomizer.startTransition;
-            }
 
             Queue<string> updates = new Queue<string>();
             HashSet<string> reachable = new HashSet<string>(reachableTransitions);
@@ -227,7 +219,7 @@ namespace RandomizerMod.Randomization
                 if (!ableToRelink1 || !ableToRelink2)
                 {
                     LogError("Error encountered in updating standby transitions. Unable to relink after removing standby transition.");
-                    Randomizer.randomizationError = true;
+                    throw new RandomizationError();
                 }
             }
         }

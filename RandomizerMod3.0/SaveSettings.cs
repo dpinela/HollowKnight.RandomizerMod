@@ -38,6 +38,8 @@ namespace RandomizerMod
 
         public bool RandomizeTransitions => RandomizeAreas || RandomizeRooms;
 
+        public bool IsMW => MWPlayers > 1;
+
         public bool FreeLantern => !(DarkRooms || RandomizeKeys);
         public SaveSettings()
         {
@@ -45,6 +47,12 @@ namespace RandomizerMod
             {
                 RandomizerAction.CreateActions(ItemPlacements, this);
             };
+        }
+
+        public int MWPlayers
+        {
+            get => GetInt(1);
+            set => SetInt(value);
         }
 
         public int JijiHintCounter
