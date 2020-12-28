@@ -105,6 +105,7 @@ namespace RandomizerMod
 
             RandoMenuItem<string> modeBtn = new RandoMenuItem<string>(back, new Vector2(0, 1040), "Mode", "Item Randomizer", "Area Randomizer", "Connected-Area Room Randomizer", "Room Randomizer");
             RandoMenuItem<string> cursedBtn = new RandoMenuItem<string>(back, new Vector2(0, 960), "Cursed", "no", "noo", "noooo", "noooooooo", "noooooooooooooooo", "Oh yeah");
+            RandoMenuItem<bool> multiworldBtn = new RandoMenuItem<bool>(back, new Vector2(0, 880), "Connect to Multiworld", false, true);
             RandoMenuItem<bool> RandoSpoilerBtn = new RandoMenuItem<bool>(back, new Vector2(0, 0), "Create Spoiler Log", true, false);
 
             // Create seed entry field
@@ -602,6 +603,18 @@ namespace RandomizerMod
                 presetPoolsBtn.SetSelection("Custom");
             }
 
+            void MWChanged(RandoMenuItem<bool> item)
+            {
+                if (item.CurrentSelection)
+                {
+                    RandomizerMod.Instance.mwConnection.Connect();
+                }
+                else
+                {
+                    RandomizerMod.Instance.mwConnection.Disconnect();
+                }
+            }
+
             modeBtn.Changed += s => HandleProgressionLock();
 
             presetSkipsBtn.Changed += UpdateSkipsButtons;
@@ -636,6 +649,8 @@ namespace RandomizerMod
             RandoRootsBtn.Changed += PoolSettingChanged;
             RandoCocoonsBtn.Changed += PoolSettingChanged;
             DuplicateBtn.Changed += s => HandleProgressionLock();
+
+            multiworldBtn.Changed += MWChanged;
 
             RandoStartItemsBtn.Changed += (RandoMenuItem<bool> Item) => UpdateStartLocationColor();
             RandoStartItemsBtn.Changed += s => HandleProgressionLock();

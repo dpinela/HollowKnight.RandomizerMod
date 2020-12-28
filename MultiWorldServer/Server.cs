@@ -157,7 +157,7 @@ namespace MultiWorldServer
                     ReadFromClient(client, message);
                 }
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 DisconnectClient(client);
             }
@@ -226,7 +226,7 @@ namespace MultiWorldServer
                 NetworkStream stream = (NetworkStream)c.TcpClient.GetStream();
                 stream.EndWrite(res);
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
             finally
@@ -251,7 +251,7 @@ namespace MultiWorldServer
                 Thread.Sleep(10);
                 client.TcpClient.Close();
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 //Do nothing, we're already disconnecting
             }
@@ -435,15 +435,8 @@ namespace MultiWorldServer
         private void HandleItemSend(Client sender, MWItemSendMessage message)
         {
             //Confirm sending the item to the sender
-            SendMessage(new MWItemSendConfirmMessage {Item = message.Item, To=message.To, Location=message.Location}, sender);
-            lock (sender.Session.PickedUpLocations)
-            {
-                if (!sender.Session.PickedUpLocations.Contains(message.Location))
-                {
-                    sender.Session.PickedUpLocations.Add(message.Location);
-                    SendItemTo(message.To, message.Item, sender.Session.Name);
-                }
-            }
+            SendMessage(new MWItemSendConfirmMessage {Item = message.Item, To=message.To}, sender);
+            SendItemTo(message.To, message.Item, sender.Session.Name);
         }
 
         private void SendItemTo(uint player, string Item, string From)

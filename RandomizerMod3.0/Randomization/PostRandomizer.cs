@@ -9,12 +9,12 @@ namespace RandomizerMod.Randomization
 {
     internal static class PostRandomizer
     {
-        public static void PostRandomizationTasks(ItemManager im, VanillaManager vm, TransitionManager tm, string StartName, List<string> startItems)
+        public static void PostRandomizationTasks(ItemManager im, TransitionManager tm, string StartName, List<string> startItems)
         {
             RemovePlaceholders(im);
-            SaveAllPlacements(im, vm, tm, StartName, startItems);
+            SaveAllPlacements(im, tm, StartName, startItems);
             //No vanilla'd loctions in the spoiler log, please!
-            (int, string, string)[] orderedILPairs = RandomizerMod.Instance.Settings.ItemPlacements.Except(VanillaManager.Instance.ItemPlacements)
+            (int, string, string)[] orderedILPairs = RandomizerMod.Instance.Settings.ItemPlacements.Except(VanillaManager.ItemPlacements)
                 .Select(pair => (pair.Item2.StartsWith("Equip") ? 0 : im.locationOrder[pair.Item2], pair.Item1, pair.Item2)).ToArray();
             if (RandomizerMod.Instance.Settings.CreateSpoilerLog) RandoLogger.LogAllToSpoiler(orderedILPairs, RandomizerMod.Instance.Settings._transitionPlacements.Select(kvp => (kvp.Key, kvp.Value)).ToArray());
         }
@@ -52,7 +52,7 @@ namespace RandomizerMod.Randomization
             }
         }
 
-        private static void SaveAllPlacements(ItemManager im, VanillaManager vm, TransitionManager tm, string StartName, List<String> startItems)
+        private static void SaveAllPlacements(ItemManager im, TransitionManager tm, string StartName, List<String> startItems)
         {
             if (RandomizerMod.Instance.Settings.RandomizeTransitions)
             {
@@ -68,17 +68,17 @@ namespace RandomizerMod.Randomization
             {
                 foreach (string item in kvp.Value)
                 {
-                    if (VanillaManager.Instance.ItemPlacements.Contains((item, kvp.Key))) continue;
+                    if (VanillaManager.ItemPlacements.Contains((item, kvp.Key))) continue;
                     RandomizeShopCost(item);
                 }
             }
 
-            foreach (var (item, shop) in VanillaManager.Instance.ItemPlacements.Where(p => LogicManager.ShopNames.Contains(p.Item2)))
+            foreach (var (item, shop) in VanillaManager.ItemPlacements.Where(p => LogicManager.ShopNames.Contains(p.Item2)))
             {
                 RandomizerMod.Instance.Settings.AddShopCost(item, LogicManager.GetItemDef(item).shopCost);
             }
 
-            foreach ((string, string) pair in GetPlacedItemPairs(im, vm))
+            foreach ((string, string) pair in GetPlacedItemPairs(im))
             {
                 RandomizerMod.Instance.Settings.AddItemPlacement(pair.Item1, pair.Item2);
             }
@@ -136,7 +136,7 @@ namespace RandomizerMod.Randomization
             RandomizerMod.Instance.Settings.AddShopCost(item, cost);
         }
 
-        public static List<(string, string)> GetPlacedItemPairs(ItemManager im, VanillaManager vm)
+        public static List<(string, string)> GetPlacedItemPairs(ItemManager im)
         {
             List<(string, string)> pairs = new List<(string, string)>();
             foreach (KeyValuePair<string, List<string>> kvp in im.shopItems)
@@ -152,7 +152,7 @@ namespace RandomizerMod.Randomization
             }
 
             //Vanilla Item Placements (for RandomizerActions, Hints, Logs, etc)
-            foreach ((string, string) pair in vm.ItemPlacements)
+            foreach ((string, string) pair in VanillaManager.ItemPlacements)
             {
                 pairs.Add((pair.Item1, pair.Item2));
             }
@@ -160,11 +160,11 @@ namespace RandomizerMod.Randomization
             return pairs;
         }
 
-        public static void LogItemPlacements(ItemManager im, VanillaManager vm, ProgressionManager pm)
+        public static void LogItemPlacements(ItemManager im, ProgressionManager pm)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("All Item Placements:");
-            foreach ((string, string) pair in GetPlacedItemPairs(im, vm))
+            foreach ((string, string) pair in GetPlacedItemPairs(im))
             {
                 ReqDef def = LogicManager.GetItemDef(pair.Item1);
                 if (def.progression) sb.AppendLine($"--{pm.CanGet(pair.Item2)} - {pair.Item1} -at- {pair.Item2}");

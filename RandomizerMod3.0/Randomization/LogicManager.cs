@@ -345,7 +345,7 @@ namespace RandomizerMod.Randomization
         }
         public static ReqDef GetItemDef(string name)
         {
-            string newName = Regex.Replace(name, @"_\(\d+\)$", ""); // an item name ending in _(1) is processed as a duplicate
+            string newName = RemovePrefixSuffix(name);
             if (!_items.TryGetValue(newName, out ReqDef def))
             {
                 LogWarn($"Nonexistent item \"{name}\" requested");
@@ -355,14 +355,22 @@ namespace RandomizerMod.Randomization
             return def;
         }
 
-        public static string RemoveDuplicateSuffix(string input)
+        public static string RemovePrefixSuffix(string input)
         {
-            return Regex.Replace(input, @"_\(\d+\)$", "");
+            string rmSuffix = Regex.Replace(input, @"_\(\d+\)$", "");
+            return Regex.Replace(rmSuffix, @"^MW\(\d+=\)_", "");
+        }
+        public static (uint, string) ExtractPlayerID(string input)
+        {
+            Regex prefix = new Regex(@"^MW\((\d+)\)_");
+            if (!prefix.IsMatch(input)) return (0, input);
+            uint id = UInt32.Parse(prefix.Match(input).Groups[1].Value);
+            return (id, prefix.Replace(input, ""));
         }
 
         public static bool TryGetItemDef(string name, out ReqDef def)
         {
-            string newName = Regex.Replace(name, @"_\(\d+\)$", ""); // an item name ending in _(1) is processed as a duplicate
+            string newName = RemovePrefixSuffix(name);
             if (!_items.TryGetValue(newName, out ReqDef def2))
             {
                 def = new ReqDef();
@@ -506,7 +514,7 @@ namespace RandomizerMod.Randomization
 
         public static bool ParseProcessedLogic(string item, int[] obtained)
         {
-            item = Regex.Replace(item, @"_\(\d+\)$", ""); // an item name ending in _(1) is processed as a duplicate
+            item = RemovePrefixSuffix(item);
             List<(int, int)> logic;
             int cost = 0;
 

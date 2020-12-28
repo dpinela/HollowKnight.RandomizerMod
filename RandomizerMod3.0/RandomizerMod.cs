@@ -14,6 +14,7 @@ using UnityEngine.SceneManagement;
 using static RandomizerMod.LogHelper;
 using static RandomizerMod.GiveItemActions;
 using RandomizerMod.SceneChanges;
+using RandomizerMod.MultiWorld;
 using System.Security.Cryptography;
 
 using Object = UnityEngine.Object;
@@ -27,14 +28,22 @@ namespace RandomizerMod
 
         private static Thread _logicParseThread;
 
+        public ClientConnection mwConnection;
+
         public static RandomizerMod Instance { get; private set; }
 
         public SaveSettings Settings { get; set; } = new SaveSettings();
+        public MWSettings MWSettings { get; set; } = new MWSettings();
 
         public override ModSettings SaveSettings
         {
             get => Settings = Settings ?? new SaveSettings();
             set => Settings = value is SaveSettings saveSettings ? saveSettings : Settings;
+        }
+        public override ModSettings GlobalSettings
+        {
+            get => MWSettings = MWSettings ?? new MWSettings();
+            set => MWSettings = value is MWSettings globalSettings ? globalSettings : MWSettings;
         }
 
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloaded)
@@ -102,6 +111,7 @@ namespace RandomizerMod
                 {nameof(PlayerData.gotCharm_24), nameof(PlayerData.fragileGreed_unbreakable)},
                 {nameof(PlayerData.gotCharm_25), nameof(PlayerData.fragileStrength_unbreakable)}
             };
+            mwConnection = new ClientConnection(MWSettings.IP, MWSettings.Port, MWSettings.UserName);
 
             _logicParseThread.Join(); // new update -- logic manager is needed to supply start locations to menu
             MenuChanger.EditUI();
@@ -148,12 +158,12 @@ namespace RandomizerMod
                 _logicParseThread.Join();
             }
 
-            RandoLogger.InitializeTracker();
-            RandoLogger.InitializeSpoiler();
+            RandoLogger.InitializeTracker(Settings);
+            RandoLogger.InitializeSpoiler(Settings);
 
             try
             {
-                Randomizer rando = new Randomizer(Settings);
+                Randomizer rando = new Randomizer();
                 rando.Randomize();
 
                 RandoLogger.UpdateHelperLog();

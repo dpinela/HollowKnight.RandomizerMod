@@ -16,7 +16,6 @@ namespace MultiWorldServer
         public ushort PID;
 
         public readonly List<ResendEntry> MessagesToConfirm = new List<ResendEntry>();
-        public readonly HashSet<string> PickedUpLocations = new HashSet<string>();
 
         public Session(string Name)
         {

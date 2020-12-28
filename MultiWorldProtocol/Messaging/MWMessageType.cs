@@ -18,6 +18,8 @@
         ItemSendMessage,
         ItemSendConfirmMessage,
         NotifyMessage,
-        PingMessage
+        PingMessage,
+        SetupMessage,
+        StartMessage
     }
 }

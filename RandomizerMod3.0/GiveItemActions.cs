@@ -6,6 +6,7 @@ using RandomizerMod.Randomization;
 using static RandomizerMod.RandoLogger;
 using static RandomizerMod.LogHelper;
 using UnityEngine;
+using MultiWorldProtocol.Messaging.Definitions.Messages;
 
 namespace RandomizerMod
 {
@@ -53,7 +54,19 @@ namespace RandomizerMod
             RandomizerMod.Instance.Settings.MarkLocationFound(location);
             UpdateHelperLog();
 
-            item = LogicManager.RemoveDuplicateSuffix(item);
+            item = LogicManager.RemovePrefixSuffix(item);
+
+            if (RandomizerMod.Instance.Settings.IsMW)
+            {
+                uint player;
+                (player, item) = LogicManager.ExtractPlayerID(item);
+
+                if (player > 0 && player != RandomizerMod.Instance.mwConnection.GetPID())
+                {
+                    RandomizerMod.Instance.mwConnection.SendItem(location, item, player);
+                    return;
+                }
+            }
 
             switch (action)
             {

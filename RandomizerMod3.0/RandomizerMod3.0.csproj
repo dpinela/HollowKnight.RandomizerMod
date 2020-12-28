@@ -96,6 +96,7 @@
     <Compile Include="Actions\ChangeShinyIntoLifeblood.cs" />
     <Compile Include="Actions\ChangeShinyIntoSoul.cs" />
     <Compile Include="BenchHandler.cs" />
+    <Compile Include="MultiWorld\MWSettings.cs" />
     <Compile Include="GiveItemActions.cs" />
     <Compile Include="MultiWorld\ClientConnection.cs" />
     <Compile Include="MultiWorld\ConnectionState.cs" />

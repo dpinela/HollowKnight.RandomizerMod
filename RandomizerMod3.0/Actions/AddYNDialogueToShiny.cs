@@ -27,13 +27,14 @@ namespace RandomizerMod.Actions
 
         private readonly int _cost;
         private readonly string _fsmName;
+        private readonly uint _playerId;
         private readonly string _itemName;
         private readonly string _objectName;
 
         private readonly string _sceneName;
         private readonly CostType _type;
 
-        public AddYNDialogueToShiny(string sceneName, string objectName, string fsmName, string itemName, int cost,
+        public AddYNDialogueToShiny(string sceneName, string objectName, string fsmName, uint playerId, string itemName, int cost,
             CostType type)
         {
             if (cost < 0)
@@ -45,6 +46,7 @@ namespace RandomizerMod.Actions
             _sceneName = sceneName;
             _objectName = objectName;
             _fsmName = fsmName;
+            _playerId = playerId;
             _itemName = itemName;
             _cost = cost;
             _type = type;
@@ -111,25 +113,27 @@ namespace RandomizerMod.Actions
             fsm.GetState(yesState).AddAction(new RandomizerCallStaticMethod(GetType(), nameof(CloseYNDialogue)));
 
             charm.AddFirstAction(new RandomizerCallStaticMethod(GetType(), nameof(OpenYNDialogue), fsm.gameObject,
-                _itemName, _cost, _type));
+                _playerId, _itemName, _cost, _type));
         }
 
-        private static void OpenYNDialogue(GameObject shiny, string itemName, int cost, CostType type)
+        private static void OpenYNDialogue(GameObject shiny, uint playerId, string itemName, int cost, CostType type)
         {
             FSMUtility.LocateFSM(GameObject.Find("DialogueManager"), "Box Open YN").SendEvent("BOX UP YN");
             FSMUtility.LocateFSM(GameObject.Find("Text YN"), "Dialogue Page Control").FsmVariables
                 .GetFsmGameObject("Requester").Value = shiny;
-            string UIName;
+            string UIName = LanguageStringManager.GetLanguageString(itemName, "UI");
+            if (playerId > 0 && RandomizerMod.Instance.Settings.IsMW && RandomizerMod.Instance.mwConnection.GetPID() != playerId)
+            {
+                UIName = RandomizerMod.Instance.Settings.GetMWPlayerName(playerId) + "'s " + UIName;
+            }
 
             switch (type)
             {
                 case CostType.Essence:
                     // prevent beginners from being confused by dn-locked dn
-                    UIName = LanguageStringManager.GetLanguageString(itemName, "UI");
                     if (UIName == "Dream Nail") UIName = "Dream Gate";
 
-                    LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE",
-                        cost + " Essence: " + UIName);
+                    LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE", cost + " Essence: " + UIName);
 
                     if (Ref.PD.dreamOrbs < cost)
                     {
@@ -141,7 +145,7 @@ namespace RandomizerMod.Actions
                     break;
 
                 case CostType.Simple:
-                    LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE", cost + " Simple Key: " + LanguageStringManager.GetLanguageString(itemName, "UI"));
+                    LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE", cost + " Simple Key: " + UIName);
 
                     if (PlayerData.instance.simpleKeys < 1 || (PlayerData.instance.simpleKeys < 2 && !PlayerData.instance.openedWaterwaysManhole))
                     {
@@ -152,7 +156,7 @@ namespace RandomizerMod.Actions
                     break;
 
                 case CostType.Grub:
-                    LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE", cost + " Grubs: " + LanguageStringManager.GetLanguageString(itemName, "UI"));
+                    LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE", cost + " Grubs: " + UIName);
 
                     if (PlayerData.instance.grubsCollected < cost)
                     {
@@ -163,7 +167,7 @@ namespace RandomizerMod.Actions
                     break;
 
                 case CostType.Wraiths:
-                    LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE", "Have Howling Wraiths: " + LanguageStringManager.GetLanguageString(itemName, "UI"));
+                    LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE", "Have Howling Wraiths: " + UIName);
 
                     if (PlayerData.instance.screamLevel < 1)
                     {
@@ -174,10 +178,9 @@ namespace RandomizerMod.Actions
                     break;
                 case CostType.Dreamnail:
                     // prevent beginners from being confused by dn-locked dn
-                    UIName = LanguageStringManager.GetLanguageString(itemName, "UI");
                     if (UIName == "Dream Nail") UIName = "Dream Gate";
 
-                    LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE", "Have Dream Nail: " + LanguageStringManager.GetLanguageString(itemName, "UI"));
+                    LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE", "Have Dream Nail: " + UIName);
 
                     if (!PlayerData.instance.hasDreamNail)
                     {
@@ -188,7 +191,6 @@ namespace RandomizerMod.Actions
                     break;
                 case CostType.whisperingRoot:
                     // prevent beginners from being confused by dn-locked dn
-                    UIName = LanguageStringManager.GetLanguageString(itemName, "UI");
                     if (UIName == "Dream Nail") UIName = "Dream Gate";
 
                     LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE", "Complete the trial: " + UIName);
@@ -216,8 +218,7 @@ namespace RandomizerMod.Actions
                     }
                     break;
                 default:
-                    LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE",
-                        LanguageStringManager.GetLanguageString(itemName, "UI"));
+                    LanguageStringManager.SetString("UI", "RANDOMIZER_YN_DIALOGUE", UIName);
                     break;
             }
             FSMUtility.LocateFSM(GameObject.Find("Text YN"), "Dialogue Page Control").FsmVariables

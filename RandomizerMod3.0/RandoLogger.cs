@@ -25,7 +25,7 @@ namespace RandomizerMod
         private static void MakeHelperLists()
         {
             {
-                randomizedLocations = ItemManager.GetRandomizedLocations(RandomizerMod.Instance.Settings);
+                randomizedLocations = ItemManager.GetRandomizedLocations();
                 obtainedLocations = new HashSet<string>(RandomizerMod.Instance.Settings.GetLocationsFound());
                 uncheckedLocations = new HashSet<string>();
                 pm = new ProgressionManager(RandomizerState.Completed, concealRandomItems: true);
@@ -48,7 +48,7 @@ namespace RandomizerMod
                 {
                     if (LogicManager.GetItemDef(item).progression)
                     {
-                        pm.Add(LogicManager.RemoveDuplicateSuffix(item));
+                        pm.Add(LogicManager.RemovePrefixSuffix(item));
                     }
                 }
 
@@ -285,55 +285,55 @@ namespace RandomizerMod
         {
             File.AppendAllText(Path.Combine(Application.persistentDataPath, "RandomizerTrackerLog.txt"), message + Environment.NewLine);
         }
-        public static void InitializeTracker()
+        public static void InitializeTracker(SaveSettings settings)
         {
             File.Create(Path.Combine(Application.persistentDataPath, "RandomizerTrackerLog.txt")).Dispose();
             string log = "Starting tracker log for new randomizer file.";
             void AddToLog(string s) => log += "\n" + s;
             AddToLog("SETTINGS");
-            AddToLog($"Seed: {RandomizerMod.Instance.Settings.Seed}");
+            AddToLog($"Seed: {settings.Seed}");
             AddToLog($"Mode: " + // :)
-                        $"{(RandomizerMod.Instance.Settings.RandomizeRooms ? (RandomizerMod.Instance.Settings.ConnectAreas ? "Connected-Area Room Randomizer" : "Room Randomizer") : (RandomizerMod.Instance.Settings.RandomizeAreas ? "Area Randomizer" : "Item Randomizer"))}");
-            AddToLog($"Cursed: {RandomizerMod.Instance.Settings.Cursed}");
-            AddToLog($"Start location: {RandomizerMod.Instance.Settings.StartName}");
-            AddToLog($"Random start items: {RandomizerMod.Instance.Settings.RandomizeStartItems}");
+                        $"{(settings.RandomizeRooms ? (settings.ConnectAreas ? "Connected-Area Room Randomizer" : "Room Randomizer") : (settings.RandomizeAreas ? "Area Randomizer" : "Item Randomizer"))}");
+            AddToLog($"Cursed: {settings.Cursed}");
+            AddToLog($"Start location: {settings.StartName}");
+            AddToLog($"Random start items: {settings.RandomizeStartItems}");
             AddToLog("REQUIRED SKIPS");
-            AddToLog($"Mild skips: {RandomizerMod.Instance.Settings.MildSkips}");
-            AddToLog($"Shade skips: {RandomizerMod.Instance.Settings.ShadeSkips}");
-            AddToLog($"Fireball skips: {RandomizerMod.Instance.Settings.FireballSkips}");
-            AddToLog($"Acid skips: {RandomizerMod.Instance.Settings.AcidSkips}");
-            AddToLog($"Spike tunnels: {RandomizerMod.Instance.Settings.SpikeTunnels}");
-            AddToLog($"Dark Rooms: {RandomizerMod.Instance.Settings.DarkRooms}");
-            AddToLog($"Spicy skips: {RandomizerMod.Instance.Settings.SpicySkips}");
+            AddToLog($"Mild skips: {settings.MildSkips}");
+            AddToLog($"Shade skips: {settings.ShadeSkips}");
+            AddToLog($"Fireball skips: {settings.FireballSkips}");
+            AddToLog($"Acid skips: {settings.AcidSkips}");
+            AddToLog($"Spike tunnels: {settings.SpikeTunnels}");
+            AddToLog($"Dark Rooms: {settings.DarkRooms}");
+            AddToLog($"Spicy skips: {settings.SpicySkips}");
             AddToLog("RANDOMIZED Pools");
-            AddToLog($"Dreamers: {RandomizerMod.Instance.Settings.RandomizeDreamers}");
-            AddToLog($"Skills: {RandomizerMod.Instance.Settings.RandomizeSkills}");
-            AddToLog($"Charms: {RandomizerMod.Instance.Settings.RandomizeCharms}");
-            AddToLog($"Keys: {RandomizerMod.Instance.Settings.RandomizeKeys}");
-            AddToLog($"Geo chests: {RandomizerMod.Instance.Settings.RandomizeGeoChests}");
-            AddToLog($"Mask shards: {RandomizerMod.Instance.Settings.RandomizeMaskShards}");
-            AddToLog($"Vessel fragments: {RandomizerMod.Instance.Settings.RandomizeVesselFragments}");
-            AddToLog($"Pale ore: {RandomizerMod.Instance.Settings.RandomizePaleOre}");
-            AddToLog($"Charm notches: {RandomizerMod.Instance.Settings.RandomizeCharmNotches}");
-            AddToLog($"Rancid eggs: {RandomizerMod.Instance.Settings.RandomizeRancidEggs}");
-            AddToLog($"Relics: {RandomizerMod.Instance.Settings.RandomizeRelics}");
-            AddToLog($"Stags: {RandomizerMod.Instance.Settings.RandomizeStags}");
-            AddToLog($"Maps: {RandomizerMod.Instance.Settings.RandomizeMaps}");
-            AddToLog($"Grubs: {RandomizerMod.Instance.Settings.RandomizeGrubs}");
-            AddToLog($"Whispering roots: {RandomizerMod.Instance.Settings.RandomizeWhisperingRoots}");
-            AddToLog($"Geo rocks: {RandomizerMod.Instance.Settings.RandomizeRocks}");
-            AddToLog($"Soul totems: {RandomizerMod.Instance.Settings.RandomizeSoulTotems}");
-            AddToLog($"Lore tablets: {RandomizerMod.Instance.Settings.RandomizeLoreTablets}");
-            AddToLog($"Lifeblood cocoons: {RandomizerMod.Instance.Settings.RandomizeLifebloodCocoons}");
-            AddToLog($"Palace totems: {RandomizerMod.Instance.Settings.RandomizePalaceTotems}");
-            AddToLog($"Duplicate major items: {RandomizerMod.Instance.Settings.DuplicateMajorItems}");
+            AddToLog($"Dreamers: {settings.RandomizeDreamers}");
+            AddToLog($"Skills: {settings.RandomizeSkills}");
+            AddToLog($"Charms: {settings.RandomizeCharms}");
+            AddToLog($"Keys: {settings.RandomizeKeys}");
+            AddToLog($"Geo chests: {settings.RandomizeGeoChests}");
+            AddToLog($"Mask shards: {settings.RandomizeMaskShards}");
+            AddToLog($"Vessel fragments: {settings.RandomizeVesselFragments}");
+            AddToLog($"Pale ore: {settings.RandomizePaleOre}");
+            AddToLog($"Charm notches: {settings.RandomizeCharmNotches}");
+            AddToLog($"Rancid eggs: {settings.RandomizeRancidEggs}");
+            AddToLog($"Relics: {settings.RandomizeRelics}");
+            AddToLog($"Stags: {settings.RandomizeStags}");
+            AddToLog($"Maps: {settings.RandomizeMaps}");
+            AddToLog($"Grubs: {settings.RandomizeGrubs}");
+            AddToLog($"Whispering roots: {settings.RandomizeWhisperingRoots}");
+            AddToLog($"Geo rocks: {settings.RandomizeRocks}");
+            AddToLog($"Soul totems: {settings.RandomizeSoulTotems}");
+            AddToLog($"Lore tablets: {settings.RandomizeLoreTablets}");
+            AddToLog($"Lifeblood cocoons: {settings.RandomizeLifebloodCocoons}");
+            AddToLog($"Palace totems: {settings.RandomizePalaceTotems}");
+            AddToLog($"Duplicate major items: {settings.DuplicateMajorItems}");
             AddToLog("QUALITY OF LIFE");
-            AddToLog($"Grubfather: {RandomizerMod.Instance.Settings.Grubfather}");
-            AddToLog($"Salubra: {RandomizerMod.Instance.Settings.CharmNotch}");
-            AddToLog($"Early geo: {RandomizerMod.Instance.Settings.EarlyGeo}");
-            AddToLog($"Extra platforms: {RandomizerMod.Instance.Settings.ExtraPlatforms}");
-            AddToLog($"Levers: {RandomizerMod.Instance.Settings.LeverSkips}");
-            AddToLog($"Jiji: {RandomizerMod.Instance.Settings.Jiji}");
+            AddToLog($"Grubfather: {settings.Grubfather}");
+            AddToLog($"Salubra: {settings.CharmNotch}");
+            AddToLog($"Early geo: {settings.EarlyGeo}");
+            AddToLog($"Extra platforms: {settings.ExtraPlatforms}");
+            AddToLog($"Levers: {settings.LeverSkips}");
+            AddToLog($"Jiji: {settings.Jiji}");
             LogTracker(log);
         }
         public static void LogTransitionToTracker(string entrance, string exit)
@@ -358,7 +358,7 @@ namespace RandomizerMod
             // don't spoil duplicate items!
             if (LogicManager.GetItemDef(item).majorItem && RandomizerMod.Instance.Settings.DuplicateMajorItems)
             {
-                item = LogicManager.RemoveDuplicateSuffix(item) + $"({new System.Random().Next(10)}?)";
+                item = LogicManager.RemovePrefixSuffix(item) + $"({new System.Random().Next(10)}?)";
             }
 
             string message = $"ITEM --- {{{item}}} at {{{location}}}";
@@ -377,10 +377,10 @@ namespace RandomizerMod
             File.AppendAllText(Path.Combine(Application.persistentDataPath, "RandomizerSpoilerLog.txt"), message + Environment.NewLine);
         }
 
-        public static void InitializeSpoiler()
+        public static void InitializeSpoiler(SaveSettings settings)
         {
             File.Create(Path.Combine(Application.persistentDataPath, "RandomizerSpoilerLog.txt")).Dispose();
-            LogSpoiler("Randomization completed with seed: " + RandomizerMod.Instance.Settings.Seed);
+            LogSpoiler("Randomization completed with seed: " + settings.Seed);
         }
 
         public static void LogTransitionToSpoiler(string entrance, string exit)

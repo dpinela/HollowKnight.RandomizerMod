@@ -10,9 +10,9 @@ namespace RandomizerMod.Randomization
     public class ProgressionManager
     {
         public int[] obtained;
-        
-        private ItemManager im;
-        private TransitionManager tm;
+
+        private ItemManager shareIm;
+        private TransitionManager shareTm;
 
         private Dictionary<string, int> grubLocations;
         private Dictionary<string, int> essenceLocations;
@@ -20,20 +20,18 @@ namespace RandomizerMod.Randomization
         private bool share = true;
         public HashSet<string> tempItems;
 
-        public ProgressionManager(RandomizerState state, ItemManager im = null, TransitionManager tm = null, int[] progression = null, bool addSettings = true, bool concealRandomItems = false)
+        public ProgressionManager(RandomizerState state, ItemManager im = null, TransitionManager tm = null, int[] progression = null, bool concealRandomItems = false)
         {
-            this.im = im;
-            this.tm = tm;
-
-            if (im == null) share = false;
+            shareIm = im;
+            shareTm = tm;
 
             obtained = new int[LogicManager.bitMaskMax + 1];
             if (progression != null) progression.CopyTo(obtained, 0);
 
-            FetchEssenceLocations(state, concealRandomItems);
-            FetchGrubLocations(state);
+            FetchEssenceLocations(state, concealRandomItems, im);
+            FetchGrubLocations(state, im);
 
-            if (addSettings) ApplyDifficultySettings();
+            ApplyDifficultySettings();
             RecalculateEssence();
             RecalculateGrubs();
         }
@@ -45,7 +43,7 @@ namespace RandomizerMod.Randomization
 
         public void Add(string item)
         {
-            item = LogicManager.RemoveDuplicateSuffix(item);
+            item = LogicManager.RemovePrefixSuffix(item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
                 RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
@@ -67,7 +65,7 @@ namespace RandomizerMod.Randomization
 
         public void Add(IEnumerable<string> items)
         {
-            foreach (string item in items.Select(i => LogicManager.RemoveDuplicateSuffix(i)))
+            foreach (string item in items.Select(i => LogicManager.RemovePrefixSuffix(i)))
             {
                 if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
                 {
@@ -101,14 +99,14 @@ namespace RandomizerMod.Randomization
 
         private void Share(string item)
         {
-            if (im != null && im.recentProgression != null)
+            if (shareIm != null && shareIm.recentProgression != null)
             {
-                im.recentProgression.Add(item);
+                shareIm.recentProgression.Add(item);
             }
 
-            if (tm != null && tm.recentProgression != null)
+            if (shareTm != null && shareTm.recentProgression != null)
             {
-                tm.recentProgression.Add(item);
+                shareTm.recentProgression.Add(item);
             }
         }
 
@@ -119,7 +117,7 @@ namespace RandomizerMod.Randomization
 
         public void Remove(string item)
         {
-            item = LogicManager.RemoveDuplicateSuffix(item);
+            item = LogicManager.RemovePrefixSuffix(item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
                 RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
@@ -143,20 +141,13 @@ namespace RandomizerMod.Randomization
         public void SaveTempItems()
         {
             temp = false;
-            if (share)
-            {
-                foreach (string item in tempItems)
-                {
-                    Share(item);
-                }
-            }
             
             tempItems = new HashSet<string>();
         }
 
         public bool Has(string item)
         {
-            item = LogicManager.RemoveDuplicateSuffix(item);
+            item = LogicManager.RemovePrefixSuffix(item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
                 RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
@@ -196,7 +187,7 @@ namespace RandomizerMod.Randomization
             share = tempshare;
         }
 
-        private void FetchGrubLocations(RandomizerState state)
+        private void FetchGrubLocations(RandomizerState state, ItemManager im = null)
         {
             switch (state)
             {
@@ -234,7 +225,7 @@ namespace RandomizerMod.Randomization
             }
         }
 
-        private void FetchEssenceLocations(RandomizerState state, bool concealRandomItems)
+        private void FetchEssenceLocations(RandomizerState state, bool concealRandomItems, ItemManager im = null)
         {
             essenceLocations = LogicManager.GetItemsByPool("Essence_Boss")
                 .ToDictionary(item => item, item => LogicManager.GetItemDef(item).geo);
@@ -250,7 +241,8 @@ namespace RandomizerMod.Randomization
                 case RandomizerState.InProgress when RandomizerMod.Instance.Settings.RandomizeWhisperingRoots:
                 case RandomizerState.Completed when RandomizerMod.Instance.Settings.RandomizeWhisperingRoots && concealRandomItems:
                     break;
-                case RandomizerState.Validating when RandomizerMod.Instance.Settings.RandomizeWhisperingRoots:
+                case RandomizerState.Validating when RandomizerMod.Instance.Settings.RandomizeWhisperingRoots && im != null:
+                    Log(im);
                     foreach (var kvp in im.nonShopItems)
                     {
                         if (LogicManager.GetItemDef(kvp.Value).pool == "Root")

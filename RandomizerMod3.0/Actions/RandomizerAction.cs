@@ -40,8 +40,12 @@ namespace RandomizerMod.Actions
             string[] shopNames = LogicManager.ShopNames;
 
             // Loop non-shop items
-            foreach ((string newItemName, string location) in items.Where(item => !shopNames.Contains(item.Item2)))
+            foreach ((string newItemNameId, string location) in items.Where(item => !shopNames.Contains(item.Item2)))
             {
+                uint playerId;
+                string newItemName;
+                (playerId, newItemName) = LogicManager.ExtractPlayerID(newItemNameId);
+
                 ReqDef oldItem = LogicManager.GetItemDef(location);
                 ReqDef newItem = LogicManager.GetItemDef(newItemName);
 
@@ -203,6 +207,7 @@ namespace RandomizerMod.Actions
                         oldItem.sceneName,
                         oldItem.objectName,
                         oldItem.fsmName,
+                        playerId,
                         newItem.nameKey,
                         cost,
                         oldItem.costType));
@@ -277,7 +282,7 @@ namespace RandomizerMod.Actions
 
         private static BigItemDef[] GetBigItemDefArray(string itemName)
         {
-            itemName = LogicManager.RemoveDuplicateSuffix(itemName);
+            itemName = LogicManager.RemovePrefixSuffix(itemName);
             string prefix = GetAdditivePrefix(itemName);
             if (prefix != null)
             {

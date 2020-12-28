@@ -23,6 +23,7 @@ namespace RandomizerMod
         private SerializableIntDictionary _variableCosts = new SerializableIntDictionary();
         private SerializableIntDictionary _shopCosts = new SerializableIntDictionary();
         private SerializableIntDictionary _additiveCounts = new SerializableIntDictionary();
+        private SerializableDictionary<uint, string> _mwPlayerNames = new SerializableDictionary<uint, string>();
 
         private SerializableBoolDictionary _obtainedItems = new SerializableBoolDictionary();
         private SerializableBoolDictionary _obtainedLocations = new SerializableBoolDictionary();
@@ -38,7 +39,7 @@ namespace RandomizerMod
 
         public bool RandomizeTransitions => RandomizeAreas || RandomizeRooms;
 
-        public bool IsMW => MWPlayers > 1;
+        public bool IsMW => MWNumPlayers > 1;
 
         public bool FreeLantern => !(DarkRooms || RandomizeKeys);
         public SaveSettings()
@@ -49,12 +50,11 @@ namespace RandomizerMod
             };
         }
 
-        public int MWPlayers
+        public int MWNumPlayers
         {
             get => GetInt(1);
             set => SetInt(value);
         }
-
         public int JijiHintCounter
         {
             get => GetInt(0);
@@ -564,6 +564,13 @@ namespace RandomizerMod
                 _additiveCounts.Add(additiveSet[0], 0);
             }
             _additiveCounts[additiveSet[0]]++;
+        }
+
+        public string GetMWPlayerName(uint playerId)
+        {
+            string name = "Player " + playerId;
+            _mwPlayerNames.TryGetValue(playerId, out name);
+            return name;
         }
     }
 }

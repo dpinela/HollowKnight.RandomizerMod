@@ -25,8 +25,11 @@ namespace RandomizerMod.MultiWorld
 
         public delegate void MessageReceiveEvent(string from, string message);
 
+        public delegate void JoinEvent(uint players);
+
         public event ItemReceiveEvent ItemReceived;
         public event MessageReceiveEvent MessageReceived;
+        public event JoinEvent JoinedMW;
 
         private List<MWMessage> messageEventQueue = new List<MWMessage>();
 
@@ -90,7 +93,7 @@ namespace RandomizerMod.MultiWorld
             Log("Connected to server!");
         }
 
-        private void Disconnect()
+        public void Disconnect()
         {
             Log("Disconnecting from server");
             PingTimer?.Dispose();
@@ -308,7 +311,7 @@ namespace RandomizerMod.MultiWorld
                 //MultiWorldMod.Instance.Config.Token = message.Token;
                 State.Joined = true;
                 Log("Joined");
-                //State.GameInfo = new GameInformation(message.PlayerId);
+                State.PlayerId = message.PlayerId;
             }
             else
             {
@@ -316,7 +319,6 @@ namespace RandomizerMod.MultiWorld
                 //RandomizerMod.Instance.Settings.Token = message.Token;
                 State.Joined = true;
                 Log("Rejoined");
-                SendMessage(new MWItemConfigurationRequestMessage());
             }
         }
 
@@ -370,7 +372,7 @@ namespace RandomizerMod.MultiWorld
 
         public void SendItem(string loc, string item, uint playerId)
         {
-            ItemSendQueue.Add(new MWItemSendMessage { Location = loc, Item = item, To = playerId });
+            ItemSendQueue.Add(new MWItemSendMessage { Item = item, To = playerId });
         }
 
         public bool GetItemAtLocation(string loc, out string item)
@@ -438,8 +440,7 @@ namespace RandomizerMod.MultiWorld
 
         public uint GetPID()
         {
-            //return State.GameInfo.PlayerID;
-            return 0;
+            return State.PlayerId;
         }
 
         public string GetUserName()

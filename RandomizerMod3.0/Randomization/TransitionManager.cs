@@ -9,7 +9,6 @@ namespace RandomizerMod.Randomization
     public class TransitionManager
     {
         public DirectedTransitions dt;
-        public ProgressionManager pm;
 
         public Dictionary<string, string> transitionPlacements;
         public HashSet<string> recentProgression; // accessed by the progression manager whenever Add is called
@@ -26,13 +25,10 @@ namespace RandomizerMod.Randomization
 
         private Random rand;
 
-        public TransitionManager(Random rnd, SaveSettings settings)
+        public TransitionManager(Random rnd)
         {
             rand = rnd;
             dt = new DirectedTransitions(rnd);
-            pm = new ProgressionManager(
-                RandomizerState.InProgress
-                );
             // start items added to pm in Connect Start to Graph in Randomizer
 
             transitionPlacements = new Dictionary<string, string>();
@@ -49,7 +45,7 @@ namespace RandomizerMod.Randomization
             standbyTransitions = new Dictionary<string, string>();
             reachableTransitions = new HashSet<string>();
             recentProgression = new HashSet<string>();
-            vanillaProgression = VanillaManager.GetVanillaProgression(settings);
+            vanillaProgression = VanillaManager.GetVanillaProgression();
             checkProgression = new HashSet<string>();
 
             dt.Add(unplacedTransitions);
@@ -59,10 +55,8 @@ namespace RandomizerMod.Randomization
         {
             reachableTransitions = new HashSet<string>();
         }
-        public void UpdateReachableTransitions(string newThing, bool item = false, ProgressionManager _pm = null)
+        public void UpdateReachableTransitions(ProgressionManager pm, string newThing, bool item = false)
         {
-            if (_pm != null) pm = _pm;
-
             Queue<string> updates = new Queue<string>();
 
             if (!item) reachableTransitions.Add(newThing);
@@ -127,10 +121,8 @@ namespace RandomizerMod.Randomization
             }
         }
 
-        private HashSet<string> FakeUpdateReachableTransitions(string newThing, ProgressionManager _pm = null)
+        private HashSet<string> FakeUpdateReachableTransitions(string newThing, ProgressionManager pm)
         {
-            if (_pm != null) pm = _pm;
-
             Queue<string> updates = new Queue<string>();
             HashSet<string> reachable = new HashSet<string>(reachableTransitions);
 
@@ -230,7 +222,7 @@ namespace RandomizerMod.Randomization
             return reachableTransitions.FirstOrDefault(t => _dt.Test(t) && unplacedTransitions.Contains(t));
         }
 
-        public string ForceTransition(DirectedTransitions _dt = null)
+        public string ForceTransition(ProgressionManager pm, DirectedTransitions _dt = null)
         {
             if (_dt == null) _dt = dt;
 
@@ -240,7 +232,7 @@ namespace RandomizerMod.Randomization
             candidateTransitions = candidateTransitions.Except(reachableTransitions).Where(transition => _dt.Test(transition)).ToList();
             bool Test(string transition)
             {
-                HashSet<string> tempProgression = FakeUpdateReachableTransitions(transition);
+                HashSet<string> tempProgression = FakeUpdateReachableTransitions(transition, pm);
                 tempProgression.Remove(transition);
                 tempProgression.IntersectWith(candidateTransitions);
                 return tempProgression.Any();
@@ -248,17 +240,20 @@ namespace RandomizerMod.Randomization
             return candidateTransitions.FirstOrDefault(t => Test(t));
         }
 
-        public void PlaceTransitionPair(string transition1, string transition2)
+        public void PlaceTransitionPair(string transition1, string transition2, ProgressionManager pm = null)
         {
             transitionPlacements.Add(transition1, transition2);
             transitionPlacements.Add(transition2, transition1);
             unplacedTransitions.Remove(transition1);
             unplacedTransitions.Remove(transition2);
             dt.Remove(transition1, transition2);
-            pm.Add(transition1);
-            pm.Add(transition2);
-            UpdateReachableTransitions(transition1);
-            UpdateReachableTransitions(transition2);
+            if (pm != null)
+            {
+                pm.Add(transition1);
+                pm.Add(transition2);
+                UpdateReachableTransitions(pm, transition1);
+                UpdateReachableTransitions(pm, transition2);
+            }
             UpdateTransitionStandby(transition1, transition2);
         }
 
@@ -279,7 +274,7 @@ namespace RandomizerMod.Randomization
             dt.Remove(transition1, transition2);
         }
 
-        public void UnloadReachableStandby()
+        public void UnloadReachableStandby(ProgressionManager pm)
         {
             Queue<(string, string)> placePairs = new Queue<(string, string)>();
             foreach (string transition1 in reachableTransitions)
@@ -292,7 +287,7 @@ namespace RandomizerMod.Randomization
             while (placePairs.Any())
             {
                 (string, string) pair = placePairs.Dequeue();
-                PlaceTransitionPair(pair.Item1, pair.Item2);
+                PlaceTransitionPair(pair.Item1, pair.Item2, pm);
             }
         }
 

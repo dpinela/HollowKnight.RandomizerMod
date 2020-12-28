@@ -10,6 +10,7 @@ namespace RandomizerMod.MultiWorld
         public string Token;
         public ulong Uid;
         public string UserName;
+        public uint PlayerId;
 
         //public GameInformation GameInfo = null;
 
