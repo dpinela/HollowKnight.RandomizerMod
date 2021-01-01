@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using static RandomizerMod.Randomization.PreRandomizer;
-using static RandomizerMod.Randomization.PostRandomizer;
-using RandomizerMod.Actions;
-using static RandomizerMod.LogHelper;
+using static RandomizerLib.PreRandomizer;
+using static RandomizerLib.Logging.LogHelper;
 
-namespace RandomizerMod.Randomization.MultiWorld
+namespace RandomizerLib.MultiWorld
 {
     public class MWRandomizer
     {
@@ -85,6 +83,21 @@ namespace RandomizerMod.Randomization.MultiWorld
         private void MWRandomizeItems()
         {
             im = new MWItemManager(players, transitionPlacements, rand, settings, startItems, startProgression, modifiedCosts);
+
+            while (im.anyItems && im.anyLocations)
+            {
+                im.PlaceItem(im.NextItem(), im.NextLocation());
+            }
+
+            if (im.anyLocations) throw new RandomizationError();
+
+            while (im.anyItems)
+            {
+                im.PlaceItem(im.NextItem(), new List<MWItem>(im.shopItems.Keys)[rand.Next(im.shopItems.Keys.Count)]);
+            }
+
+            Log(im.nonShopItems);
+            Log(im.shopItems);
         }
     }
 }

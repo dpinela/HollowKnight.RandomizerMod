@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Diagnostics;
-using System.Security.Policy;
-using static RandomizerMod.LogHelper;
-using RandomizerMod.Randomization.MultiWorld;
+using static RandomizerLib.Logging.LogHelper;
 
-namespace RandomizerMod.Randomization.MultiWorld
+namespace RandomizerLib.MultiWorld
 {
     public class MWItemManager
     {
@@ -310,10 +306,10 @@ namespace RandomizerMod.Randomization.MultiWorld
                 MWItem item = updateQueue.Dequeue();
                 int id = item.playerId;
 
-                potentialLocations = LogicManager.GetLocationsByProgression(recentProgression[id]);
+                potentialLocations = LogicManager.GetLocationsByProgression(recentProgression[id], settings[id]);
                 if (settings[id].RandomizeTransitions)
                 {
-                    potentialTransitions = LogicManager.GetTransitionsByProgression(recentProgression[id]);
+                    potentialTransitions = LogicManager.GetTransitionsByProgression(recentProgression[id], settings[id]);
                 }
                 recentProgression[id] = new HashSet<string>();
 

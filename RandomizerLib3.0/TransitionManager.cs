@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static RandomizerMod.LogHelper;
+using static RandomizerLib.Logging.LogHelper;
 
-namespace RandomizerMod.Randomization
+namespace RandomizerLib
 {
     public class TransitionManager
     {
@@ -24,16 +24,18 @@ namespace RandomizerMod.Randomization
         public int placeableCount => placeableTransitions.Count;
 
         private Random rand;
+        private RandoSettings settings;
 
-        public TransitionManager(Random rnd, RandoSettings settings)
+        public TransitionManager(Random rand, RandoSettings settings)
         {
-            rand = rnd;
-            dt = new DirectedTransitions(rnd);
+            this.rand = rand;
+            this.settings = settings;
+            dt = new DirectedTransitions(rand, settings);
             // start items added to pm in Connect Start to Graph in Randomizer
 
             transitionPlacements = new Dictionary<string, string>();
 
-            List<string> iterate = LogicManager.TransitionNames().ToList();
+            List<string> iterate = LogicManager.TransitionNames(settings).ToList();
             unplacedTransitions = new List<string>();
             while (iterate.Any())
             {
@@ -73,10 +75,10 @@ namespace RandomizerMod.Randomization
                     updates.Enqueue(next2);
                 }
 
-                HashSet<string> potentialTransitions = LogicManager.GetTransitionsByProgression(recentProgression);
+                HashSet<string> potentialTransitions = LogicManager.GetTransitionsByProgression(recentProgression, settings);
 
                 // update possible vanilla locations
-                HashSet<string> potentialLocations = LogicManager.GetLocationsByProgression(recentProgression);
+                HashSet<string> potentialLocations = LogicManager.GetLocationsByProgression(recentProgression, settings);
                 potentialLocations.IntersectWith(vanillaProgression);
                 if (potentialLocations.Any())
                 {
@@ -133,7 +135,7 @@ namespace RandomizerMod.Randomization
             while (updates.Any())
             {
                 string next = updates.Dequeue();
-                foreach (string transition in LogicManager.GetTransitionsByProgression(recentProgression))
+                foreach (string transition in LogicManager.GetTransitionsByProgression(recentProgression, settings))
                 {
                     if (!reachable.Contains(transition) && pm.CanGet(transition))
                     {
@@ -150,7 +152,7 @@ namespace RandomizerMod.Randomization
                 }
                 if (!updates.Any()) // check vanilla items last, because these almost never change
                 {
-                    foreach (string loc in LogicManager.GetLocationsByProgression(recentProgression))
+                    foreach (string loc in LogicManager.GetLocationsByProgression(recentProgression, settings))
                     {
                         if (!vanillaProgression.Contains(loc) && !checkProgression.Contains(loc)) continue;
                         if (!pm.Has(loc) && pm.CanGet(loc))
@@ -180,7 +182,7 @@ namespace RandomizerMod.Randomization
 
             if (T1InStandby || T2InStandby)
             {
-                DirectedTransitions dt = new DirectedTransitions(rand);
+                DirectedTransitions dt = new DirectedTransitions(rand, settings);
                 dt.Add(unplacedTransitions);
                 if (T1InStandby && dt.GetNextTransition(oldTransition2) is string newTransition1)
                 {

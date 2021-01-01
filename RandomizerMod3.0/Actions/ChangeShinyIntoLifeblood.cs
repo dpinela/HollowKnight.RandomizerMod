@@ -1,8 +1,10 @@
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.FsmStateActions;
 using SeanprCore;
 using UnityEngine;
+
+using RandomizerLib;
 
 namespace RandomizerMod.Actions
 {
@@ -56,7 +58,7 @@ namespace RandomizerMod.Actions
             getCharm.RemoveActionsOfType<IncrementPlayerDataInt>();
             getCharm.RemoveActionsOfType<SendMessage>();
 
-            getCharm.AddAction(new RandomizerExecuteLambda(() => GiveItemActions.GiveItem(GiveItemActions.GiveAction.None, _item, _location)));
+            getCharm.AddAction(new RandomizerExecuteLambda(() => GiveItemActions.GiveItem(GiveAction.None, _item, _location)));
             getCharm.AddAction(new RandomizerAddLifeblood(_masksAmount));
 
             getCharm.ClearTransitions();

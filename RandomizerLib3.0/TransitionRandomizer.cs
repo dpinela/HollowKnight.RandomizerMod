@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using static RandomizerMod.LogHelper;
-using static RandomizerMod.Randomization.SpanningTree;
+using static RandomizerLib.Logging.LogHelper;
+using static RandomizerLib.SpanningTree;
 
-namespace RandomizerMod.Randomization
+namespace RandomizerLib
 {
     internal static class TransitionRandomizer
     {
@@ -29,11 +29,11 @@ namespace RandomizerMod.Randomization
 
                 try
                 {
-                    PlaceOneWayTransitions(tm, rand);
+                    PlaceOneWayTransitions(tm, rand, settings);
 
-                    if (settings.RandomizeAreas) BuildAreaSpanningTree(tm, rand, startTransition);
-                    else if (settings.RandomizeRooms && settings.ConnectAreas) BuildCARSpanningTree(tm, rand, startTransition);
-                    else if (settings.RandomizeRooms && !settings.ConnectAreas) BuildRoomSpanningTree(tm, rand, startTransition);
+                    if (settings.RandomizeAreas) BuildAreaSpanningTree(tm, rand, settings, startTransition);
+                    else if (settings.RandomizeRooms && settings.ConnectAreas) BuildCARSpanningTree(tm, rand, settings, startTransition);
+                    else if (settings.RandomizeRooms && !settings.ConnectAreas) BuildRoomSpanningTree(tm, rand, settings, startTransition);
                     else
                     {
                         LogError("Ambiguous settings passed to transition randomizer.");
@@ -50,7 +50,7 @@ namespace RandomizerMod.Randomization
                     tm.ResetReachableTransitions();
 
                     ConnectStartToGraph(settings, tm, im, rand, startTransition);
-                    CompleteTransitionGraph(tm, im, startTransition);
+                    CompleteTransitionGraph(tm, im, settings, startTransition);
                 }
                 catch (RandomizationError)
                 {
@@ -58,19 +58,19 @@ namespace RandomizerMod.Randomization
                     continue;
                 }
 
-                if (ValidateTransitionRandomization(tm, startProgression, startTransition)) break;
+                if (ValidateTransitionRandomization(tm, settings, startProgression, startTransition)) break;
             }
             watch.Stop();
-            RandomizerMod.Instance.Log("Transition randomization finished in " + watch.Elapsed.TotalSeconds + " seconds.");
+            Log("Transition randomization finished in " + watch.Elapsed.TotalSeconds + " seconds.");
 
             return tm;
         }
 
-        private static void PlaceOneWayTransitions(TransitionManager tm, Random rand)
+        private static void PlaceOneWayTransitions(TransitionManager tm, Random rand, RandoSettings settings)
         {
-            List<string> oneWayEntrances = LogicManager.TransitionNames().Where(transition => LogicManager.GetTransitionDef(transition).oneWay == 1).ToList();
-            List<string> oneWayExits = LogicManager.TransitionNames().Where(transition => LogicManager.GetTransitionDef(transition).oneWay == 2).ToList();
-            List<string> horizontalOneWays = oneWayEntrances.Where(t => !LogicManager.GetTransitionDef(t).doorName.StartsWith("b")).ToList();
+            List<string> oneWayEntrances = LogicManager.TransitionNames(settings).Where(transition => LogicManager.GetTransitionDef(transition, settings).oneWay == 1).ToList();
+            List<string> oneWayExits = LogicManager.TransitionNames(settings).Where(transition => LogicManager.GetTransitionDef(transition, settings).oneWay == 2).ToList();
+            List<string> horizontalOneWays = oneWayEntrances.Where(t => !LogicManager.GetTransitionDef(t, settings).doorName.StartsWith("b")).ToList();
 
             while (horizontalOneWays.Any())
             {
@@ -83,7 +83,7 @@ namespace RandomizerMod.Randomization
                 oneWayExits.Remove(downExit);
             }
 
-            DirectedTransitions directed = new DirectedTransitions(rand);
+            DirectedTransitions directed = new DirectedTransitions(rand, settings);
             directed.Add(oneWayExits);
             while (oneWayEntrances.Any())
             {
@@ -99,9 +99,9 @@ namespace RandomizerMod.Randomization
 
         private static void PlaceIsolatedTransitions(RandoSettings settings, TransitionManager tm, Random rand, string startTransition)
         {
-            List<string> isolatedTransitions = tm.unplacedTransitions.Where(transition => LogicManager.GetTransitionDef(transition).isolated).ToList();
-            List<string> nonisolatedTransitions = tm.unplacedTransitions.Where(transition => !LogicManager.GetTransitionDef(transition).isolated).ToList();
-            DirectedTransitions directed = new DirectedTransitions(rand);
+            List<string> isolatedTransitions = tm.unplacedTransitions.Where(transition => LogicManager.GetTransitionDef(transition, settings).isolated).ToList();
+            List<string> nonisolatedTransitions = tm.unplacedTransitions.Where(transition => !LogicManager.GetTransitionDef(transition, settings).isolated).ToList();
+            DirectedTransitions directed = new DirectedTransitions(rand, settings);
             isolatedTransitions.Remove(startTransition);
             nonisolatedTransitions.Remove(startTransition);
             directed.Add(nonisolatedTransitions);
@@ -127,7 +127,7 @@ namespace RandomizerMod.Randomization
             Log("Attaching start to graph...");
 
             {   // keeping local variables out of the way
-                DirectedTransitions d = new DirectedTransitions(rand);
+                DirectedTransitions d = new DirectedTransitions(rand, settings);
                 d.Add(startTransition);
                 string transition2 = tm.ForceTransition(im.pm, d);
                 if (transition2 is null) // this should happen extremely rarely, but it has to be handled
@@ -161,7 +161,7 @@ namespace RandomizerMod.Randomization
                     throw new RandomizationError();
                 }
 
-                DirectedTransitions directed = new DirectedTransitions(rand);
+                DirectedTransitions directed = new DirectedTransitions(rand, settings);
                 directed.Add(placeableTransitions);
 
                 if (tm.ForceTransition(im.pm, directed) is string transition1)
@@ -176,7 +176,7 @@ namespace RandomizerMod.Randomization
                 }
             }
         }
-        private static void CompleteTransitionGraph(TransitionManager tm, ItemManager im, string startTransition)
+        private static void CompleteTransitionGraph(TransitionManager tm, ItemManager im, RandoSettings settings, string startTransition)
         {
             int failsafe = 0;
             Log("Beginning full placement of transitions...");
@@ -256,14 +256,15 @@ namespace RandomizerMod.Randomization
             }
             Log("Placing last reserved transitions...");
             tm.UnloadStandby();
-            Log("All transitions placed? " + (tm.transitionPlacements.Count == LogicManager.TransitionNames().Count(t => LogicManager.GetTransitionDef(t).oneWay != 2)));
+            Log("All transitions placed? " + (tm.transitionPlacements.Count == LogicManager.TransitionNames(settings).Count(t => LogicManager.GetTransitionDef(t, settings).oneWay != 2)));
         }
 
-        private static bool ValidateTransitionRandomization(TransitionManager tm, List<string> startProgression, string startTransition)
+        private static bool ValidateTransitionRandomization(TransitionManager tm, RandoSettings settings, List<string> startProgression, string startTransition)
         {
             Log("Beginning transition placement validation...");
 
             ProgressionManager pm = new ProgressionManager(
+                settings,
                 RandomizerState.Validating,
                 null,
                 tm
@@ -274,12 +275,12 @@ namespace RandomizerMod.Randomization
             tm.ResetReachableTransitions();
             tm.UpdateReachableTransitions(pm, startTransition);
 
-            bool validated = tm.reachableTransitions.SetEquals(LogicManager.TransitionNames());
+            bool validated = tm.reachableTransitions.SetEquals(LogicManager.TransitionNames(settings));
 
             if (!validated)
             {
                 Log("Transition placements failed to validate!");
-                foreach (string t in LogicManager.TransitionNames().Except(tm.reachableTransitions)) Log(t);
+                foreach (string t in LogicManager.TransitionNames(settings).Except(tm.reachableTransitions)) Log(t);
             }
             else Log("Validation successful.");
             return validated;

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
-using static RandomizerMod.LogHelper;
+using static RandomizerLib.Logging.LogHelper;
 
-namespace RandomizerMod.Randomization
+namespace RandomizerLib
 {
     public class ProgressionManager : IProgressionManager
     {
@@ -21,8 +21,11 @@ namespace RandomizerMod.Randomization
         private bool share = true;
         public HashSet<string> tempItems;
 
-        public ProgressionManager(RandomizerState state, ItemManager im = null, TransitionManager tm = null, int[] progression = null, bool concealRandomItems = false, Dictionary<string, int> modifiedCosts = null)
+        private RandoSettings settings;
+
+        public ProgressionManager(RandoSettings settings, RandomizerState state, ItemManager im = null, TransitionManager tm = null, int[] progression = null, bool concealRandomItems = false, Dictionary<string, int> modifiedCosts = null)
         {
+            this.settings = settings;
             shareIm = im;
             shareTm = tm;
 
@@ -41,7 +44,7 @@ namespace RandomizerMod.Randomization
 
         public bool CanGet(string item)
         {
-            return LogicManager.ParseProcessedLogic(item, obtained, modifiedCosts);
+            return LogicManager.ParseProcessedLogic(item, obtained, settings, modifiedCosts);
         }
 
         public void Add(string item)
@@ -49,7 +52,7 @@ namespace RandomizerMod.Randomization
             item = LogicManager.RemovePrefixSuffix(item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
-                RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
+                LogWarn("Could not find progression value corresponding to: " + item);
                 return;
             }
             obtained[a.Item2] |= a.Item1;
@@ -72,7 +75,7 @@ namespace RandomizerMod.Randomization
             {
                 if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
                 {
-                    RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
+                    LogWarn("Could not find progression value corresponding to: " + item);
                     return;
                 }
                 obtained[a.Item2] |= a.Item1;
@@ -123,7 +126,7 @@ namespace RandomizerMod.Randomization
             item = LogicManager.RemovePrefixSuffix(item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
-                RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
+                LogWarn("Could not find progression value corresponding to: " + item);
                 return;
             }
             obtained[a.Item2] &= ~a.Item1;
@@ -153,7 +156,7 @@ namespace RandomizerMod.Randomization
             item = LogicManager.RemovePrefixSuffix(item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
-                RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
+                LogWarn("Could not find progression value corresponding to: " + item);
                 return false;
             }
             return (obtained[a.Item2] & a.Item1) == a.Item1;
@@ -161,7 +164,7 @@ namespace RandomizerMod.Randomization
 
         public void UpdateWaypoints()
         {
-            if (RandomizerMod.Instance.Settings.RandomizeRooms) return;
+            if (settings.RandomizeRooms) return;
 
             foreach(string waypoint in LogicManager.Waypoints)
             {
@@ -177,15 +180,15 @@ namespace RandomizerMod.Randomization
             bool tempshare = share;
             share = false;
 
-            if (RandomizerMod.Instance.Settings.ShadeSkips) Add("SHADESKIPS");
-            if (RandomizerMod.Instance.Settings.AcidSkips) Add("ACIDSKIPS");
-            if (RandomizerMod.Instance.Settings.SpikeTunnels) Add("SPIKETUNNELS");
-            if (RandomizerMod.Instance.Settings.SpicySkips) Add("SPICYSKIPS");
-            if (RandomizerMod.Instance.Settings.FireballSkips) Add("FIREBALLSKIPS");
-            if (RandomizerMod.Instance.Settings.DarkRooms) Add("DARKROOMS");
-            if (RandomizerMod.Instance.Settings.MildSkips) Add("MILDSKIPS");
-            if (!RandomizerMod.Instance.Settings.Cursed) Add("NOTCURSED");
-            if (RandomizerMod.Instance.Settings.Cursed) Add("CURSED");
+            if (settings.ShadeSkips) Add("SHADESKIPS");
+            if (settings.AcidSkips) Add("ACIDSKIPS");
+            if (settings.SpikeTunnels) Add("SPIKETUNNELS");
+            if (settings.SpicySkips) Add("SPICYSKIPS");
+            if (settings.FireballSkips) Add("FIREBALLSKIPS");
+            if (settings.DarkRooms) Add("DARKROOMS");
+            if (settings.MildSkips) Add("MILDSKIPS");
+            if (!settings.Cursed) Add("NOTCURSED");
+            if (settings.Cursed) Add("CURSED");
 
             share = tempshare;
         }
@@ -198,11 +201,11 @@ namespace RandomizerMod.Randomization
                     grubLocations = LogicManager.GetItemsByPool("Grub").ToDictionary(grub => grub, grub => 1);
                     break;
 
-                case RandomizerState.InProgress when RandomizerMod.Instance.Settings.RandomizeGrubs:
+                case RandomizerState.InProgress when settings.RandomizeGrubs:
                     grubLocations = new Dictionary<string, int>();
                     break;
 
-                case RandomizerState.Validating when RandomizerMod.Instance.Settings.RandomizeGrubs && im != null:
+                case RandomizerState.Validating when settings.RandomizeGrubs && im != null:
                     grubLocations = im.nonShopItems.Where(kvp => LogicManager.GetItemDef(kvp.Value).pool == "Grub").ToDictionary(kvp => kvp.Value, kvp => 1);
                     foreach (var kvp in im.shopItems)
                     {
@@ -213,18 +216,18 @@ namespace RandomizerMod.Randomization
                     }
                     break;
 
-                case RandomizerState.Completed when RandomizerMod.Instance.Settings.RandomizeGrubs:
-                    grubLocations = RandomizerMod.Instance.Settings.ItemPlacements
+                /*case RandomizerState.Completed when settings.RandomizeGrubs:
+                    grubLocations = settings.ItemPlacements
                         .Where(pair => LogicManager.GetItemDef(pair.Item1).pool == "Grub" && !LogicManager.ShopNames.Contains(pair.Item2))
                         .ToDictionary(pair => pair.Item2, kvp => 1);
                     foreach (string shop in LogicManager.ShopNames)
                     {
-                        if (RandomizerMod.Instance.Settings.ItemPlacements.Any(pair => pair.Item2 == shop && LogicManager.GetItemDef(pair.Item1).pool == "Grub"))
+                        if (settings.ItemPlacements.Any(pair => pair.Item2 == shop && LogicManager.GetItemDef(pair.Item1).pool == "Grub"))
                         {
-                            grubLocations.Add(shop, RandomizerMod.Instance.Settings.ItemPlacements.Count(pair => pair.Item2 == shop && LogicManager.GetItemDef(pair.Item1).pool == "Grub"));
+                            grubLocations.Add(shop, settings.ItemPlacements.Count(pair => pair.Item2 == shop && LogicManager.GetItemDef(pair.Item1).pool == "Grub"));
                         }
                     }
-                    break;
+                    break;*/
             }
         }
 
@@ -241,10 +244,10 @@ namespace RandomizerMod.Randomization
                         essenceLocations.Add(root, LogicManager.GetItemDef(root).geo);
                     }
                     break;
-                case RandomizerState.InProgress when RandomizerMod.Instance.Settings.RandomizeWhisperingRoots:
-                case RandomizerState.Completed when RandomizerMod.Instance.Settings.RandomizeWhisperingRoots && concealRandomItems:
+                case RandomizerState.InProgress when settings.RandomizeWhisperingRoots:
+                case RandomizerState.Completed when settings.RandomizeWhisperingRoots && concealRandomItems:
                     break;
-                case RandomizerState.Validating when RandomizerMod.Instance.Settings.RandomizeWhisperingRoots && im != null:
+                case RandomizerState.Validating when settings.RandomizeWhisperingRoots && im != null:
                     foreach (var kvp in im.nonShopItems)
                     {
                         if (LogicManager.GetItemDef(kvp.Value).pool == "Root")
@@ -267,8 +270,8 @@ namespace RandomizerMod.Randomization
                         }
                     }
                     break;
-                case RandomizerState.Completed when RandomizerMod.Instance.Settings.RandomizeWhisperingRoots && !concealRandomItems:
-                    foreach (var pair in RandomizerMod.Instance.Settings.ItemPlacements)
+                /*case RandomizerState.Completed when settings.RandomizeWhisperingRoots && !concealRandomItems:
+                    foreach (var pair in settings.ItemPlacements)
                     {
                         if (LogicManager.GetItemDef(pair.Item1).pool == "Root" && !LogicManager.ShopNames.Contains(pair.Item2))
                         {
@@ -277,10 +280,10 @@ namespace RandomizerMod.Randomization
                     }
                     foreach (string shop in LogicManager.ShopNames)
                     {
-                        if (RandomizerMod.Instance.Settings.ItemPlacements.Any(pair => pair.Item2 == shop && LogicManager.GetItemDef(pair.Item1).pool == "Root"))
+                        if (settings.ItemPlacements.Any(pair => pair.Item2 == shop && LogicManager.GetItemDef(pair.Item1).pool == "Root"))
                         {
                             essenceLocations.Add(shop, 0);
-                            foreach (var pair in RandomizerMod.Instance.Settings.ItemPlacements)
+                            foreach (var pair in settings.ItemPlacements)
                             {
                                 if (pair.Item2 == shop && LogicManager.GetItemDef(pair.Item1).pool == "Root")
                                 {
@@ -289,7 +292,7 @@ namespace RandomizerMod.Randomization
                             }
                         }
                     }
-                    break;
+                    break;*/
             }
         }
 
@@ -357,9 +360,9 @@ namespace RandomizerMod.Randomization
                 if (LogicManager.GetItemDef(item).progression && Has(item)) progression += item + ", ";
             }
 
-            if (RandomizerMod.Instance.Settings.RandomizeTransitions)
+            if (settings.RandomizeTransitions)
             {
-                foreach (string transition in LogicManager.TransitionNames())
+                foreach (string transition in LogicManager.TransitionNames(settings))
                 {
                     if (Has(transition)) progression += transition + ", ";
                 }

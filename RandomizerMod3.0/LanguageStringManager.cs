@@ -8,6 +8,8 @@ using Language;
 using static RandomizerMod.LogHelper;
 using RandomizerMod.Randomization;
 
+using RandomizerLib;
+
 namespace RandomizerMod
 {
     internal static class LanguageStringManager
@@ -145,8 +147,8 @@ namespace RandomizerMod
             {
                 ReqDef def = LogicManager.GetItemDef(item);
                 if (def.majorItem) return true;
-                else if (def.action == GiveItemActions.GiveAction.Kingsoul) return true;
-                else if (def.action == GiveItemActions.GiveAction.Dreamer) return true;
+                else if (def.action == GiveAction.Kingsoul) return true;
+                else if (def.action == GiveAction.Dreamer) return true;
                 else if (item == "Focus") return true;
 
                 return false;

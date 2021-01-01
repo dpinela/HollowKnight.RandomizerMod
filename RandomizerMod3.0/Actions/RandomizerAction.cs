@@ -8,6 +8,8 @@ using static RandomizerMod.LogHelper;
 using static RandomizerMod.GiveItemActions;
 using Object = UnityEngine.Object;
 
+using RandomizerLib;
+
 namespace RandomizerMod.Actions
 {
     public abstract class RandomizerAction
@@ -195,10 +197,10 @@ namespace RandomizerMod.Actions
 
                 }
 
-                if (oldItem.cost != 0 || oldItem.costType != AddYNDialogueToShiny.CostType.Geo)
+                if (oldItem.cost != 0 || oldItem.costType != CostType.Geo)
                 {
                     int cost = oldItem.cost;
-                    if (oldItem.costType == AddYNDialogueToShiny.CostType.Essence || oldItem.costType == AddYNDialogueToShiny.CostType.Grub)
+                    if (oldItem.costType == CostType.Essence || oldItem.costType == CostType.Grub)
                     {
                         cost = settings.VariableCosts.First(pair => pair.Item1 == location).Item2;
                     }

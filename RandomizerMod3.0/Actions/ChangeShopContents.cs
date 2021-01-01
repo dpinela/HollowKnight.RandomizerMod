@@ -7,6 +7,8 @@ using RandomizerMod.FsmStateActions;
 using static RandomizerMod.LogHelper;
 using RandomizerMod.Randomization;
 
+using RandomizerLib;
+
 namespace RandomizerMod.Actions
 {
     public struct ShopItemDef

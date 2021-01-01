@@ -8,6 +8,8 @@ using SeanprCore;
 using UnityEngine;
 using static RandomizerMod.GiveItemActions;
 
+using RandomizerLib;
+
 namespace RandomizerMod.Actions
 {
     // ReSharper disable once UnusedMember.Global

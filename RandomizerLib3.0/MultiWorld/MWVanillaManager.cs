@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using RandomizerMod.Randomization.MultiWorld;
+using RandomizerLib.MultiWorld;
 
-namespace RandomizerMod.Randomization.MultiWorld
+namespace RandomizerLib.MultiWorld
 {
     public class MWVanillaManager
     {
@@ -109,7 +109,8 @@ namespace RandomizerMod.Randomization.MultiWorld
             locationsObtained.Add(location);
         }
 
-        public bool TryGetVanillaTransitionProgression(MWItem transition, out HashSet<MWItem> progression)
+        // Currently unused, worry about it later
+        /*public bool TryGetVanillaTransitionProgression(MWItem transition, out HashSet<MWItem> progression)
         {
             progression = new HashSet<MWItem>(LogicManager.GetLocationsByProgression(new List<string>{ transition.item }).Select(loc => new MWItem(transition.playerId, loc)));
             if (progression.Any(l => progressionShopItems.ContainsKey(l)))
@@ -119,7 +120,7 @@ namespace RandomizerMod.Randomization.MultiWorld
             progression.IntersectWith(progressionLocations);
 
             return progression.Any();
-        }
+        }*/
 
         private HashSet<MWItem> GetVanillaItems()
         {

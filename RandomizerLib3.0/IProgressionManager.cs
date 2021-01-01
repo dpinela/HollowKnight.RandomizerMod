@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Diagnostics;
-using static RandomizerMod.LogHelper;
+﻿using System.Collections.Generic;
 
-namespace RandomizerMod.Randomization
+namespace RandomizerLib
 {
     public interface IProgressionManager
     {

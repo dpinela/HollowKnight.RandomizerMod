@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RandomizerMod.Randomization
+namespace RandomizerLib
 {
     public class VanillaManager
     {
@@ -19,7 +19,7 @@ namespace RandomizerMod.Randomization
             locationsObtained = new HashSet<string>();
         }
 
-        public static void SetupVanilla(RandoSettings settings = null)
+        public static void SetupVanilla(RandoSettings settings)
         {
             ItemPlacements = new List<(string, string)>();
             progressionLocations = new HashSet<string>();
@@ -104,7 +104,8 @@ namespace RandomizerMod.Randomization
             locationsObtained.Add(location);
         }
 
-        public static bool TryGetVanillaTransitionProgression(string transition, out HashSet<string> progression)
+        // currently unused, worry about this later
+        /*public static bool TryGetVanillaTransitionProgression(string transition, out HashSet<string> progression)
         {
             progression = new HashSet<string>(LogicManager.GetLocationsByProgression(new List<string>{ transition }));
             if (progression.Any(l => progressionShopItems.ContainsKey(l)))
@@ -114,16 +115,11 @@ namespace RandomizerMod.Randomization
             progression.IntersectWith(progressionLocations);
 
             return progression.Any();
-        }
+        }*/
 
 
-        public static HashSet<string> GetVanillaItems(RandoSettings settings = null)
+        public static HashSet<string> GetVanillaItems(RandoSettings settings)
         {
-            if (settings == null)
-            {
-                settings = RandomizerMod.Instance.Settings.RandomizerSettings;
-            }
-
             HashSet<string> unrandoItems = new HashSet<string>();
 
             if (!settings.RandomizeDreamers) unrandoItems.UnionWith(LogicManager.GetItemsByPool("Dreamer"));
@@ -149,12 +145,8 @@ namespace RandomizerMod.Randomization
             return unrandoItems;
         }
 
-        public static HashSet<string> GetVanillaProgression(RandoSettings settings = null)
+        public static HashSet<string> GetVanillaProgression(RandoSettings settings)
         {
-            if (settings == null)
-            {
-                settings = RandomizerMod.Instance.Settings.RandomizerSettings;
-            }
             HashSet<string> unrandoItems = new HashSet<string>();
 
             if (!settings.RandomizeDreamers) unrandoItems.UnionWith(LogicManager.GetItemsByPool("Dreamer"));

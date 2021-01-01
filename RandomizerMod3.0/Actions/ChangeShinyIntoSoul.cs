@@ -1,9 +1,11 @@
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.FsmStateActions;
 using SeanprCore;
 using UnityEngine;
 using static RandomizerMod.LogHelper;
+
+using RandomizerLib;
 
 namespace RandomizerMod.Actions
 {
@@ -56,7 +58,7 @@ namespace RandomizerMod.Actions
             getCharm.RemoveActionsOfType<IncrementPlayerDataInt>();
             getCharm.RemoveActionsOfType<SendMessage>();
 
-            getCharm.AddAction(new RandomizerExecuteLambda(() => GiveItemActions.GiveItem(GiveItemActions.GiveAction.None, _item, _location)));
+            getCharm.AddAction(new RandomizerExecuteLambda(() => GiveItemActions.GiveItem(GiveAction.None, _item, _location)));
             getCharm.AddAction(new RandomizerAddSoul(fsm.gameObject));
 
             // Skip all the other type checks

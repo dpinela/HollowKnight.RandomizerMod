@@ -10,21 +10,12 @@ using SeanprCore;
 using UnityEngine;
 using static RandomizerMod.LogHelper;
 
+using RandomizerLib;
+
 namespace RandomizerMod.Actions
 {
-    internal class AddYNDialogueToShiny : RandomizerAction
+    public class AddYNDialogueToShiny : RandomizerAction
     {
-        public enum CostType
-        {
-            Geo = 0,
-            Essence,
-            Simple,
-            Grub,
-            Wraiths,
-            Dreamnail,
-            whisperingRoot
-        }
-
         private readonly int _cost;
         private readonly string _fsmName;
         private readonly int _playerId;

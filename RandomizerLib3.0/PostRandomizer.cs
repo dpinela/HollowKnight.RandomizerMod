@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static RandomizerMod.LogHelper;
+using static RandomizerLib.Logging.LogHelper;
 
-namespace RandomizerMod.Randomization
+namespace RandomizerLib
 {
     internal static class PostRandomizer
     {
+
+        // Uh, lets worry about this later
         /*public static void PostRandomizationTasks(ItemManager im, TransitionManager tm, string StartName, List<string> startItems, Dictionary<string, int> modifiedCosts)
         {
             RemovePlaceholders(im);
@@ -138,7 +140,7 @@ namespace RandomizerMod.Randomization
 
             cost = Math.Max(cost, 1);
             RandomizerMod.Instance.Settings.AddShopCost(item, cost);
-        }
+        }*/
 
         public static List<(string, string)> GetPlacedItemPairs(ItemManager im)
         {
@@ -175,6 +177,6 @@ namespace RandomizerMod.Randomization
             }
 
             Log(sb.ToString());
-        }*/
+        }
     }
 }

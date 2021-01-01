@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiWorldServer", "MultiWo
 		{646D3716-FE32-4F72-839A-942BE24E6978} = {646D3716-FE32-4F72-839A-942BE24E6978}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomizerLib3.0", "RandomizerLib3.0\RandomizerLib3.0.csproj", "{9A6E25CA-F58E-4F1B-9187-7142844A7D0A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MWRandomizerTest", "MWRandomizerTest\MWRandomizerTest.csproj", "{532E9758-15E7-4D47-851D-A07407ED1F1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{859C2A14-2A15-4EC8-9F69-75135AD7CBD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{859C2A14-2A15-4EC8-9F69-75135AD7CBD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{859C2A14-2A15-4EC8-9F69-75135AD7CBD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A6E25CA-F58E-4F1B-9187-7142844A7D0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A6E25CA-F58E-4F1B-9187-7142844A7D0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A6E25CA-F58E-4F1B-9187-7142844A7D0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A6E25CA-F58E-4F1B-9187-7142844A7D0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{532E9758-15E7-4D47-851D-A07407ED1F1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{532E9758-15E7-4D47-851D-A07407ED1F1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{532E9758-15E7-4D47-851D-A07407ED1F1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{532E9758-15E7-4D47-851D-A07407ED1F1C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

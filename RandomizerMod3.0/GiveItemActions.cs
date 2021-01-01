@@ -8,44 +8,13 @@ using static RandomizerMod.LogHelper;
 using UnityEngine;
 using MultiWorldProtocol.Messaging.Definitions.Messages;
 
+using RandomizerLib;
+
 namespace RandomizerMod
 {
     // WORK IN PROGRESS
     public static class GiveItemActions
     {
-        public enum GiveAction
-        {
-            Bool = 0,
-            Int,
-            Charm,
-            EquippedCharm,
-            Additive,
-            SpawnGeo,
-            AddGeo,
-
-            Map,
-            Grub,
-            Essence,
-            Stag,
-            DirtmouthStag,
-
-            MaskShard,
-            VesselFragment,
-            WanderersJournal,
-            HallownestSeal,
-            KingsIdol,
-            ArcaneEgg,
-
-            Dreamer,
-            Kingsoul,
-            Grimmchild,
-
-            SettingsBool,
-            None,
-            AddSoul,
-
-            Lifeblood
-        }
 
         public static void GiveItem(GiveAction action, string item, string location, int geo = 0)
         {

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static RandomizerMod.LogHelper;
-using static RandomizerMod.Randomization.Randomizer;
+using static RandomizerLib.Logging.LogHelper;
+using static RandomizerLib.Randomizer;
 
-namespace RandomizerMod.Randomization
+namespace RandomizerLib
 {
     internal static class PreRandomizer
     {
@@ -21,14 +21,14 @@ namespace RandomizerMod.Randomization
                     continue; //Skip cost rando if this item's pool is vanilla
                 }
 
-                if (def.costType == Actions.AddYNDialogueToShiny.CostType.Essence) //essence cost
+                if (def.costType == CostType.Essence) //essence cost
                 {
                     int cost = 1 + rand.Next(MAX_ESSENCE_COST);
                     modifiedCosts[item] = cost;
                     continue;
                 }
 
-                if (def.costType == Actions.AddYNDialogueToShiny.CostType.Grub) //grub cost
+                if (def.costType == CostType.Grub) //grub cost
                 {
                     int cost = 1 + rand.Next(MAX_GRUB_COST);
                     modifiedCosts[item] = cost;
@@ -69,7 +69,7 @@ namespace RandomizerMod.Randomization
 
             for (int i = rand.Next(2) + 1; i > 0; i--)
             {
-                List<string> charms = LogicManager.ItemNames.Where(_item => LogicManager.GetItemDef(_item).action == GiveItemActions.GiveAction.Charm).Except(startItems).ToList();
+                List<string> charms = LogicManager.ItemNames.Where(_item => LogicManager.GetItemDef(_item).action == GiveAction.Charm).Except(startItems).ToList();
                 startItems.Add(charms[rand.Next(charms.Count)]);
             }
 

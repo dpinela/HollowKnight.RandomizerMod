@@ -16,6 +16,8 @@ using System.Collections;
 using RandomizerMod.SceneChanges;
 using RandomizerMod.Randomization;
 
+using RandomizerLib;
+
 namespace RandomizerMod.SceneChanges
 {
     internal static partial class SceneEditor

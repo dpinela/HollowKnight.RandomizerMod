@@ -21,6 +21,8 @@ using System.IO;
 using System.Reflection;
 using static RandomizerMod.GiveItemActions;
 
+using RandomizerLib;
+
 namespace RandomizerMod
 {
     public static class StartSaveChanges

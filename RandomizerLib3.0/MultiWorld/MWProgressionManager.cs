@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static RandomizerLib.Logging.LogHelper;
 
-namespace RandomizerMod.Randomization.MultiWorld
+namespace RandomizerLib.MultiWorld
 {
     public class MWProgressionManager
     {
@@ -56,7 +57,7 @@ namespace RandomizerMod.Randomization.MultiWorld
 
         public bool CanGet(MWItem mwItem)
         {
-            return LogicManager.ParseProcessedLogic(mwItem.item, obtained[mwItem.playerId], modifiedCosts[mwItem.playerId]);
+            return LogicManager.ParseProcessedLogic(mwItem.item, obtained[mwItem.playerId], settings[mwItem.playerId], modifiedCosts[mwItem.playerId]);
         }
 
         public void Add(MWItem mwItem)
@@ -64,7 +65,7 @@ namespace RandomizerMod.Randomization.MultiWorld
             string item = LogicManager.RemovePrefixSuffix(mwItem.item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
-                RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
+                LogWarn("Could not find progression value corresponding to: " + item);
                 return;
             }
             obtained[mwItem.playerId][a.Item2] |= a.Item1;
@@ -88,7 +89,7 @@ namespace RandomizerMod.Randomization.MultiWorld
                 string item = LogicManager.RemovePrefixSuffix(mwItem.item);
                 if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
                 {
-                    RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
+                    LogWarn("Could not find progression value corresponding to: " + item);
                     return;
                 }
                 obtained[mwItem.playerId][a.Item2] |= a.Item1;
@@ -139,7 +140,7 @@ namespace RandomizerMod.Randomization.MultiWorld
             string item = LogicManager.RemovePrefixSuffix(mwItem.item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
-                RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
+                LogWarn("Could not find progression value corresponding to: " + item);
                 return;
             }
             obtained[mwItem.playerId][a.Item2] &= ~a.Item1;
@@ -169,7 +170,7 @@ namespace RandomizerMod.Randomization.MultiWorld
             string item = LogicManager.RemovePrefixSuffix(mwItem.item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
-                RandomizerMod.Instance.LogWarn("Could not find progression value corresponding to: " + item);
+                LogWarn("Could not find progression value corresponding to: " + item);
                 return false;
             }
             return (obtained[mwItem.playerId][a.Item2] & a.Item1) == a.Item1;
@@ -285,7 +286,7 @@ namespace RandomizerMod.Randomization.MultiWorld
                 case RandomizerState.InProgress when settings[id].RandomizeWhisperingRoots:
                 case RandomizerState.Completed when settings[id].RandomizeWhisperingRoots && concealRandomItems:
                     break;
-                case RandomizerState.Validating when RandomizerMod.Instance.Settings.RandomizeWhisperingRoots && im != null:
+                case RandomizerState.Validating when settings[id].RandomizeWhisperingRoots && im != null:
                     foreach (var kvp in im.nonShopItems)
                     {
                         if (kvp.Value.playerId == id && LogicManager.GetItemDef(kvp.Value.item).pool == "Root")

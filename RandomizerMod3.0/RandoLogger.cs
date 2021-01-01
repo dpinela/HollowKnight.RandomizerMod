@@ -10,6 +10,8 @@ using UnityEngine;
 using Modding;
 using RandomizerMod.Randomization;
 
+using RandomizerLib;
+
 namespace RandomizerMod
 {
     public static class RandoLogger
@@ -22,13 +24,14 @@ namespace RandomizerMod
         public static HashSet<string> uncheckedTransitions;
         public static HashSet<string> randomizedTransitions;
 
+        // TODO this is probably all wrong
         private static void MakeHelperLists()
         {
             {
                 randomizedLocations = ItemManager.GetRandomizedLocations(RandomizerMod.Instance.Settings.RandomizerSettings);
                 obtainedLocations = new HashSet<string>(RandomizerMod.Instance.Settings.GetLocationsFound());
                 uncheckedLocations = new HashSet<string>();
-                pm = new ProgressionManager(RandomizerState.Completed, concealRandomItems: true);
+                pm = new ProgressionManager(RandomizerMod.Instance.Settings.RandomizerSettings, RandomizerState.Completed, concealRandomItems: true);
 
                 if (RandomizerMod.Instance.Settings.RandomizeRooms)
                 {
@@ -74,11 +77,11 @@ namespace RandomizerMod
 
                 if (!LogicManager.ShopNames.Contains(location))
                 {
-                    if (LogicManager.GetItemDef(location).costType == Actions.AddYNDialogueToShiny.CostType.Essence)
+                    if (LogicManager.GetItemDef(location).costType == CostType.Essence)
                     {
                         altLocation = "Seer";
                     }
-                    else if (LogicManager.GetItemDef(location).costType == Actions.AddYNDialogueToShiny.CostType.Grub)
+                    else if (LogicManager.GetItemDef(location).costType == CostType.Grub)
                     {
                         altLocation = "Grubfather";
                     }

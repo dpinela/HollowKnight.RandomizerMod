@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RandomizerMod.Randomization
+namespace RandomizerLib
 {
     [Serializable]
     public class RandoSettings
@@ -77,8 +77,7 @@ namespace RandomizerMod.Randomization
         // Seed
 
         public int Seed = -1;
-
-        internal bool GetRandomizeByPool(string pool)
+        public bool GetRandomizeByPool(string pool)
         {
             switch (pool)
             {

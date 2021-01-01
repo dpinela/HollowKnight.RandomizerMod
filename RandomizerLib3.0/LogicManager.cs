@@ -6,14 +6,13 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using SeanprCore;
-using static RandomizerMod.LogHelper;
-using static RandomizerMod.GiveItemActions;
+using static RandomizerLib.Logging.LogHelper;
 using System.Text.RegularExpressions;
 using GlobalEnums;
 
-namespace RandomizerMod.Randomization
+namespace RandomizerLib
 {
-    internal enum ItemType
+    public enum ItemType
     {
         Big,
         Charm,
@@ -24,10 +23,53 @@ namespace RandomizerMod.Randomization
         Soul,
         Lifeblood
     }
+    public enum CostType
+    {
+        Geo = 0,
+        Essence,
+        Simple,
+        Grub,
+        Wraiths,
+        Dreamnail,
+        whisperingRoot
+    }
+    public enum GiveAction
+    {
+        Bool = 0,
+        Int,
+        Charm,
+        EquippedCharm,
+        Additive,
+        SpawnGeo,
+        AddGeo,
+
+        Map,
+        Grub,
+        Essence,
+        Stag,
+        DirtmouthStag,
+
+        MaskShard,
+        VesselFragment,
+        WanderersJournal,
+        HallownestSeal,
+        KingsIdol,
+        ArcaneEgg,
+
+        Dreamer,
+        Kingsoul,
+        Grimmchild,
+
+        SettingsBool,
+        None,
+        AddSoul,
+
+        Lifeblood
+    }
 
     // ReSharper disable InconsistentNaming
 #pragma warning disable 0649 // Assigned via reflection
-    internal struct TransitionDef
+    public struct TransitionDef
     {
         public string sceneName;
         public string doorName;
@@ -43,7 +85,7 @@ namespace RandomizerMod.Randomization
         public bool deadEnd;
         public int oneWay; // 0 == 2-way, 1 == can only go in, 2 == can only come out
     }
-    internal struct ReqDef
+    public struct ReqDef
     {
         // Control variables
         public string boolName;
@@ -107,10 +149,10 @@ namespace RandomizerMod.Randomization
 
         // For pricey items such as dash slash location
         public int cost;
-        public Actions.AddYNDialogueToShiny.CostType costType;
+        public CostType costType;
     }
 
-    internal struct ShopDef
+    public struct ShopDef
     {
         public string sceneName;
         public string objectName;
@@ -126,7 +168,7 @@ namespace RandomizerMod.Randomization
         public bool dungDiscount;
     }
 
-    internal struct Waypoint
+    public struct Waypoint
     {
         public string[] itemLogic;
         public List<(int, int)> processedItemLogic;
@@ -134,7 +176,7 @@ namespace RandomizerMod.Randomization
         public List<(int, int)> processedAreaLogic;
     }
 
-    internal struct StartDef
+    public struct StartDef
     {
         // respawn marker properties
         public string sceneName;
@@ -156,7 +198,7 @@ namespace RandomizerMod.Randomization
 #pragma warning restore 0649
     // ReSharper restore InconsistentNaming
 
-    internal static class LogicManager
+    public static class LogicManager
     {
         private static Dictionary<string, TransitionDef> _areaTransitions;
         private static Dictionary<string, TransitionDef> _roomTransitions;
@@ -187,14 +229,12 @@ namespace RandomizerMod.Randomization
 
         public static int essenceTolerance(RandoSettings settings = null)
         {
-            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
             return settings.SpicySkips ? 50 : settings.MildSkips ? 100 : 150;
         }
         public static int grubTolerance(RandoSettings settings = null)
         {
-            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
             return settings.SpicySkips ? 1 : settings.MildSkips ? 2 : 3;
-    }
+        }
 
 
         public static Dictionary<string, (int, int)> itemCountsByPool = null;
@@ -317,9 +357,8 @@ namespace RandomizerMod.Randomization
             Log("Parsed items.xml in " + watch.Elapsed.TotalSeconds + " seconds");
         }
 
-        public static string[] TransitionNames(bool area = false, bool room = false, RandoSettings settings = null)
+        public static string[] TransitionNames(RandoSettings settings, bool area = false, bool room = false)
         {
-            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
             if (area) return _areaTransitions.Keys.ToArray();
             if (room) return _roomTransitions.Keys.ToArray();
 
@@ -333,9 +372,8 @@ namespace RandomizerMod.Randomization
             return _roomTransitions.ContainsKey(transition);
         }
 
-        public static TransitionDef GetTransitionDef(string name, RandoSettings settings = null)
+        public static TransitionDef GetTransitionDef(string name, RandoSettings settings)
         {
-            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
             if (settings.RandomizeAreas && _areaTransitions.TryGetValue(name, out TransitionDef def1))
             {
                 return def1;
@@ -414,10 +452,8 @@ namespace RandomizerMod.Randomization
             return new HashSet<string>(_poolIndexedItems[pool]);
         }
 
-        public static HashSet<string> GetLocationsByProgression(IEnumerable<string> newStuff, RandoSettings settings = null)
+        public static HashSet<string> GetLocationsByProgression(IEnumerable<string> newStuff, RandoSettings settings)
         {
-            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
-
             HashSet<string> locations = new HashSet<string>();
             if (settings.RandomizeRooms)
             {
@@ -460,10 +496,8 @@ namespace RandomizerMod.Randomization
 
             return locations;
         }
-        public static HashSet<string> GetTransitionsByProgression(IEnumerable<string> newStuff, RandoSettings settings = null)
+        public static HashSet<string> GetTransitionsByProgression(IEnumerable<string> newStuff, RandoSettings settings)
         {
-            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
-
             HashSet<string> transitions = new HashSet<string>();
             if (settings.RandomizeRooms)
             {
@@ -493,7 +527,7 @@ namespace RandomizerMod.Randomization
 
             return transitions;
         }
-        internal static bool HasItemWithShopBool(string shopBool)
+        public static bool HasItemWithShopBool(string shopBool)
         {// Used to determine if an item that is normally sold in a shop is potentially randomizable.
             return _items.Values.Where(val => val.shopBool == shopBool).Any();
         }
@@ -527,10 +561,8 @@ namespace RandomizerMod.Randomization
             return itemCountsByPool[poolName];
         }
 
-        public static bool ParseProcessedLogic(string item, int[] obtained, IDictionary<string, int> variableCosts = null, RandoSettings settings = null)
+        public static bool ParseProcessedLogic(string item, int[] obtained, RandoSettings settings, IDictionary<string, int> variableCosts = null)
         {
-            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
-
             item = RemovePrefixSuffix(item);
             List<(int, int)> logic;
             int cost = 0;
@@ -577,7 +609,7 @@ namespace RandomizerMod.Randomization
             }
             else
             {
-                RandomizerMod.Instance.LogWarn($"ParseProcessedLogic called for non-existent item/shop \"{item}\"");
+                LogWarn($"ParseProcessedLogic called for non-existent item/shop \"{item}\"");
                 return false;
             }
 
@@ -596,7 +628,7 @@ namespace RandomizerMod.Randomization
                     case -2:
                         if (stack.Count < 2)
                         {
-                            RandomizerMod.Instance.LogWarn($"Could not parse logic for \"{item}\": Found + when stack contained less than 2 items");
+                            LogWarn($"Could not parse logic for \"{item}\": Found + when stack contained less than 2 items");
                             return false;
                         }
 
@@ -606,7 +638,7 @@ namespace RandomizerMod.Randomization
                     case -1:
                         if (stack.Count < 2)
                         {
-                            RandomizerMod.Instance.LogWarn($"Could not parse logic for \"{item}\": Found | when stack contained less than 2 items");
+                            LogWarn($"Could not parse logic for \"{item}\": Found | when stack contained less than 2 items");
                             return false;
                         }
                         stack.Push(stack.Pop() | stack.Pop());
@@ -801,8 +833,8 @@ namespace RandomizerMod.Randomization
             }
             foreach (string item in ItemNames)
             {
-                if (_items[item].costType == Actions.AddYNDialogueToShiny.CostType.Grub) grubfatherLocations.Add(item);
-                else if (_items[item].costType == Actions.AddYNDialogueToShiny.CostType.Essence) seerLocations.Add(item);
+                if (_items[item].costType == CostType.Grub) grubfatherLocations.Add(item);
+                else if (_items[item].costType == CostType.Essence) seerLocations.Add(item);
             }
             
         }
@@ -879,7 +911,7 @@ namespace RandomizerMod.Randomization
                     else if (infix[i] == "200ESSENCE") postfix.Add((-5, 0));
                     else
                     {
-                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) RandomizerMod.Instance.LogWarn("Error in logic sentence for: " + itemName + 
+                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) LogWarn("Error in logic sentence for: " + itemName + 
                             "\nCould not find progression value for " + infix[i]);
                         postfix.Add(pair);
                     }
@@ -900,7 +932,7 @@ namespace RandomizerMod.Randomization
                     else if (infix[i] == "200ESSENCE") postfix.Add((-5, 0));
                     else
                     {
-                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) RandomizerMod.Instance.LogWarn("Error in logic sentence for: " + itemName +
+                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) LogWarn("Error in logic sentence for: " + itemName +
                             "\nCould not find progression value for " + infix[i]);
                         postfix.Add(pair);
                     }
@@ -921,7 +953,7 @@ namespace RandomizerMod.Randomization
                     else if (infix[i] == "200ESSENCE") postfix.Add((-5, 0));
                     else
                     {
-                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) RandomizerMod.Instance.LogWarn("Error in logic sentence for: " + itemName +
+                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) LogWarn("Error in logic sentence for: " + itemName +
                             "\nCould not find progression value for " + infix[i]);
                         postfix.Add(pair);
                     }
@@ -947,7 +979,7 @@ namespace RandomizerMod.Randomization
                     else if (infix[i] == "200ESSENCE") postfix.Add((-5, 0));
                     else
                     {
-                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) RandomizerMod.Instance.LogWarn("Error in logic sentence for: " + shopName +
+                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) LogWarn("Error in logic sentence for: " + shopName +
                             "\nCould not find progression value for " + infix[i]);
                         postfix.Add(pair);
                     }
@@ -968,7 +1000,7 @@ namespace RandomizerMod.Randomization
                     else if (infix[i] == "200ESSENCE") postfix.Add((-5, 0));
                     else
                     {
-                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) RandomizerMod.Instance.LogWarn("Error in logic sentence for: " + shopName +
+                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) LogWarn("Error in logic sentence for: " + shopName +
                             "\nCould not find progression value for " + infix[i]);
                         postfix.Add(pair);
                     }
@@ -989,7 +1021,7 @@ namespace RandomizerMod.Randomization
                     else if (infix[i] == "200ESSENCE") postfix.Add((-5, 0));
                     else
                     {
-                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) RandomizerMod.Instance.LogWarn("Error in logic sentence for: " + shopName +
+                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) LogWarn("Error in logic sentence for: " + shopName +
                             "\nCould not find progression value for " + infix[i]);
                         postfix.Add(pair);
                     }
@@ -1016,7 +1048,7 @@ namespace RandomizerMod.Randomization
                     else if (infix[i] == "200ESSENCE") postfix.Add((-5, 0));
                     else
                     {
-                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) RandomizerMod.Instance.LogWarn("Error in logic sentence for: " + transitionName +
+                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) LogWarn("Error in logic sentence for: " + transitionName +
                             "\nCould not find progression value for " + infix[i]);
                         postfix.Add(pair);
                     }
@@ -1044,7 +1076,7 @@ namespace RandomizerMod.Randomization
                     else if (infix[i] == "200ESSENCE") postfix.Add((-5, 0));
                     else
                     {
-                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) RandomizerMod.Instance.LogWarn("Error in logic sentence for: " + transitionName +
+                        if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) LogWarn("Error in logic sentence for: " + transitionName +
                             "\nCould not find progression value for " + infix[i]);
                         postfix.Add(pair);
                     }
@@ -1071,7 +1103,7 @@ namespace RandomizerMod.Randomization
                         else if (infix[i] == "200ESSENCE") postfix.Add((-5, 0));
                         else
                         {
-                            if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) RandomizerMod.Instance.LogWarn("Error in logic sentence for: " + waypoint +
+                            if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) LogWarn("Error in logic sentence for: " + waypoint +
                             "\nCould not find progression value for " + infix[i]);
                             postfix.Add(pair);
                         }
@@ -1093,7 +1125,7 @@ namespace RandomizerMod.Randomization
                         else if (infix[i] == "200ESSENCE") postfix.Add((-5, 0));
                         else
                         {
-                            if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) RandomizerMod.Instance.LogWarn("Error in logic sentence for: " + waypoint +
+                            if (!progressionBitMask.TryGetValue(infix[i], out (int, int) pair)) LogWarn("Error in logic sentence for: " + waypoint +
                             "\nCould not find progression value for " + infix[i]);
                             postfix.Add(pair);
                         }
@@ -1324,9 +1356,9 @@ namespace RandomizerMod.Randomization
                             LogWarn($"Could not parse \"{fieldNode.InnerText}\" to GiveAction");
                         }
                     }
-                    else if (field.FieldType == typeof(Actions.AddYNDialogueToShiny.CostType))
+                    else if (field.FieldType == typeof(CostType))
                     {
-                        if (fieldNode.InnerText.TryToEnum(out Actions.AddYNDialogueToShiny.CostType type))
+                        if (fieldNode.InnerText.TryToEnum(out CostType type))
                         {
                             field.SetValue(def, type);
                         }

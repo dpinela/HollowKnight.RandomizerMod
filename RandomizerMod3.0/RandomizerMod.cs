@@ -11,14 +11,16 @@ using RandomizerMod.Randomization;
 using SeanprCore;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static RandomizerMod.LogHelper;
 using static RandomizerMod.GiveItemActions;
 using RandomizerMod.SceneChanges;
 using RandomizerMod.MultiWorld;
 using System.Security.Cryptography;
 
+using RandomizerLib;
+using RandomizerLib.MultiWorld;
+using static RandomizerMod.LogHelper;
+
 using Object = UnityEngine.Object;
-using RandomizerMod.Randomization.MultiWorld;
 
 namespace RandomizerMod
 {
@@ -64,7 +66,8 @@ namespace RandomizerMod
             // Unlock godseeker too because idk why not
             Ref.GM.SetStatusRecordInt("RecBossRushMode", 1);
 
-            Assembly randoDLL = GetType().Assembly;
+            Assembly randoModDLL = GetType().Assembly;
+            Assembly randoLibDLL = Assembly.Load("RandomizerLib3.0, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null");
 
             // Load embedded resources
             _sprites = ResourceHelper.GetSprites("RandomizerMod.Resources.");
@@ -72,7 +75,7 @@ namespace RandomizerMod
             try
             {
                 LanguageStringManager.LoadLanguageXML(
-                    randoDLL.GetManifestResourceStream("RandomizerMod.Resources.language.xml"));
+                    randoModDLL.GetManifestResourceStream("RandomizerMod.Resources.language.xml"));
             }
             catch (Exception e)
             {
@@ -80,7 +83,7 @@ namespace RandomizerMod
             }
 
             _logicParseThread = new Thread(() =>
-            LogicManager.ParseXML(randoDLL));
+            LogicManager.ParseXML(randoModDLL));
             _logicParseThread.Start();
 
             // Add hooks
@@ -581,8 +584,8 @@ namespace RandomizerMod
                     {
                         RandomizerMod.Instance.LogError("Error in logging new transition: " + transitionName + "\n" + e);
                     }
-                    info.SceneName = LogicManager.GetTransitionDef(destination).sceneName.Split('-').First();
-                    info.EntryGateName = LogicManager.GetTransitionDef(destination).doorName;
+                    info.SceneName = LogicManager.GetTransitionDef(destination, RandomizerMod.Instance.Settings.RandomizerSettings).sceneName.Split('-').First();
+                    info.EntryGateName = LogicManager.GetTransitionDef(destination, RandomizerMod.Instance.Settings.RandomizerSettings).doorName;
                 }
             }
             SceneEditor.ApplySaveDataChanges(info.SceneName, info.EntryGateName);

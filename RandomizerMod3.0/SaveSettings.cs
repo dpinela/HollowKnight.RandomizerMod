@@ -5,7 +5,8 @@ using RandomizerMod.Actions;
 using SeanprCore;
 using RandomizerMod.Randomization;
 using static RandomizerMod.LogHelper;
-using static RandomizerMod.Randomization.Randomizer;
+
+using RandomizerLib;
 
 namespace RandomizerMod
 {

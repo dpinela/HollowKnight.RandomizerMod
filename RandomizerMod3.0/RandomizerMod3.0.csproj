@@ -96,19 +96,11 @@
     <Compile Include="Actions\ChangeShinyIntoLifeblood.cs" />
     <Compile Include="Actions\ChangeShinyIntoSoul.cs" />
     <Compile Include="BenchHandler.cs" />
+    <Compile Include="LogHelper.cs" />
     <Compile Include="MultiWorld\MWSettings.cs" />
     <Compile Include="GiveItemActions.cs" />
     <Compile Include="MultiWorld\ClientConnection.cs" />
     <Compile Include="MultiWorld\ConnectionState.cs" />
-    <Compile Include="Randomization\MultiWorld\MWItemManager.cs" />
-    <Compile Include="Randomization\MultiWorld\MWItem.cs" />
-    <Compile Include="Randomization\MultiWorld\MWProgressionManager.cs" />
-    <Compile Include="Randomization\IProgressionManager.cs" />
-    <Compile Include="Randomization\MultiWorld\MWVanillaManager.cs" />
-    <Compile Include="Randomization\RandoSettings.cs" />
-    <Compile Include="Randomization\TransitionRandomizer.cs" />
-    <Compile Include="Randomization\MultiWorld\MWRandomizer.cs" />
-    <Compile Include="Randomization\RandomizationError.cs" />
     <Compile Include="StartSaveChanges.cs" />
     <Compile Include="RandoLogger.cs" />
     <Compile Include="Components\RandomizerTinkEffect.cs" />
@@ -132,11 +124,8 @@
     <Compile Include="LanguageStringManager.cs" />
     <Compile Include="FsmStateActions\RandomizerBoolTest.cs" />
     <Compile Include="Actions\RandomizerAction.cs" />
-    <Compile Include="LogHelper.cs" />
     <Compile Include="MenuChanger.cs" />
     <Compile Include="Randomization\PostRandomizer.cs" />
-    <Compile Include="Randomization\SpanningTree.cs" />
-    <Compile Include="Randomization\PreRandomizer.cs" />
     <Compile Include="SceneChanges\DreamPlantEdits.cs" />
     <Compile Include="SceneChanges\RandomizerChanges.cs" />
     <Compile Include="SceneChanges\QoLFixes.cs" />
@@ -144,15 +133,8 @@
     <Compile Include="SceneChanges\TransitionFixes.cs" />
     <Compile Include="SceneChanges\SceneEditor.cs" />
     <Compile Include="ObjectCache.cs" />
-    <Compile Include="Randomization\DirectedTransitions.cs" />
-    <Compile Include="Randomization\ItemManager.cs" />
-    <Compile Include="Randomization\TransitionManager.cs" />
-    <Compile Include="Randomization\ProgressionManager.cs" />
-    <Compile Include="Randomization\LogicManager.cs" />
-    <Compile Include="Randomization\VanillaManager.cs" />
     <Compile Include="RandomizerMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Randomization\Randomizer.cs" />
     <Compile Include="RestrictionManager.cs" />
     <Compile Include="SaveSettings.cs" />
   </ItemGroup>
@@ -406,6 +388,10 @@
     <ProjectReference Include="..\MultiWorldProtocol\MultiWorldProtocol.csproj">
       <Project>{646d3716-fe32-4f72-839a-942be24e6978}</Project>
       <Name>MultiWorldProtocol</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RandomizerLib3.0\RandomizerLib3.0.csproj">
+      <Project>{9a6e25ca-f58e-4f1b-9187-7142844a7d0a}</Project>
+      <Name>RandomizerLib3.0</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

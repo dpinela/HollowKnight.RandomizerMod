@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
-using static RandomizerMod.LogHelper;
-using System.Security.Policy;
+using static RandomizerLib.Logging.LogHelper;
 
-namespace RandomizerMod.Randomization
+namespace RandomizerLib
 {
     public class ItemManager
     {
@@ -55,6 +54,7 @@ namespace RandomizerMod.Randomization
         {
             this.tm = tm;
             pm = new ProgressionManager(
+                settings,
                 RandomizerState.InProgress,
                 this,
                 tm,
@@ -277,10 +277,10 @@ namespace RandomizerMod.Randomization
 
             while (updateQueue.Any())
             {
-                potentialLocations = LogicManager.GetLocationsByProgression(recentProgression);
+                potentialLocations = LogicManager.GetLocationsByProgression(recentProgression, settings);
                 if (settings.RandomizeTransitions)
                 {
-                    potentialTransitions = LogicManager.GetTransitionsByProgression(recentProgression);
+                    potentialTransitions = LogicManager.GetTransitionsByProgression(recentProgression, settings);
                 }
                 recentProgression = new HashSet<string>();
 
@@ -347,7 +347,7 @@ namespace RandomizerMod.Randomization
 
             void UpdateTransitions()
             {
-                foreach (string transition in LogicManager.GetTransitionsByProgression(pm.tempItems))
+                foreach (string transition in LogicManager.GetTransitionsByProgression(pm.tempItems, settings))
                 {
                     if (!pm.Has(transition) && pm.CanGet(transition))
                     {
@@ -365,7 +365,7 @@ namespace RandomizerMod.Randomization
             }
             bool CheckForNewLocations()
             {
-                foreach (string location in LogicManager.GetLocationsByProgression(pm.tempItems))
+                foreach (string location in LogicManager.GetLocationsByProgression(pm.tempItems, settings))
                 {
                     if (randomizedLocations.Contains(location) && !reachableLocations.Contains(location) && pm.CanGet(location))
                     {
@@ -492,8 +492,8 @@ namespace RandomizerMod.Randomization
 
         public void LogLocationStatus(string loc)
         {
-            if (unplacedLocations.Contains(loc)) RandomizerMod.Instance.Log($"{loc} unfilled.");
-            else if (nonShopItems.ContainsKey(loc)) RandomizerMod.Instance.Log($"{loc} filled with {nonShopItems[loc]}");
+            if (unplacedLocations.Contains(loc)) Log($"{loc} unfilled.");
+            else if (nonShopItems.ContainsKey(loc)) Log($"{loc} filled with {nonShopItems[loc]}");
             else Log($"{loc} not found.");
         }
 

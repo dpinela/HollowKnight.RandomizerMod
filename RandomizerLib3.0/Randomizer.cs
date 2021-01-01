@@ -2,14 +2,13 @@
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
-using RandomizerMod.Actions;
-using static RandomizerMod.LogHelper;
+using static RandomizerLib.Logging.LogHelper;
 using System.Text;
-using static RandomizerMod.Randomization.PreRandomizer;
-using static RandomizerMod.Randomization.PostRandomizer;
-using static RandomizerMod.Randomization.SpanningTree;
+using static RandomizerLib.PreRandomizer;
+using static RandomizerLib.PostRandomizer;
+using static RandomizerLib.SpanningTree;
 
-namespace RandomizerMod.Randomization
+namespace RandomizerLib
 {
     public enum RandomizerState
     {
@@ -29,15 +28,19 @@ namespace RandomizerMod.Randomization
         Dictionary<string, int> modifiedCosts;
         public string StartName;
         public StartDef startDef => LogicManager.GetStartLocation(StartName);        
-        public string startTransition => RandomizerMod.Instance.Settings.RandomizeRooms ? startDef.roomTransition : startDef.areaTransition;
+        public string startTransition => settings.RandomizeRooms ? startDef.roomTransition : startDef.areaTransition;
 
         private RandoSettings settings;
 
+        public Randomizer(RandoSettings settings)
+        {
+            this.settings = settings;
+        }
+
         public void Randomize()
         {
-            settings = RandomizerMod.Instance.Settings.RandomizerSettings;
             rand = new Random(settings.Seed);
-            VanillaManager.SetupVanilla();
+            VanillaManager.SetupVanilla(settings);
 
             ItemManager im = null;
             TransitionManager tm = null;
@@ -53,19 +56,18 @@ namespace RandomizerMod.Randomization
 
                 try
                 {
-                    RandomizerMod.Instance.Settings.ResetPlacements();
                     modifiedCosts = RandomizeNonShopCosts(rand, settings);
                     (startItems, startProgression) = RandomizeStartingItems(rand, settings);
                     StartName = RandomizeStartingLocation(rand, settings, startProgression);
-                    if (RandomizerMod.Instance.Settings.RandomizeTransitions) tm = TransitionRandomizer.RandomizeTransitions(RandomizerMod.Instance.Settings.RandomizerSettings, rand, StartName, startItems, startProgression);
+                    if (settings.RandomizeTransitions) tm = TransitionRandomizer.RandomizeTransitions(settings, rand, StartName, startItems, startProgression);
                     im = RandomizeItems(tm, startItems, startProgression);
 
                     randoSuccess = true;
                 } catch (RandomizationError) { }
             }
 
-            PostRandomizationTasks(im, tm, StartName, startItems, modifiedCosts);
-            RandomizerAction.CreateActions(RandomizerMod.Instance.Settings.ItemPlacements, RandomizerMod.Instance.Settings);
+            /*PostRandomizationTasks(im, tm, StartName, startItems, modifiedCosts);
+            RandomizerAction.CreateActions(RandomizerMod.Instance.Settings.ItemPlacements, RandomizerMod.Instance.Settings);*/
         }
 
         private ItemManager RandomizeItems(TransitionManager tm, List<string> startItems, List<string> startProgression)
@@ -76,7 +78,7 @@ namespace RandomizerMod.Randomization
             Log("");
             Log("Beginning item randomization...");
 
-            ItemManager im = new ItemManager(tm, rand, RandomizerMod.Instance.Settings.RandomizerSettings, startItems, startProgression, modifiedCosts);
+            ItemManager im = new ItemManager(tm, rand, settings, startItems, startProgression, modifiedCosts);
 
             FirstPass(im, startProgression);
             SecondPass(im);
@@ -85,7 +87,7 @@ namespace RandomizerMod.Randomization
                 throw new RandomizationError();
             }
 
-            RandomizerMod.Instance.Log("Item randomization finished in " + watch.Elapsed.TotalSeconds + " seconds.");
+            Log("Item randomization finished in " + watch.Elapsed.TotalSeconds + " seconds.");
             return im;
         }
 
@@ -211,7 +213,7 @@ namespace RandomizerMod.Randomization
 
         private bool ValidateItemRandomization(ItemManager im, TransitionManager tm, List<string> startItems, List<string> startProgression)
         {
-            RandomizerMod.Instance.Log("Beginning item placement validation...");
+            Log("Beginning item placement validation...");
 
             List<string> unfilledLocations;
             if (im.normalFillShops) unfilledLocations = im.randomizedLocations.Except(im.nonShopItems.Keys).Except(im.shopItems.Keys).ToList();
@@ -274,6 +276,7 @@ namespace RandomizerMod.Randomization
             */
 
             ProgressionManager pm = new ProgressionManager(
+                settings,
                 RandomizerState.Validating,
                 im,
                 tm,
@@ -286,9 +289,9 @@ namespace RandomizerMod.Randomization
             HashSet<string> items = im.randomizedItems;
             items.ExceptWith(startItems);
 
-            if (RandomizerMod.Instance.Settings.RandomizeTransitions)
+            if (settings.RandomizeTransitions)
             {
-                transitions.UnionWith(LogicManager.TransitionNames());
+                transitions.UnionWith(LogicManager.TransitionNames(settings));
                 tm.ResetReachableTransitions();
                 tm.UpdateReachableTransitions(pm, startTransition);
             }
@@ -298,7 +301,7 @@ namespace RandomizerMod.Randomization
             int passes = 0;
             while (locations.Any() || items.Any() || transitions.Any())
             {
-                if (RandomizerMod.Instance.Settings.RandomizeTransitions) transitions.ExceptWith(tm.reachableTransitions);
+                if (settings.RandomizeTransitions) transitions.ExceptWith(tm.reachableTransitions);
 
                 foreach (string location in locations.Where(loc => pm.CanGet(loc)).ToList())
                 {
@@ -307,8 +310,8 @@ namespace RandomizerMod.Randomization
                     if (VanillaManager.progressionLocations.Contains(location))
                     {
                         im.vm.UpdateVanillaLocations(im, location, false, pm);
-                        if (RandomizerMod.Instance.Settings.RandomizeTransitions && !LogicManager.ShopNames.Contains(location)) tm.UpdateReachableTransitions(pm, location, true);
-                        else if (RandomizerMod.Instance.Settings.RandomizeTransitions)
+                        if (settings.RandomizeTransitions && !LogicManager.ShopNames.Contains(location)) tm.UpdateReachableTransitions(pm, location, true);
+                        else if (settings.RandomizeTransitions)
                         {
                             foreach (string i in VanillaManager.progressionShopItems[location])
                             {
@@ -324,7 +327,7 @@ namespace RandomizerMod.Randomization
                         if (LogicManager.GetItemDef(item).progression)
                         {
                             pm.Add(item);
-                            if (RandomizerMod.Instance.Settings.RandomizeTransitions) tm.UpdateReachableTransitions(pm, item, true);
+                            if (settings.RandomizeTransitions) tm.UpdateReachableTransitions(pm, item, true);
                         }
                     }
 
@@ -336,7 +339,7 @@ namespace RandomizerMod.Randomization
                             if (LogicManager.GetItemDef(newItem).progression)
                             {
                                 pm.Add(newItem);
-                                if (RandomizerMod.Instance.Settings.RandomizeTransitions) tm.UpdateReachableTransitions(pm, newItem, true);
+                                if (settings.RandomizeTransitions) tm.UpdateReachableTransitions(pm, newItem, true);
                             }
                         }
                     }

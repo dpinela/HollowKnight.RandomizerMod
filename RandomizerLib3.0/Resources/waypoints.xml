@@ -1,0 +1,320 @@
+﻿<randomizer>
+  <item name="King's_Pass">
+    <itemLogic>Howling_Cliffs | (Dirtmouth + CLAW)</itemLogic>
+    <areaLogic>Tutorial_01[top1] | Tutorial_01[top2] | Tutorial_01[right1]</areaLogic>
+  </item>
+  <item name="Dirtmouth">
+    <itemLogic>Crossroads | (Upper_Crystal_Peak + CLAW + SUPERDASH) | King's_Pass | (Howling_Cliffs + (SUPERDASH | (WINGS + DASH))) | (Dirtmouth_Stag + Can_Stag)</itemLogic>
+    <areaLogic>Town[left1] | Town[right1] | Town[top1] | Town[bot1] | (Dirtmouth_Stag + Can_Stag)</areaLogic>
+  </item>
+  <item name="Can_Stag">
+    <itemLogic>Crossroads | Greenpath | Queen's_Station | Top_Left_Queen's_Gardens | Left_Elevator | Upper_King's_Station | Upper_Resting_Grounds | (Distant_Village + (CLAW | WINGS | (Beast's_Den + DASH))) | Palace_Grounds</itemLogic>
+    <areaLogic>Crossroads | Greenpath | Queen's_Station | Top_Left_Queen's_Gardens | Left_Elevator | Upper_King's_Station | Upper_Resting_Grounds | (Distant_Village + (CLAW | WINGS | (Deepnest_10[door1] + DASH))) | Palace_Grounds</areaLogic>
+  </item>
+  <item name="Crossroads">
+    <itemLogic>Dirtmouth | (Crystal_Peak + LANTERN) | (Blue_Lake + (CLAW | WINGS)) | (Fungal_Wastes + (ACID | DASH | SUPERDASH | CLAW | WINGS)) | (Right_Fog_Canyon + (CLAW + (SKIPACID | ACID | (WINGS + DASH + ACIDSKIPS)))) | Ancestral_Mound | Upper_Tram | (Crossroads_Stag + Can_Stag) | Left_Elevator</itemLogic>
+    <areaLogic>Crossroads_01[top1] | (CLAW + (ACID | (ACIDSKIPS + SUPERDASH)) + Crossroads_35[bot1]) | Crossroads_18[bot1] | Crossroads_04[right1] | (LANTERN + Mines_33[right1]) | Crossroads_45[right1] | Crossroads_06[door1] | Crossroads_02[door1] | Upper_Tram | (Crossroads_Stag + Can_Stag) | Left_Elevator</areaLogic>
+  </item>
+  <item name="Ancestral_Mound">
+    <itemLogic>Crossroads</itemLogic>
+    <areaLogic>Crossroads_ShamanTemple[left1]</areaLogic>
+  </item>
+  <item name="Greenpath">
+    <itemLogic>(Crossroads + BALDURS) | Howling_Cliffs | Left_Fog_Canyon | (Lake_of_Unn + (DASH | WINGS | (CLAW + (ACID | SUPERDASH)))) | Stone_Sanctuary | (Greenpath-QG + (CLAW | WINGS)) | (Greenpath_Stag + Can_Stag)</itemLogic>
+    <areaLogic>Fungus1_01[right1] | Fungus1_20_v02[right1] | Fungus1_11[bot1] | Fungus1_34[door1] | (Fungus1_25[left1] + (DASH | WINGS | (CLAW + (ACID | SUPERDASH)))) | (Greenpath-QG + (CLAW | WINGS)) | (Greenpath_Stag + Can_Stag)</areaLogic>
+  </item>
+  <item name="Lake_of_Unn">
+    <itemLogic>Greenpath + (DASH | WINGS | SUPERDASH | ACID | AIRSTALL)</itemLogic>
+    <areaLogic>Fungus1_26[right1]</areaLogic>
+  </item>
+  <item name="Stone_Sanctuary">
+    <itemLogic>Greenpath + (LANTERN | DARKROOMS)</itemLogic>
+    <areaLogic>Fungus1_35[left1] + (LANTERN | DARKROOMS)</areaLogic>
+  </item>
+  <item name="Greenpath-QG">
+    <itemLogic>Greenpath + Far_Queen's_Gardens + CLAW</itemLogic>
+    <areaLogic>Greenpath + Fungus1_13[left1] + CLAW</areaLogic>
+  </item>
+  <item name="Left_Fog_Canyon">
+    <itemLogic>Greenpath | Queen's_Station | (Top_Right_Queen's_Gardens + (CLAW | WINGS | ACID | SKIPACID)) | Right_Fog_Canyon</itemLogic>
+    <areaLogic>Fungus3_01[top1] | Fungus3_02[right2] | ((CLAW | WINGS) + Fungus3_44[bot1]) | Fungus3_44[door1] | ((ACID | SKIPACID) + Fungus3_03[left1]) | Right_Fog_Canyon</areaLogic>
+  </item>
+  <item name="Overgrown_Mound">
+    <itemLogic>Left_Fog_Canyon + (CLAW | (WINGS + MILDSKIPS))</itemLogic>
+    <areaLogic>Room_Fungus_Shaman[left1]</areaLogic>
+  </item>
+  <item name="Right_Fog_Canyon">
+    <itemLogic>(Left_Fog_Canyon + SHADOWDASH) | (Fungal_Wastes + ACID) | (Crossroads + (ACID | SKIPACID | (WINGS + DASH + ACIDSKIPS))) | Teacher's_Archives</itemLogic>
+    <areaLogic>(Left_Fog_Canyon + SHADOWDASH) | Fungus3_26[right1] | Fungus3_26[top1] | Fungus3_47[door1]</areaLogic>
+  </item>
+  <item name="Teacher's_Archives">
+    <itemLogic>Right_Fog_Canyon</itemLogic>
+    <areaLogic>Fungus3_archive[left1]</areaLogic>
+  </item>
+  <item name="Queen's_Station">
+    <itemLogic>Left_Fog_Canyon | Fungal_Wastes | (Queen's_Station_Stag + Can_Stag)</itemLogic>
+    <areaLogic>Fungus2_01[left1] | Fungus2_01[right1] | (Queen's_Station_Stag + Can_Stag)</areaLogic>
+  </item>
+  <item name="Fungal_Wastes">
+    <itemLogic>(Queen's_Station + (CLAW | WINGS | DASH | SUPERDASH | AIRSTALL)) | (ACID + Right_Fog_Canyon) | (Crossroads + (DASH | WINGS | INFECTED | (CLAW + AIRSTALL))) | ((Left_City | Left_Elevator) + CLAW + QUAKE) | (Fungal_Core + (CLAW | WINGS)) | (Mantis_Village + (CLAW | WINGS | MILDSKIPS)) | (Mantis_Outskirts + (DASH | CLAW | WINGS | ACID | MILDSKIPS))</itemLogic>
+    <areaLogic>Fungus2_03[left1] | (ACID + Fungus2_33[left1]) | Fungus2_06[top1] | (CLAW + QUAKE + Fungus2_21[right1]) | Fungus2_11[right1] | ((CLAW | WINGS) + (Bottom_Left_Fungal_Wastes | Fungus2_17[left1] | Fungus2_17[bot1]))</areaLogic>
+  </item>
+  <item name="Bottom_Left_Fungal_Wastes">
+    <itemLogic>(Fungal_Wastes + (CLAW | (WINGS + (SHADESKIPS | SPICYSKIPS)))) | Bottom_Right_Queen's_Gardens | (Upper_Deepnest + ((CLAW + (DASH | SUPERDASH | WINGS | SHADESKIPS | SPICYSKIPS)) | (WINGS + (SHADESKIPS | SPICYSKIPS))))</itemLogic>
+    <areaLogic>Deepnest_01[bot1] | Deepnest_01[left1] | (Fungal_Wastes + (CLAW | (WINGS + (SHADESKIPS | SPICYSKIPS))))</areaLogic>
+  </item>
+  <item name="Fungal_Core">
+    <itemLogic>Fungal_Wastes + CLAW + WINGS</itemLogic>
+    <areaLogic>Fungus2_29[right1] + CLAW + WINGS</areaLogic>
+  </item>
+  <!--inconsistency: Mantis_Outskirts is used for Fungus2_12 and dashmaster access in item rando. Shouldn't cause issues-->
+  <item name="Mantis_Outskirts">
+    <itemLogic>Fungal_Wastes | (Mantis_Village + (CLAW | WINGS | ACID | (DASH + MILDSKIPS)))</itemLogic>
+    <areaLogic>Fungus2_12[left1] | (Far_Left_Waterways + (CLAW | WINGS) + Fungus2_23[right2]) | (Mantis_Village + (CLAW | WINGS | ACID | (DASH + MILDSKIPS)))</areaLogic>
+  </item>
+  <item name="Mantis_Village">
+    <itemLogic>(Fungal_Wastes + (MILDSKIPS | CLAW | WINGS)) | (Mantis_Outskirts + (DASH | CLAW | WINGS | SUPERDASH | ACID))</itemLogic>
+    <areaLogic>Fungus2_14[top1] | (Fungus2_15[left1] + CLAW) | (Mantis_Outskirts + (DASH | CLAW | WINGS | SUPERDASH | ACID))</areaLogic>
+  </item>
+  <item name="Left_City">
+    <itemLogic>(Fungal_Wastes + CREST + (ACID | SUPERDASH | (CLAW + (DASH | WINGS)))) | Right_City | Soul_Sanctum | Left_Elevator</itemLogic>
+    <areaLogic>Ruins1_01[left1] | Ruins1_04[bot1] | Ruins1_05b[bot1] | Ruins1_31[right1] | Ruins1_05[right1] | Right_City | Left_Elevator</areaLogic>
+  </item>
+  <item name="Left_Elevator">
+    <itemLogic>(Left_City + ((CLAW + (DASH | SUPERDASH | WINGS | MILDSKIPS)) | (WINGS + SHADESKIPS))) | Soul_Sanctum | (City_Storerooms_Stag + Can_Stag)</itemLogic>
+    <areaLogic>(Left_City + ((CLAW + (DASH | SUPERDASH | WINGS | MILDSKIPS)) | (WINGS + SHADESKIPS))) | Ruins1_31[right1] | (City_Storerooms_Stag + Can_Stag)</areaLogic>
+  </item>
+  <item name="Soul_Sanctum">
+    <itemLogic>(Left_City + ((CLAW + (DASH | SUPERDASH | WINGS | MILDSKIPS)) | (WINGS + MILDSKIPS))) | (Left_Elevator + (CLAW | WINGS))</itemLogic>
+    <areaLogic>Ruins1_23[left1] | (Ruins1_09[left1] + (CLAW | WINGS))</areaLogic>
+  </item>
+  <item name="Right_City">
+    <itemLogic>(Left_City + CLAW + WINGS) | Lower_King's_Station | Pleasure_House | Emilitia | (Waterways_Shaft + CLAW + (DASH | WINGS | SUPERDASH | MILDSKIPS)) | (Central_Left_Waterways + SPICYSKIPS + WINGS + BOSS) | (Central_Left_Waterways + SUPERDASH + MILDSKIPS + WINGS)</itemLogic>
+    <areaLogic>((CLAW + WINGS) + Left_City) | Ruins2_04[left2] | Ruins2_04[right1] | Ruins2_04[right2] | Ruins2_04[door_Ruin_Elevator] | Emilitia</areaLogic>
+  </item>
+  <item name="Lower_King's_Station">
+    <itemLogic>Right_City | Upper_King's_Station | Tower_of_Love | Central_Kingdom's_Edge | (King's_Station_Stag + Can_Stag)</itemLogic>
+    <areaLogic>Ruins2_06[left1] | Ruins2_06[left2] | Upper_King's_Station | Ruins2_07[top1] | Ruins2_07[right1] | (King's_Station_Stag + Can_Stag)</areaLogic>
+  </item>
+  <item name="Upper_King's_Station">
+    <itemLogic>(Right_City + (CLAW | WINGS | (MILDSKIPS + DASH))) | (Lower_King's_Station + (CLAW | WINGS)) | Right_Elevator | Top_Kingdom's_Edge | (King's_Station_Stag + Can_Stag + (CLAW | WINGS | SPICYSKIPS))</itemLogic>
+    <areaLogic>(Ruins2_06[left1] + (CLAW | WINGS | MILDSKIPS)) | ((CLAW | WINGS) + (Ruins2_07[top1] | Ruins2_07[right1])) | Right_Elevator | Top_Kingdom's_Edge | (King's_Station_Stag + Can_Stag + (CLAW | WINGS | SPICYSKIPS))</areaLogic>
+  </item>
+  <item name="Right_Elevator">
+    <itemLogic>Lower_Resting_Grounds | Upper_King's_Station</itemLogic>
+    <areaLogic>Lower_Resting_Grounds | Upper_King's_Station</areaLogic>
+  </item>
+  <item name="Pleasure_House">
+    <itemLogic>Right_City + (Upper_King's_Station | CLAW | WINGS | DASH) + SIMPLE4</itemLogic>
+    <areaLogic>Ruins_Elevator[left1] | Ruins_Bathhouse[right1]</areaLogic>
+  </item>
+  <item name="Tower_of_Love">
+    <itemLogic>Upper_Kingdom's_Edge</itemLogic>
+    <areaLogic>Ruins2_11_b[right1]</areaLogic>
+  </item>
+  <item name="Upper_Left_Waterways">
+    <itemLogic>(Left_City + SIMPLE1) | (Far_Left_Waterways + (CLAW | WINGS)) | (Central_Left_Waterways + (CLAW | (WINGS + MILDSKIPS)))</itemLogic>
+    <areaLogic>Waterways_01[top1] | (Far_Left_Waterways + (CLAW | WINGS)) | (Central_Left_Waterways + (CLAW | (WINGS + MILDSKIPS)))</areaLogic>
+  </item>
+  <item name="Central_Left_Waterways">
+    <itemLogic>Upper_Left_Waterways | (Lower_Left_Waterways + (CLAW | WINGS)) | (Waterways_Shaft + TUNNEL + (SUPERDASH | ACID) + (CLAW | WINGS | SPICYSKIPS)) | (Right_Waterways + CLAW + SUPERDASH)</itemLogic>
+    <areaLogic>Upper_Left_Waterways | (Lower_Left_Waterways + (CLAW | WINGS)) | (Waterways_Shaft + TUNNEL + (SUPERDASH | ACID) + (CLAW | WINGS | SPICYSKIPS)) | (Right_Waterways + CLAW + SUPERDASH)</areaLogic>
+  </item>
+  <item name="Far_Left_Waterways">
+    <itemLogic>Upper_Left_Waterways + (CLAW | WINGS)</itemLogic>
+    <areaLogic>(Upper_Left_Waterways + (CLAW | WINGS)) | (Waterways_09[left1])</areaLogic>
+  </item>
+  <item name="Lower_Left_Waterways">
+    <itemLogic>(Central_Left_Waterways + QUAKE) | (Junk_Pit + CLAW)</itemLogic>
+    <areaLogic>(Central_Left_Waterways + QUAKE) | (GG_Pipeway[left1] + (CLAW | WINGS))</areaLogic>
+  </item>
+  <item name="Waterways_Shaft">
+    <itemLogic>Right_City | (Upper_Basin + CLAW) | (Central_Left_Waterways + (CLAW | (WINGS + SPICYSKIPS) | SUPERDASH | (ACID + TUNNEL))) | (Right_Waterways + CLAW + (SUPERDASH | (ACID + WINGS + TUNNEL)))</itemLogic>
+    <areaLogic>Abyss_01[right1] | (Abyss_01[left3] + CLAW) | (Central_Left_Waterways + (CLAW | (WINGS + SPICYSKIPS) | SUPERDASH | (ACID + TUNNEL))) | (Right_Waterways + CLAW + (SUPERDASH | (ACID + WINGS + TUNNEL)))</areaLogic>
+  </item>
+  <item name="Right_Waterways">
+    <itemLogic>(Central_Left_Waterways + SUPERDASH + (CLAW | (WINGS + ACID))) | (Waterways_Shaft + TUNNEL + ((CLAW + SUPERDASH) | (CLAW + WINGS + DASH) | ((CLAW | WINGS) + ACID))) | (Lower_Kingdom's_Edge + CLAW + (SUPERDASH | ACID)) | (Isma's_Grove + (ACID | SKIPACID)) | Emilitia</itemLogic>
+    <areaLogic>(Central_Left_Waterways + SUPERDASH + (CLAW | (WINGS + ACID))) | (Waterways_Shaft + TUNNEL + ((CLAW + SUPERDASH) | (CLAW + WINGS + DASH) | ((CLAW | WINGS) + ACID))) | (Waterways_14[bot2] + CLAW + (SUPERDASH | ACID)) | (Waterways_07[right2] + ACID) | (Waterways_07[right1] + (CLAW | WINGS)) | Waterways_07[door1]</areaLogic>
+  </item>
+  <item name="Junk_Pit">
+    <itemLogic>Lower_Left_Waterways + (CLAW | WINGS)</itemLogic>
+    <areaLogic>GG_Waterways[right1] | Room_GG_Shortcut[top1]</areaLogic>
+  </item>
+  <item name="Isma's_Grove">
+    <itemLogic>Right_Waterways + ((CLAW + Central_Left_Waterways + BOSS) | (ACID + (CLAW | WINGS | MILDSKIPS)) | SKIPACID)</itemLogic>
+    <areaLogic>(Waterways_13[left1] + CLAW) | (Waterways_13[left2] + (ACID | SKIPACID))</areaLogic>
+  </item>
+  <item name="Emilitia">
+    <itemLogic>Right_Waterways + CLAW</itemLogic>
+    <areaLogic>Ruins_House_03[left2] + CLAW</areaLogic>
+  </item>
+  <item name="Upper_Deepnest">
+    <itemLogic>Bottom_Left_Fungal_Wastes | Failed_Tramway | (Far_Right_Deepnest + CLAW)</itemLogic>
+    <areaLogic>Deepnest_01b[top1] | Deepnest_01b[top2] | Deepnest_17[left1] | (Far_Right_Deepnest + CLAW)</areaLogic>
+  </item>
+  <item name="Far_Right_Deepnest">
+    <itemLogic>(Mantis_Village + (CLAW | WINGS)) | Fungal_Core</itemLogic>
+    <areaLogic>Fungus2_25[right1] | Fungus2_25[top2]</areaLogic>
+  </item>
+  <item name="Deepnest">
+    <itemLogic>(Upper_Deepnest + (CLAW | WINGS)) | Lower_Tram | Failed_Tramway | (Dark_Deepnest + (CLAW | WINGS | DASH) + (LANTERN | DARKROOMS))</itemLogic>
+    <areaLogic>(Upper_Deepnest + (CLAW | WINGS)) | Lower_Tram | Deepnest_33[top1] | Deepnest_33[top2] | (Dark_Deepnest + (CLAW | WINGS | DASH) + (LANTERN | DARKROOMS))</areaLogic>
+  </item>
+  <item name="Failed_Tramway">
+    <itemLogic>(Deepnest + (CLAW | WINGS)) | (Dark_Deepnest + CLAW)</itemLogic>
+    <areaLogic>((Deepnest_14[bot1] | Deepnest_14[bot2]) + (CLAW | DASH | WINGS)) | Deepnest_26[bot1]</areaLogic>
+  </item>
+  <item name="Dark_Deepnest">
+    <itemLogic>(LANTERN | DARKROOMS) + ((Deepnest + (CLAW | WINGS)) | (Bottom_Left_Queen's_Gardens + (CLAW | WINGS)) | Weaver's_Den | (Distant_Village + CLAW))</itemLogic>
+    <areaLogic>(LANTERN | DARKROOMS) + ((Deepnest + (CLAW | WINGS)) | Deepnest_42[top1] | Deepnest_39[door1] | ((Deepnest_41[left1] | Deepnest_41[left2]) + CLAW))</areaLogic>
+  </item>
+  <item name="Weaver's_Den">
+    <itemLogic>Dark_Deepnest + (DASH | WINGS | SUPERDASH | AIRSTALL) + (CLAW | (WINGS + MILDSKIPS))</itemLogic>
+    <areaLogic>Deepnest_45_v02[left1]</areaLogic>
+  </item>
+  <item name="Distant_Village">
+    <itemLogic>(Dark_Deepnest + (CLAW | (WINGS + MILDSKIPS))) | Beast's_Den | (Distant_Village_Stag + Can_Stag)</itemLogic>
+    <areaLogic>Deepnest_10[right2] | Deepnest_10[door1] | (Distant_Village_Stag + Can_Stag)</areaLogic>
+  </item>
+  <item name="Beast's_Den">
+    <itemLogic>(Dark_Deepnest + (CLAW | (WINGS + MILDSKIPS))) | (Distant_Village_Stag + Can_Stag) | (Distant_Village + (CLAW | WINGS))</itemLogic>
+    <areaLogic>Deepnest_Spider_Town[left1]</areaLogic>
+  </item>
+  <item name="Lower_Tram">
+    <itemLogic>TRAM + (Deepnest | Mid_Basin | Lower_Kingdom's_Edge)</itemLogic>
+    <areaLogic>TRAM + (Deepnest | Mid_Basin | Lower_Kingdom's_Edge)</areaLogic>
+  </item>
+  <item name="Upper_Basin">
+    <itemLogic>Waterways_Shaft | (Mid_Basin + (CLAW | WINGS))</itemLogic>
+    <areaLogic>Abyss_02[right1] | (Mid_Basin + (CLAW | WINGS))</areaLogic>
+  </item>
+  <item name="Mid_Basin">
+    <itemLogic>Upper_Basin | (Lower_Basin + (CLAW | (WINGS + MILDSKIPS))) | Lower_Tram</itemLogic>
+    <areaLogic>Upper_Basin | (Lower_Basin + (CLAW | (WINGS + MILDSKIPS))) | Lower_Tram</areaLogic>
+  </item>
+  <item name="Lower_Basin">
+    <itemLogic>Mid_Basin | (Abyss + ((CLAW + DASH) | WINGS)) | Palace_Grounds | (Far_Left_Basin + (CLAW | WINGS | SUPERDASH))</itemLogic>
+    <areaLogic>Mid_Basin | Abyss_04[bot1] | Abyss_04[right1] | (Far_Left_Basin + (CLAW | WINGS | SUPERDASH))</areaLogic>
+  </item>
+  <item name="Far_Left_Basin">
+    <itemLogic>Lower_Basin + (WINGS | SUPERDASH)</itemLogic>
+    <areaLogic>Lower_Basin + (WINGS | SUPERDASH)</areaLogic>
+  </item>
+  <item name="Palace_Grounds">
+    <itemLogic>(Lower_Basin + CLAW + WINGS) | (Hidden_Station_Stag + Can_Stag)</itemLogic>
+    <areaLogic>Abyss_05[left1] | (Hidden_Station_Stag + Can_Stag)</areaLogic>
+  </item>
+  <item name="Abyss">
+    <itemLogic>Lower_Basin + King's_Brand</itemLogic>
+    <areaLogic>Abyss_06_Core[top1] + King's_Brand</areaLogic>
+  </item>
+  <item name="Lower_Kingdom's_Edge">
+    <itemLogic>Lower_Tram | (Hive + (CLAW | WINGS))</itemLogic>
+    <areaLogic>Lower_Tram | Abyss_03_c[right1] | Deepnest_East_01[right1] | Deepnest_East_02[top1]</areaLogic>
+  </item>
+  <!--Deepnest_East_03-->
+  <item name="Central_Kingdom's_Edge">
+    <itemLogic>Right_City | (Lower_Kingdom's_Edge + (CLAW | WINGS)) | Upper_Kingdom's_Edge | Center_Right_Kingdom's_Edge</itemLogic>
+    <areaLogic>Deepnest_East_03[left1] | Deepnest_East_02[top1] | (Lower_Kingdom's_Edge + (CLAW | WINGS)) | Upper_Kingdom's_Edge | Center_Right_Kingdom's_Edge</areaLogic>
+  </item>
+  <!--Deepnest_East_07-->
+  <item name="Upper_Kingdom's_Edge">
+    <itemLogic>Center_Right_Kingdom's_Edge | Top_Kingdom's_Edge | Tower_of_Love</itemLogic>
+    <areaLogic>Center_Right_Kingdom's_Edge | Top_Kingdom's_Edge | Deepnest_East_07[left2]</areaLogic>
+  </item>
+  <!--Deepnest_East_11-->
+  <item name="Center_Right_Kingdom's_Edge">
+    <itemLogic>(Central_Kingdom's_Edge + (CLAW | (WINGS + MILDSKIPS) | (ACID + (DASH | WINGS)))) | Upper_Kingdom's_Edge | Cast_Off_Shell</itemLogic>
+    <areaLogic>(Central_Kingdom's_Edge + (CLAW | (WINGS + MILDSKIPS) | (ACID + (DASH | WINGS)))) | Upper_Kingdom's_Edge | Deepnest_East_11[right1]</areaLogic>
+  </item>
+  <item name="Oro_Bench">
+    <itemLogic>(Central_Kingdom's_Edge + (CLAW | (WINGS + MILDSKIPS))) | (Center_Right_Kingdom's_Edge + (CLAW | WINGS | SPICYSKIPS))</itemLogic>
+    <areaLogic>(Central_Kingdom's_Edge + (CLAW | (WINGS + MILDSKIPS))) | (Center_Right_Kingdom's_Edge + (CLAW | WINGS | SPICYSKIPS))</areaLogic>
+  </item>
+  <item name="Cast_Off_Shell">
+    <itemLogic>Upper_Kingdom's_Edge + (WINGS | (SPICYSKIPS + CLAW))</itemLogic>
+    <areaLogic>Deepnest_East_Hornet[left1]</areaLogic>
+  </item>
+  <item name="Top_Kingdom's_Edge">
+    <itemLogic>(Upper_Kingdom's_Edge + (CLAW | WINGS)) | Colosseum</itemLogic>
+    <areaLogic>(Upper_Kingdom's_Edge + (CLAW | WINGS)) | Deepnest_East_09[right1]</areaLogic>
+  </item>
+  <item name="Hive">
+    <itemLogic>Lower_Kingdom's_Edge + (CLAW | WINGS)</itemLogic>
+    <areaLogic>Hive_01[left1] | Hive_03_c[left1]</areaLogic>
+  </item>
+  <item name="Colosseum">
+    <itemLogic>Top_Kingdom's_Edge | Pale_Lurker_Area</itemLogic>
+    <areaLogic>Room_Colosseum_01[left1] | (Room_Colosseum_Spectate[right1] + CLAW)</areaLogic>
+  </item>
+  <item name="Pale_Lurker_Area">
+    <itemLogic>Colosseum + CLAW</itemLogic>
+    <areaLogic>GG_Lurker[left1]</areaLogic>
+  </item>
+  <item name="Crystal_Peak">
+    <itemLogic>(Crossroads + (LANTERN | QUAKE)) | (Dirtmouth + CLAW + WINGS + SUPERDASH) | ((SUPERDASH | (WINGS + DASH)) + (LANTERN | DARKROOMS) + Crystallized_Mound) | Upper_Crystal_Peak</itemLogic>
+    <areaLogic>(QUAKE + Mines_01[left1]) | Mines_02[left1] | ((SUPERDASH | (WINGS + DASH)) + (LANTERN | DARKROOMS) + Mines_28[door1]) | Upper_Crystal_Peak</areaLogic>
+  </item>
+  <item name="Upper_Crystal_Peak">
+    <itemLogic>(Crystal_Peak + (CLAW | (SPIKETUNNELS + WINGS + (DASH | AIRSTALL)))) | (King's_Pass + CLAW + WINGS + SUPERDASH) | Hallownest's_Crown</itemLogic>
+    <areaLogic>(Crystal_Peak + (CLAW | (SPIKETUNNELS + WINGS + (DASH | AIRSTALL)))) | (Mines_10[left1] + CLAW + WINGS + SUPERDASH) | Mines_13[top1] | Mines_23[top1] | Mines_23[right1]</areaLogic>
+  </item>
+  <item name="Hallownest's_Crown">
+    <itemLogic>Upper_Crystal_Peak + CLAW + (DASH | WINGS | SUPERDASH) + (WINGS | MILDSKIPS)</itemLogic>
+    <areaLogic>Mines_25[left1] + CLAW + (DASH | WINGS | SUPERDASH) + (WINGS | MILDSKIPS)</areaLogic>
+  </item>
+  <item name="Crystallized_Mound">
+    <itemLogic>Crystal_Peak + (LANTERN | DARKROOMS) + ((WINGS + DASH) | SUPERDASH | (AIRSTALL + (WINGS | DASH)))</itemLogic>
+    <areaLogic>Mines_35[left1]</areaLogic>
+  </item>
+  <item name="Upper_Tram">
+    <itemLogic>TRAM + (Crossroads | Upper_Resting_Grounds)</itemLogic>
+    <areaLogic>TRAM + (Crossroads | Upper_Resting_Grounds)</areaLogic>
+  </item>
+  <item name="Upper_Resting_Grounds">
+    <itemLogic>Upper_Tram | (Lower_Resting_Grounds + (DASH | CLAW | WINGS | MILDSKIPS)) | (Crystal_Peak + (LANTERN | DARKROOMS)) | Crystallized_Mound | Spirits_Glade | (Resting_Grounds_Stag + Can_Stag)</itemLogic>
+    <areaLogic>Upper_Tram | (Lower_Resting_Grounds + (DASH | CLAW | WINGS | MILDSKIPS)) | RestingGrounds_02[top1] | RestingGrounds_05[right1] | (Resting_Grounds_Stag + Can_Stag)</areaLogic>
+  </item>
+  <item name="Spirits_Glade">
+    <itemLogic>200ESSENCE + Upper_Resting_Grounds</itemLogic>
+    <areaLogic>RestingGrounds_08[left1]</areaLogic>
+  </item>
+  <item name="Lower_Resting_Grounds">
+    <itemLogic>(Upper_Resting_Grounds + QUAKE) | Blue_Lake | Right_Elevator</itemLogic>
+    <areaLogic>(Upper_Resting_Grounds + QUAKE) | RestingGrounds_06[left1] | Right_Elevator</areaLogic>
+  </item>
+  <item name="Blue_Lake">
+    <itemLogic>(Crossroads + ((CLAW + (WINGS | SUPERDASH)) | INFECTED | (SHADESKIPS + (CLAW | WINGS | (SPICYSKIPS + DASH + AIRSTALL))))) | (Lower_Resting_Grounds + (CLAW | WINGS))</itemLogic>
+    <areaLogic>Crossroads_50[left1] | (Crossroads_50[right1] + (CLAW | WINGS))</areaLogic>
+  </item>
+  <item name="Top_Right_Queen's_Gardens">
+    <itemLogic>(Left_Fog_Canyon + (ACID | SKIPACID | SHADOWDASH)) | (Top_Left_Queen's_Gardens + (SUPERDASH | DASH | WINGS))</itemLogic>
+    <areaLogic>Fungus3_34[right1] | Fungus3_34[top1] | (Top_Left_Queen's_Gardens + (SUPERDASH | DASH | WINGS))</areaLogic>
+  </item>
+  <!--Check skills here-->
+  <item name="Bottom_Right_Queen's_Gardens">
+    <itemLogic>(Top_Right_Queen's_Gardens + (DASH | ((CLAW | WINGS) + SUPERDASH))) | (Bottom_Left_Queen's_Gardens + CLAW)</itemLogic>
+    <areaLogic>(Top_Right_Queen's_Gardens + (DASH | ((CLAW | WINGS) + SUPERDASH))) | (Bottom_Left_Queen's_Gardens + CLAW)</areaLogic>
+  </item>
+  <!--Here too-->
+  <item name="Bottom_Left_Queen's_Gardens">
+    <itemLogic>Bottom_Right_Queen's_Gardens | (Top_Left_Queen's_Gardens + (DASH | WINGS)) | (Dark_Deepnest + CLAW + (WINGS | (DASH + MILDSKIPS)) + (LANTERN | (DARKROOMS + SPICYSKIPS)))</itemLogic>
+    <areaLogic>Bottom_Right_Queen's_Gardens | (Top_Left_Queen's_Gardens + (DASH | WINGS)) | (Deepnest_43[bot1] + CLAW)</areaLogic>
+  </item>
+  <item name="Top_Left_Queen's_Gardens">
+    <itemLogic>(Bottom_Left_Queen's_Gardens + MINIBOSS + (CLAW | (WINGS + MILDSKIPS)) + (DASH | WINGS)) | (Queen's_Gardens_Stag + Can_Stag + (CLAW | WINGS | (DASH + SPICYSKIPS))) | (Far_Queen's_Gardens + DASH)</itemLogic>
+    <areaLogic>(Bottom_Left_Queen's_Gardens + MINIBOSS + (CLAW | (WINGS + MILDSKIPS)) + (DASH | WINGS)) | (Queen's_Gardens_Stag + Can_Stag + (CLAW | WINGS | (DASH + SPICYSKIPS))) | (Far_Queen's_Gardens + DASH)</areaLogic>
+  </item>
+  <item name="Far_Queen's_Gardens">
+    <itemLogic>(Top_Left_Queen's_Gardens + (CLAW | WINGS) + DASH) | (Greenpath-QG + (CLAW | WINGS))</itemLogic>
+    <areaLogic>(Top_Left_Queen's_Gardens + (CLAW | WINGS) + DASH) | Fungus3_22[right1]</areaLogic>
+  </item>
+  <item name="Howling_Cliffs">
+    <itemLogic>(Greenpath + ((CLAW + (BALDURS | WINGS)) | (WINGS + AIRSTALL + SHADESKIPS + SPICYSKIPS))) | (King's_Pass + (CLAW | (WINGS + SPICYSKIPS))) | Stag_Nest</itemLogic>
+    <areaLogic>(Cliffs_02[bot1] + (CLAW | WINGS)) | (Fungus1_28[left2] + (CLAW + (BALDURS | WINGS))) | Cliffs_02[left2]</areaLogic>
+  </item>
+  <item name="Stag_Nest">
+    <itemLogic>(Howling_Cliffs + WINGS + MILDSKIPS) | ((ALLSTAGS | Stag_Nest_Stag) + Can_Stag)</itemLogic>
+    <areaLogic>Cliffs_03[right1] | ((ALLSTAGS | Stag_Nest_Stag) + Can_Stag)</areaLogic>
+  </item>
+</randomizer>

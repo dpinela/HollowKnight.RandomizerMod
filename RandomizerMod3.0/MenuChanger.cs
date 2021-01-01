@@ -9,6 +9,8 @@ using Object = UnityEngine.Object;
 using Random = System.Random;
 using RandomizerMod.Randomization;
 
+using RandomizerLib;
+
 namespace RandomizerMod
 {
     internal static class MenuChanger
