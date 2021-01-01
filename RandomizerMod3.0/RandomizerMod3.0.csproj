@@ -100,6 +100,14 @@
     <Compile Include="GiveItemActions.cs" />
     <Compile Include="MultiWorld\ClientConnection.cs" />
     <Compile Include="MultiWorld\ConnectionState.cs" />
+    <Compile Include="Randomization\MultiWorld\MWItemManager.cs" />
+    <Compile Include="Randomization\MultiWorld\MWItem.cs" />
+    <Compile Include="Randomization\MultiWorld\MWProgressionManager.cs" />
+    <Compile Include="Randomization\IProgressionManager.cs" />
+    <Compile Include="Randomization\MultiWorld\MWVanillaManager.cs" />
+    <Compile Include="Randomization\RandoSettings.cs" />
+    <Compile Include="Randomization\TransitionRandomizer.cs" />
+    <Compile Include="Randomization\MultiWorld\MWRandomizer.cs" />
     <Compile Include="Randomization\RandomizationError.cs" />
     <Compile Include="StartSaveChanges.cs" />
     <Compile Include="RandoLogger.cs" />

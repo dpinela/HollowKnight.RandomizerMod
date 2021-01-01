@@ -285,7 +285,7 @@ namespace RandomizerMod.MultiWorld
             }
         }
 
-        private void ClearFromSendQueue(uint playerId, string item)
+        private void ClearFromSendQueue(int playerId, string item)
         {
             for(int i=ItemSendQueue.Count-1; i>=0; i--)
             {
@@ -370,7 +370,7 @@ namespace RandomizerMod.MultiWorld
             SendMessage(new MWNotifyMessage { Message = message, To = "All", From = State.UserName });
         }
 
-        public void SendItem(string loc, string item, uint playerId)
+        public void SendItem(string loc, string item, int playerId)
         {
             ItemSendQueue.Add(new MWItemSendMessage { Item = item, To = playerId });
         }

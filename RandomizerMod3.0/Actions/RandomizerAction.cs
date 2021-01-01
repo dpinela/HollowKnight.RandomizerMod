@@ -42,7 +42,7 @@ namespace RandomizerMod.Actions
             // Loop non-shop items
             foreach ((string newItemNameId, string location) in items.Where(item => !shopNames.Contains(item.Item2)))
             {
-                uint playerId;
+                int playerId;
                 string newItemName;
                 (playerId, newItemName) = LogicManager.ExtractPlayerID(newItemNameId);
 

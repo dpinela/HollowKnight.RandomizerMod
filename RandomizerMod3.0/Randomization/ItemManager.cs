@@ -12,7 +12,9 @@ namespace RandomizerMod.Randomization
     {
         private TransitionManager tm;
         internal ProgressionManager pm;
-        private VanillaManager vm;
+        internal VanillaManager vm;
+
+        private RandoSettings settings;
 
         public Dictionary<string, string> nonShopItems;
         public Dictionary<string, List<string>> shopItems;
@@ -38,27 +40,36 @@ namespace RandomizerMod.Randomization
         public HashSet<string> randomizedItems;
         public HashSet<string> allLocations;
 
-        private List<string> startItems;
-        private List<string> startProgression;
-
         public int availableCount => reachableLocations.Intersect(unplacedLocations).Count();
 
         public bool anyLocations => unplacedLocations.Any();
         public bool anyItems => unplacedItems.Any();
         public bool canGuess => unplacedProgression.Any(i => LogicManager.GetItemDef(i).itemCandidate);
-        internal ItemManager(TransitionManager tm, VanillaManager vm, Random rnd, List<string> startItems, List<string> startProgression)
+        internal ItemManager(TransitionManager tm,
+                             Random rnd,
+                             RandoSettings settings,
+                             List<string> startItems,
+                             List<string> startProgression,
+                             Dictionary<string, int> modifiedCosts = null,
+                             VanillaManager vm = null)
         {
-            // takes approximately .004s to construct
             this.tm = tm;
             pm = new ProgressionManager(
                 RandomizerState.InProgress,
                 this,
-                tm
+                tm,
+                modifiedCosts: modifiedCosts
                 ); ;
-            this.vm = vm;
+            if (vm != null)
+            {
+                this.vm = vm;
+            }
+            else
+            {
+                this.vm = new VanillaManager();
+            }
 
-            this.startItems = startItems;
-            this.startProgression = startProgression;
+            this.settings = settings;
 
             nonShopItems = new Dictionary<string, string>();
             shopItems = new Dictionary<string, List<string>>();
@@ -80,7 +91,7 @@ namespace RandomizerMod.Randomization
                 shopItems.Add(shopName, new List<string>());
             }
 
-            randomizedItems = GetRandomizedItems();
+            randomizedItems = GetRandomizedItems(startItems);
             randomizedLocations = GetRandomizedLocations();
             List<string> items = randomizedItems.ToList();
             List<string> locations = randomizedLocations.ToList();
@@ -99,7 +110,7 @@ namespace RandomizerMod.Randomization
             {
                 string i = items[rnd.Next(items.Count)];
 
-                if (RandomizerMod.Instance.Settings.Cursed)
+                if (settings.Cursed)
                 {
                     if (LogicManager.GetItemDef(i).majorItem) i = items[rnd.Next(items.Count)];
                 }
@@ -137,32 +148,32 @@ namespace RandomizerMod.Randomization
             }
         }
 
-        private HashSet<string> GetRandomizedItems() // not suitable outside randomizer, because it can't compute duplicate items
+        private HashSet<string> GetRandomizedItems(List<string> startItems) // not suitable outside randomizer, because it can't compute duplicate items
         {
             HashSet<string> items = new HashSet<string>();
 
-            if (RandomizerMod.Instance.Settings.RandomizeDreamers) items.UnionWith(LogicManager.GetItemsByPool("Dreamer"));
-            if (RandomizerMod.Instance.Settings.RandomizeSkills) items.UnionWith(LogicManager.GetItemsByPool("Skill"));
-            if (RandomizerMod.Instance.Settings.RandomizeCharms) items.UnionWith(LogicManager.GetItemsByPool("Charm"));
-            if (RandomizerMod.Instance.Settings.RandomizeKeys) items.UnionWith(LogicManager.GetItemsByPool("Key"));
-            if (RandomizerMod.Instance.Settings.RandomizeMaskShards) items.UnionWith(LogicManager.GetItemsByPool("Mask"));
-            if (RandomizerMod.Instance.Settings.RandomizeVesselFragments) items.UnionWith(LogicManager.GetItemsByPool("Vessel"));
-            if (RandomizerMod.Instance.Settings.RandomizePaleOre) items.UnionWith(LogicManager.GetItemsByPool("Ore"));
-            if (RandomizerMod.Instance.Settings.RandomizeCharmNotches) items.UnionWith(LogicManager.GetItemsByPool("Notch"));
-            if (RandomizerMod.Instance.Settings.RandomizeGeoChests) items.UnionWith(LogicManager.GetItemsByPool("Geo"));
-            if (RandomizerMod.Instance.Settings.RandomizeRancidEggs) items.UnionWith(LogicManager.GetItemsByPool("Egg"));
-            if (RandomizerMod.Instance.Settings.RandomizeRelics) items.UnionWith(LogicManager.GetItemsByPool("Relic"));
-            if (RandomizerMod.Instance.Settings.RandomizeMaps) items.UnionWith(LogicManager.GetItemsByPool("Map"));
-            if (RandomizerMod.Instance.Settings.RandomizeStags) items.UnionWith(LogicManager.GetItemsByPool("Stag"));
-            if (RandomizerMod.Instance.Settings.RandomizeGrubs) items.UnionWith(LogicManager.GetItemsByPool("Grub"));
-            if (RandomizerMod.Instance.Settings.RandomizeWhisperingRoots) items.UnionWith(LogicManager.GetItemsByPool("Root"));
-            if (RandomizerMod.Instance.Settings.RandomizeRocks) items.UnionWith(LogicManager.GetItemsByPool("Rock"));
-            if (RandomizerMod.Instance.Settings.RandomizeSoulTotems) items.UnionWith(LogicManager.GetItemsByPool("Soul"));
-            if (RandomizerMod.Instance.Settings.RandomizePalaceTotems) items.UnionWith(LogicManager.GetItemsByPool("PalaceSoul"));
-            if (RandomizerMod.Instance.Settings.RandomizeLoreTablets) items.UnionWith(LogicManager.GetItemsByPool("Lore"));
-            if (RandomizerMod.Instance.Settings.RandomizeLifebloodCocoons) items.UnionWith(LogicManager.GetItemsByPool("Cocoon"));
+            if (settings.RandomizeDreamers) items.UnionWith(LogicManager.GetItemsByPool("Dreamer"));
+            if (settings.RandomizeSkills) items.UnionWith(LogicManager.GetItemsByPool("Skill"));
+            if (settings.RandomizeCharms) items.UnionWith(LogicManager.GetItemsByPool("Charm"));
+            if (settings.RandomizeKeys) items.UnionWith(LogicManager.GetItemsByPool("Key"));
+            if (settings.RandomizeMaskShards) items.UnionWith(LogicManager.GetItemsByPool("Mask"));
+            if (settings.RandomizeVesselFragments) items.UnionWith(LogicManager.GetItemsByPool("Vessel"));
+            if (settings.RandomizePaleOre) items.UnionWith(LogicManager.GetItemsByPool("Ore"));
+            if (settings.RandomizeCharmNotches) items.UnionWith(LogicManager.GetItemsByPool("Notch"));
+            if (settings.RandomizeGeoChests) items.UnionWith(LogicManager.GetItemsByPool("Geo"));
+            if (settings.RandomizeRancidEggs) items.UnionWith(LogicManager.GetItemsByPool("Egg"));
+            if (settings.RandomizeRelics) items.UnionWith(LogicManager.GetItemsByPool("Relic"));
+            if (settings.RandomizeMaps) items.UnionWith(LogicManager.GetItemsByPool("Map"));
+            if (settings.RandomizeStags) items.UnionWith(LogicManager.GetItemsByPool("Stag"));
+            if (settings.RandomizeGrubs) items.UnionWith(LogicManager.GetItemsByPool("Grub"));
+            if (settings.RandomizeWhisperingRoots) items.UnionWith(LogicManager.GetItemsByPool("Root"));
+            if (settings.RandomizeRocks) items.UnionWith(LogicManager.GetItemsByPool("Rock"));
+            if (settings.RandomizeSoulTotems) items.UnionWith(LogicManager.GetItemsByPool("Soul"));
+            if (settings.RandomizePalaceTotems) items.UnionWith(LogicManager.GetItemsByPool("PalaceSoul"));
+            if (settings.RandomizeLoreTablets) items.UnionWith(LogicManager.GetItemsByPool("Lore"));
+            if (settings.RandomizeLifebloodCocoons) items.UnionWith(LogicManager.GetItemsByPool("Cocoon"));
 
-            if (RandomizerMod.Instance.Settings.Cursed)
+            if (settings.Cursed)
             {
                 items.Remove("Shade_Soul");
                 items.Remove("Descending_Dark");
@@ -196,13 +207,13 @@ namespace RandomizerMod.Randomization
                 items.UnionWith(LogicManager.GetItemsByPool("Cursed"));
             }
 
-            if (RandomizerMod.Instance.Settings.DuplicateMajorItems)
+            if (settings.DuplicateMajorItems)
             {
                 duplicatedItems = new List<string>();
                 foreach (string majorItem in LogicManager.ItemNames.Where(_item => LogicManager.GetItemDef(_item).majorItem).ToList())
                 {
                     if (startItems.Contains(majorItem)) continue;
-                    if (RandomizerMod.Instance.Settings.Cursed && (majorItem == "Vengeful_Spirit" || majorItem == "Desolate_Dive" || majorItem == "Howling_Wraiths")) continue;
+                    if (settings.Cursed && (majorItem == "Vengeful_Spirit" || majorItem == "Desolate_Dive" || majorItem == "Howling_Wraiths")) continue;
                     duplicatedItems.Add(majorItem);
                 }
             }
@@ -210,30 +221,35 @@ namespace RandomizerMod.Randomization
             return items;
         }
 
-        public static HashSet<string> GetRandomizedLocations()
+        public HashSet<string> GetRandomizedLocations()
+        {
+            return GetRandomizedLocations(settings);
+        }
+
+        public static HashSet<string> GetRandomizedLocations(RandoSettings settings)
         {
             HashSet<string> locations = new HashSet<string>();
-            if (RandomizerMod.Instance.Settings.RandomizeDreamers) locations.UnionWith(LogicManager.GetItemsByPool("Dreamer"));
-            if (RandomizerMod.Instance.Settings.RandomizeSkills) locations.UnionWith(LogicManager.GetItemsByPool("Skill"));
-            if (RandomizerMod.Instance.Settings.RandomizeCharms) locations.UnionWith(LogicManager.GetItemsByPool("Charm"));
-            if (RandomizerMod.Instance.Settings.RandomizeKeys) locations.UnionWith(LogicManager.GetItemsByPool("Key"));
-            if (RandomizerMod.Instance.Settings.RandomizeMaskShards) locations.UnionWith(LogicManager.GetItemsByPool("Mask"));
-            if (RandomizerMod.Instance.Settings.RandomizeVesselFragments) locations.UnionWith(LogicManager.GetItemsByPool("Vessel"));
-            if (RandomizerMod.Instance.Settings.RandomizePaleOre) locations.UnionWith(LogicManager.GetItemsByPool("Ore"));
-            if (RandomizerMod.Instance.Settings.RandomizeCharmNotches) locations.UnionWith(LogicManager.GetItemsByPool("Notch"));
-            if (RandomizerMod.Instance.Settings.RandomizeGeoChests) locations.UnionWith(LogicManager.GetItemsByPool("Geo"));
-            if (RandomizerMod.Instance.Settings.RandomizeRancidEggs) locations.UnionWith(LogicManager.GetItemsByPool("Egg"));
-            if (RandomizerMod.Instance.Settings.RandomizeRelics) locations.UnionWith(LogicManager.GetItemsByPool("Relic"));
-            if (RandomizerMod.Instance.Settings.RandomizeMaps) locations.UnionWith(LogicManager.GetItemsByPool("Map"));
-            if (RandomizerMod.Instance.Settings.RandomizeStags) locations.UnionWith(LogicManager.GetItemsByPool("Stag"));
-            if (RandomizerMod.Instance.Settings.RandomizeGrubs) locations.UnionWith(LogicManager.GetItemsByPool("Grub"));
-            if (RandomizerMod.Instance.Settings.RandomizeWhisperingRoots) locations.UnionWith(LogicManager.GetItemsByPool("Root"));
-            if (RandomizerMod.Instance.Settings.RandomizeRocks) locations.UnionWith(LogicManager.GetItemsByPool("Rock"));
-            if (RandomizerMod.Instance.Settings.RandomizeSoulTotems) locations.UnionWith(LogicManager.GetItemsByPool("Soul"));
-            if (RandomizerMod.Instance.Settings.RandomizePalaceTotems) locations.UnionWith(LogicManager.GetItemsByPool("PalaceSoul"));
-            if (RandomizerMod.Instance.Settings.RandomizeLoreTablets) locations.UnionWith(LogicManager.GetItemsByPool("Lore"));
-            if (RandomizerMod.Instance.Settings.RandomizeLifebloodCocoons) locations.UnionWith(LogicManager.GetItemsByPool("Cocoon"));
-            if (RandomizerMod.Instance.Settings.Cursed) locations.UnionWith(LogicManager.GetItemsByPool("Cursed"));
+            if (settings.RandomizeDreamers) locations.UnionWith(LogicManager.GetItemsByPool("Dreamer"));
+            if (settings.RandomizeSkills) locations.UnionWith(LogicManager.GetItemsByPool("Skill"));
+            if (settings.RandomizeCharms) locations.UnionWith(LogicManager.GetItemsByPool("Charm"));
+            if (settings.RandomizeKeys) locations.UnionWith(LogicManager.GetItemsByPool("Key"));
+            if (settings.RandomizeMaskShards) locations.UnionWith(LogicManager.GetItemsByPool("Mask"));
+            if (settings.RandomizeVesselFragments) locations.UnionWith(LogicManager.GetItemsByPool("Vessel"));
+            if (settings.RandomizePaleOre) locations.UnionWith(LogicManager.GetItemsByPool("Ore"));
+            if (settings.RandomizeCharmNotches) locations.UnionWith(LogicManager.GetItemsByPool("Notch"));
+            if (settings.RandomizeGeoChests) locations.UnionWith(LogicManager.GetItemsByPool("Geo"));
+            if (settings.RandomizeRancidEggs) locations.UnionWith(LogicManager.GetItemsByPool("Egg"));
+            if (settings.RandomizeRelics) locations.UnionWith(LogicManager.GetItemsByPool("Relic"));
+            if (settings.RandomizeMaps) locations.UnionWith(LogicManager.GetItemsByPool("Map"));
+            if (settings.RandomizeStags) locations.UnionWith(LogicManager.GetItemsByPool("Stag"));
+            if (settings.RandomizeGrubs) locations.UnionWith(LogicManager.GetItemsByPool("Grub"));
+            if (settings.RandomizeWhisperingRoots) locations.UnionWith(LogicManager.GetItemsByPool("Root"));
+            if (settings.RandomizeRocks) locations.UnionWith(LogicManager.GetItemsByPool("Rock"));
+            if (settings.RandomizeSoulTotems) locations.UnionWith(LogicManager.GetItemsByPool("Soul"));
+            if (settings.RandomizePalaceTotems) locations.UnionWith(LogicManager.GetItemsByPool("PalaceSoul"));
+            if (settings.RandomizeLoreTablets) locations.UnionWith(LogicManager.GetItemsByPool("Lore"));
+            if (settings.RandomizeLifebloodCocoons) locations.UnionWith(LogicManager.GetItemsByPool("Cocoon"));
+            if (settings.Cursed) locations.UnionWith(LogicManager.GetItemsByPool("Cursed"));
 
             locations = new HashSet<string>(locations.Where(item => LogicManager.GetItemDef(item).type != ItemType.Shop));
             locations.UnionWith(LogicManager.ShopNames);
@@ -262,7 +278,7 @@ namespace RandomizerMod.Randomization
             while (updateQueue.Any())
             {
                 potentialLocations = LogicManager.GetLocationsByProgression(recentProgression);
-                if (RandomizerMod.Instance.Settings.RandomizeTransitions)
+                if (settings.RandomizeTransitions)
                 {
                     potentialTransitions = LogicManager.GetTransitionsByProgression(recentProgression);
                 }
@@ -278,7 +294,7 @@ namespace RandomizerMod.Randomization
                     }
                 }
                 
-                if (RandomizerMod.Instance.Settings.RandomizeTransitions)
+                if (settings.RandomizeTransitions)
                 {
                     if (tm.transitionPlacements.TryGetValue(item, out string transition1) && !pm.Has(transition1))
                     {
@@ -365,7 +381,7 @@ namespace RandomizerMod.Randomization
                 string item = unplacedProgression[i];
                 pm.AddTemp(item);
                 if (CheckForNewLocations()) found = true;
-                else if (RandomizerMod.Instance.Settings.RandomizeTransitions)
+                else if (settings.RandomizeTransitions)
                 {
                     UpdateTransitions();
                     while (progressionQueue.Any())
@@ -385,7 +401,7 @@ namespace RandomizerMod.Randomization
         }
         public void Delinearize(Random rand)
         {
-            if (RandomizerMod.Instance.Settings.Cursed) return;
+            if (settings.Cursed) return;
 
             // add back shops for rare consideration for late progression
             if (delinearizeShops && unplacedProgression.Count > 0 && rand.Next(8) == 0)
@@ -424,6 +440,7 @@ namespace RandomizerMod.Randomization
             else nonShopItems.Add(location, item);
             UpdateOrder(location);
             unplacedLocations.Remove(location);
+
             if (LogicManager.GetItemDef(item).progression)
             {
                 unplacedProgression.Remove(item);

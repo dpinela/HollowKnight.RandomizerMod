@@ -9,44 +9,40 @@ namespace RandomizerMod.Randomization
 {
     internal static class PreRandomizer
     {
-        public static void RandomizeNonShopCosts(Random rand)
+        public static Dictionary<string, int> RandomizeNonShopCosts(Random rand, RandoSettings settings)
         {
+            Dictionary<string, int> modifiedCosts = new Dictionary<string, int>();
             foreach (string item in LogicManager.ItemNames)
             {
                 ReqDef def = LogicManager.GetItemDef(item);
-                if (!RandomizerMod.Instance.Settings.GetRandomizeByPool(def.pool))
+                if (!settings.GetRandomizeByPool(def.pool))
                 {
-                    RandomizerMod.Instance.Settings.AddNewCost(item, def.cost);
+                    modifiedCosts.Add(item, def.cost);
                     continue; //Skip cost rando if this item's pool is vanilla
                 }
 
                 if (def.costType == Actions.AddYNDialogueToShiny.CostType.Essence) //essence cost
                 {
                     int cost = 1 + rand.Next(MAX_ESSENCE_COST);
-
-                    def.cost = cost;
-                    LogicManager.EditItemDef(item, def); // really shouldn't be editing this, bad idea
-                    RandomizerMod.Instance.Settings.AddNewCost(item, cost);
+                    modifiedCosts[item] = cost;
                     continue;
                 }
 
                 if (def.costType == Actions.AddYNDialogueToShiny.CostType.Grub) //grub cost
                 {
                     int cost = 1 + rand.Next(MAX_GRUB_COST);
-
-                    def.cost = cost;
-                    LogicManager.EditItemDef(item, def); // yeah, I'm probably not fixing it though
-                    RandomizerMod.Instance.Settings.AddNewCost(item, cost);
+                    modifiedCosts[item] = cost;
                     continue;
                 }
             }
+            return modifiedCosts;
         }
 
-        public static (List<string>, List<string>) RandomizeStartingItems(Random rand)
+        public static (List<string>, List<string>) RandomizeStartingItems(Random rand, RandoSettings settings)
         {
             List<string> startItems = new List<string>();
             List<string> startProgression = new List<string>();
-            if (!RandomizerMod.Instance.Settings.RandomizeStartItems) return (startItems, startProgression);
+            if (!settings.RandomizeStartItems) return (startItems, startProgression);
 
             List<string> pool1 = new List<string> { "Mantis_Claw", "Monarch_Wings" };
             List<string> pool2 = new List<string> { "Mantis_Claw", "Monarch_Wings", "Mothwing_Cloak", "Crystal_Heart" };
@@ -86,19 +82,19 @@ namespace RandomizerMod.Randomization
             return (startItems, startProgression);
         }
 
-        public static string RandomizeStartingLocation(Random rand, List<String> startProgression)
+        public static string RandomizeStartingLocation(Random rand, RandoSettings settings, List<String> startProgression)
         {
             string StartName = null;
-            if (RandomizerMod.Instance.Settings.RandomizeStartLocation)
+            if (settings.RandomizeStartLocation)
             {
-                List<string> startLocations = LogicManager.StartLocations.Where(start => TestStartLocation(start)).Except(new string[] { "King's Pass" }).ToList();
+                List<string> startLocations = LogicManager.StartLocations.Where(start => TestStartLocation(settings, start)).Except(new string[] { "King's Pass" }).ToList();
                 StartName = startLocations[rand.Next(startLocations.Count)];
             }
-            else if (!LogicManager.StartLocations.Contains(RandomizerMod.Instance.Settings.StartName))
+            else if (!LogicManager.StartLocations.Contains(settings.StartName))
             {
                 StartName = "King's Pass";
             }
-            else StartName = RandomizerMod.Instance.Settings.StartName;
+            else StartName = settings.StartName;
 
             Log("Setting start location as " + StartName);
 
@@ -108,30 +104,30 @@ namespace RandomizerMod.Randomization
             {
                 startProgression = new List<string>();
             }
-            if (!RandomizerMod.Instance.Settings.RandomizeRooms)
+            if (!settings.RandomizeRooms)
             {
                 startProgression.Add(def.waypoint);
             }
-            if (RandomizerMod.Instance.Settings.RandomizeAreas && !string.IsNullOrEmpty(def.areaTransition))
+            if (settings.RandomizeAreas && !string.IsNullOrEmpty(def.areaTransition))
             {
                 startProgression.Add(def.areaTransition);
             }
-            if (RandomizerMod.Instance.Settings.RandomizeRooms)
+            if (settings.RandomizeRooms)
             {
                 startProgression.Add(def.roomTransition);
             }
 
             return StartName;
         }
-        private static bool TestStartLocation(string start)
+        private static bool TestStartLocation(RandoSettings settings, string start)
         {
             // could potentially add logic checks here in the future
             StartDef startDef = LogicManager.GetStartLocation(start);
-            if (RandomizerMod.Instance.Settings.RandomizeStartItems)
+            if (settings.RandomizeStartItems)
             {
                 return true;
             }
-            if (RandomizerMod.Instance.Settings.RandomizeRooms)
+            if (settings.RandomizeRooms)
             {
                 if (startDef.roomSafe)
                 {
@@ -139,7 +135,7 @@ namespace RandomizerMod.Randomization
                 }
                 else return false;
             }
-            if (RandomizerMod.Instance.Settings.RandomizeAreas)
+            if (settings.RandomizeAreas)
             {
                 if (startDef.areaSafe)
                 {

@@ -29,6 +29,8 @@ namespace RandomizerMod
         private SerializableBoolDictionary _obtainedLocations = new SerializableBoolDictionary();
         private SerializableBoolDictionary _obtainedTransitions = new SerializableBoolDictionary();
 
+        private RandoSettings _randoSettings = new RandoSettings();
+
         /// <remarks>item, location</remarks>
         public (string, string)[] ItemPlacements => _itemPlacements.Select(pair => (pair.Key, pair.Value)).ToArray();
 
@@ -50,7 +52,14 @@ namespace RandomizerMod
             };
         }
 
+        public RandoSettings RandomizerSettings => _randoSettings;
+
         public int MWNumPlayers
+        {
+            get => GetInt(1);
+            set => SetInt(value);
+        }
+        public int MWPlayerId
         {
             get => GetInt(1);
             set => SetInt(value);
@@ -68,65 +77,65 @@ namespace RandomizerMod
 
         public bool AllBosses
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.AllBosses;
+            set => _randoSettings.AllBosses = value;
         }
 
         public bool AllSkills
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.AllSkills;
+            set => _randoSettings.AllSkills = value;
         }
 
         public bool AllCharms
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.AllCharms;
+            set => _randoSettings.AllCharms = value;
         }
 
         public bool CharmNotch
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.CharmNotch;
+            set => _randoSettings.CharmNotch = value;
         }
 
         public bool Grubfather
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.Grubfather;
+            set => _randoSettings.Grubfather = value;
         }
         public bool Jiji
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.Jiji;
+            set => _randoSettings.Jiji = value;
         }
         public bool Quirrel
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.Quirrel;
+            set => _randoSettings.Quirrel = value;
         }
         public bool ItemDepthHints
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.ItemDepthHints;
+            set => _randoSettings.ItemDepthHints = value;
         }
 
         public bool EarlyGeo
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.EarlyGeo;
+            set => _randoSettings.EarlyGeo = value;
         }
 
         public bool LeverSkips
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.LeverSkips;
+            set => _randoSettings.LeverSkips = value;
         }
 
         public bool ExtraPlatforms
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.ExtraPlatforms;
+            set => _randoSettings.ExtraPlatforms = value;
         }
 
         public bool Randomizer
@@ -136,18 +145,18 @@ namespace RandomizerMod
         }
         public bool RandomizeAreas
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeAreas;
+            set => _randoSettings.RandomizeAreas = value;
         }
         public bool RandomizeRooms
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeRooms;
+            set => _randoSettings.RandomizeRooms = value;
         }
         public bool ConnectAreas
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.ConnectAreas;
+            set => _randoSettings.ConnectAreas = value;
         }
         public bool SlyCharm
         {
@@ -156,199 +165,155 @@ namespace RandomizerMod
         }
         public bool RandomizeDreamers
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeDreamers;
+            set => _randoSettings.RandomizeDreamers = value;
         }
         public bool RandomizeSkills
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeSkills;
+            set => _randoSettings.RandomizeSkills = value;
         }
         public bool RandomizeCharms
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeCharms;
+            set => _randoSettings.RandomizeCharms = value;
         }
         public bool RandomizeKeys
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeKeys;
+            set => _randoSettings.RandomizeKeys = value;
         }
         public bool RandomizeGeoChests
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeGeoChests;
+            set => _randoSettings.RandomizeGeoChests = value;
         }
         public bool RandomizeMaskShards
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeMaskShards;
+            set => _randoSettings.RandomizeMaskShards = value;
         }
         public bool RandomizeVesselFragments
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeVesselFragments;
+            set => _randoSettings.RandomizeVesselFragments = value;
         }
         public bool RandomizeCharmNotches
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeCharmNotches;
+            set => _randoSettings.RandomizeCharmNotches = value;
         }
         public bool RandomizePaleOre
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizePaleOre;
+            set => _randoSettings.RandomizePaleOre = value;
         }
         public bool RandomizeRancidEggs
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeRancidEggs;
+            set => _randoSettings.RandomizeRancidEggs = value;
         }
         public bool RandomizeRelics
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeRelics;
+            set => _randoSettings.RandomizeRelics = value;
         }
 
         public bool RandomizeMaps
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeMaps;
+            set => _randoSettings.RandomizeMaps = value;
         }
 
         public bool RandomizeStags
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeStags;
+            set => _randoSettings.RandomizeStags = value;
         }
 
         public bool RandomizeGrubs
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeGrubs;
+            set => _randoSettings.RandomizeGrubs = value;
         }
 
         public bool RandomizeWhisperingRoots
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeWhisperingRoots;
+            set => _randoSettings.RandomizeWhisperingRoots = value;
         }
         
         public bool RandomizeRocks
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeRocks;
+            set => _randoSettings.RandomizeRocks = value;
         }
         
         public bool RandomizeSoulTotems
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeSoulTotems;
+            set => _randoSettings.RandomizeSoulTotems = value;
         }
         
         public bool RandomizePalaceTotems
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizePalaceTotems;
+            set => _randoSettings.RandomizePalaceTotems = value;
         }
         
         public bool RandomizeLoreTablets
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeLoreTablets;
+            set => _randoSettings.RandomizeLoreTablets = value;
         }
 
         public bool RandomizeLifebloodCocoons
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeLifebloodCocoons;
+            set => _randoSettings.RandomizeLifebloodCocoons = value;
         }
 
         public bool DuplicateMajorItems
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.DuplicateMajorItems;
+            set => _randoSettings.DuplicateMajorItems = value;
         }
 
         internal bool GetRandomizeByPool(string pool)
         {
-            switch (pool)
-            {
-                case "Dreamer":
-                    return RandomizeDreamers;
-                case "Skill":
-                    return RandomizeSkills;
-                case "Charm":
-                    return RandomizeCharms;
-                case "Key":
-                    return RandomizeKeys;
-                case "Mask":
-                    return RandomizeMaskShards;
-                case "Vessel":
-                    return RandomizeVesselFragments;
-                case "Ore":
-                    return RandomizePaleOre;
-                case "Notch":
-                    return RandomizeCharmNotches;
-                case "Geo":
-                    return RandomizeGeoChests;
-                case "Egg":
-                    return RandomizeRancidEggs;
-                case "Relic":
-                    return RandomizeRelics;
-                case "Map":
-                    return RandomizeMaps;
-                case "Stag":
-                    return RandomizeStags;
-                case "Grub":
-                    return RandomizeGrubs;
-                case "Root":
-                    return RandomizeWhisperingRoots;
-                case "Rock":
-                    return RandomizeRocks;
-                case "Soul":
-                    return RandomizeSoulTotems;
-                case "PalaceSoul":
-                    return RandomizePalaceTotems;
-                case "Lore":
-                    return RandomizeLoreTablets;
-                case "Lifeblood":
-                    return RandomizeLifebloodCocoons;
-                default:
-                    return false;
-            }
+            return _randoSettings.GetRandomizeByPool(pool);
         }
 
 
         public bool CreateSpoilerLog
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.CreateSpoilerLog;
+            set => _randoSettings.CreateSpoilerLog = value;
         }
 
         public bool Cursed
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.Cursed;
+            set => _randoSettings.Cursed = value;
         }
 
         public bool RandomizeStartItems
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeStartItems;
+            set => _randoSettings.RandomizeStartItems = value;
         }
 
         public bool RandomizeStartLocation
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.RandomizeStartLocation;
+            set => _randoSettings.RandomizeStartLocation = value;
         }
 
         // The following settings names are referenced in Benchwarp. Please do not change!
         public string StartName
         {
-            get => GetString("King's Pass");
-            set => SetString(value);
+            get => _randoSettings.StartName;
+            set => _randoSettings.StartName = value;
         }
 
         public string StartSceneName
@@ -378,50 +343,50 @@ namespace RandomizerMod
 
         public bool ShadeSkips
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.ShadeSkips;
+            set => _randoSettings.ShadeSkips = value;
         }
 
         public bool AcidSkips
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.AcidSkips;
+            set => _randoSettings.AcidSkips = value;
         }
 
         public bool SpikeTunnels
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.SpikeTunnels;
+            set => _randoSettings.SpikeTunnels = value;
         }
 
         public bool MildSkips
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.MildSkips;
+            set => _randoSettings.MildSkips = value;
         }
 
         public bool SpicySkips
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.SpicySkips;
+            set => _randoSettings.SpicySkips = value;
         }
 
         public bool FireballSkips
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.FireballSkips;
+            set => _randoSettings.FireballSkips = value;
         }
 
         public bool DarkRooms
         {
-            get => GetBool(false);
-            set => SetBool(value);
+            get => _randoSettings.DarkRooms;
+            set => _randoSettings.DarkRooms = value;
         }
 
         public int Seed
         {
-            get => GetInt(-1);
-            set => SetInt(value);
+            get => _randoSettings.Seed;
+            set => _randoSettings.Seed = value;
         }
 
         public void ResetPlacements()

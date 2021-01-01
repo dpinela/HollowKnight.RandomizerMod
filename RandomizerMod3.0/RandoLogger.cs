@@ -25,7 +25,7 @@ namespace RandomizerMod
         private static void MakeHelperLists()
         {
             {
-                randomizedLocations = ItemManager.GetRandomizedLocations();
+                randomizedLocations = ItemManager.GetRandomizedLocations(RandomizerMod.Instance.Settings.RandomizerSettings);
                 obtainedLocations = new HashSet<string>(RandomizerMod.Instance.Settings.GetLocationsFound());
                 uncheckedLocations = new HashSet<string>();
                 pm = new ProgressionManager(RandomizerState.Completed, concealRandomItems: true);
@@ -394,7 +394,7 @@ namespace RandomizerMod
             string message = $"Putting item \"{item.Replace('_', ' ')}\" at \"{location.Replace('_', ' ')}\"";
             LogSpoiler(message);
         }
-        public static void LogAllToSpoiler((int, string, string)[] orderedILPairs, (string, string)[] transitionPlacements)
+        public static void LogAllToSpoiler((int, string, string)[] orderedILPairs, (string, string)[] transitionPlacements, Dictionary<string, int> modifiedCosts)
         {
             RandomizerMod.Instance.Log("Generating spoiler log...");
             new Thread(() =>
@@ -405,7 +405,7 @@ namespace RandomizerMod
                 string log = string.Empty;
                 void AddToLog(string message) => log += message + Environment.NewLine;
 
-                AddToLog(GetItemSpoiler(orderedILPairs));
+                AddToLog(GetItemSpoiler(orderedILPairs, modifiedCosts));
                 AddToLog(GetTransitionSpoiler(transitionPlacements));
 
                 try
@@ -534,7 +534,7 @@ namespace RandomizerMod
             return log;
         }
 
-        private static string GetItemSpoiler((int, string, string)[] orderedILPairs)
+        private static string GetItemSpoiler((int, string, string)[] orderedILPairs, Dictionary<string, int> modifiedCosts)
         {
             string log = string.Empty;
             void AddToLog(string message) => log += message + Environment.NewLine;
@@ -565,7 +565,7 @@ namespace RandomizerMod
                 {
                     string cost = "";
                     if (LogicManager.TryGetItemDef(pair.Item3, out ReqDef itemDef)) {
-                        if (itemDef.cost != 0) cost = $" [{itemDef.cost} {itemDef.costType.ToString("g")}]";
+                        if (itemDef.cost != 0) cost = $" [{(modifiedCosts.ContainsKey(pair.Item3) ? modifiedCosts[pair.Item3] : itemDef.cost)} {itemDef.costType.ToString("g")}]";
                     }
                     else cost = $" [{RandomizerMod.Instance.Settings.GetShopCost(pair.Item2)} Geo]";
 

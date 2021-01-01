@@ -66,6 +66,10 @@
       <Project>{646d3716-fe32-4f72-839a-942be24e6978}</Project>
       <Name>MultiWorldProtocol</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RandomizerMod3.0\RandomizerMod3.0.csproj">
+      <Project>{2a00b777-cba2-409b-bb29-3339c92ccacc}</Project>
+      <Name>RandomizerMod3.0</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

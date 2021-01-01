@@ -25,7 +25,7 @@ namespace RandomizerMod.Randomization
 
         private Random rand;
 
-        public TransitionManager(Random rnd)
+        public TransitionManager(Random rnd, RandoSettings settings)
         {
             rand = rnd;
             dt = new DirectedTransitions(rnd);
@@ -45,7 +45,7 @@ namespace RandomizerMod.Randomization
             standbyTransitions = new Dictionary<string, string>();
             reachableTransitions = new HashSet<string>();
             recentProgression = new HashSet<string>();
-            vanillaProgression = VanillaManager.GetVanillaProgression();
+            vanillaProgression = VanillaManager.GetVanillaProgression(settings);
             checkProgression = new HashSet<string>();
 
             dt.Add(unplacedTransitions);

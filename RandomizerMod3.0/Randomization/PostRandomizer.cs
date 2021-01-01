@@ -9,14 +9,14 @@ namespace RandomizerMod.Randomization
 {
     internal static class PostRandomizer
     {
-        public static void PostRandomizationTasks(ItemManager im, TransitionManager tm, string StartName, List<string> startItems)
+        public static void PostRandomizationTasks(ItemManager im, TransitionManager tm, string StartName, List<string> startItems, Dictionary<string, int> modifiedCosts)
         {
             RemovePlaceholders(im);
-            SaveAllPlacements(im, tm, StartName, startItems);
+            SaveAllPlacements(im, tm, StartName, startItems, modifiedCosts);
             //No vanilla'd loctions in the spoiler log, please!
             (int, string, string)[] orderedILPairs = RandomizerMod.Instance.Settings.ItemPlacements.Except(VanillaManager.ItemPlacements)
                 .Select(pair => (pair.Item2.StartsWith("Equip") ? 0 : im.locationOrder[pair.Item2], pair.Item1, pair.Item2)).ToArray();
-            if (RandomizerMod.Instance.Settings.CreateSpoilerLog) RandoLogger.LogAllToSpoiler(orderedILPairs, RandomizerMod.Instance.Settings._transitionPlacements.Select(kvp => (kvp.Key, kvp.Value)).ToArray());
+            if (RandomizerMod.Instance.Settings.CreateSpoilerLog) RandoLogger.LogAllToSpoiler(orderedILPairs, RandomizerMod.Instance.Settings._transitionPlacements.Select(kvp => (kvp.Key, kvp.Value)).ToArray(), modifiedCosts);
         }
 
         private static void RemovePlaceholders(ItemManager im)
@@ -52,7 +52,7 @@ namespace RandomizerMod.Randomization
             }
         }
 
-        private static void SaveAllPlacements(ItemManager im, TransitionManager tm, string StartName, List<String> startItems)
+        private static void SaveAllPlacements(ItemManager im, TransitionManager tm, string StartName, List<String> startItems, Dictionary<string, int> modifiedCosts)
         {
             if (RandomizerMod.Instance.Settings.RandomizeTransitions)
             {
@@ -62,6 +62,11 @@ namespace RandomizerMod.Randomization
                     // For map tracking
                     //     RandoLogger.LogTransitionToTracker(kvp.Key, kvp.Value);
                 }
+            }
+
+            foreach (KeyValuePair<string, int> kvp in modifiedCosts)
+            {
+                RandomizerMod.Instance.Settings.AddNewCost(kvp.Key, kvp.Value);
             }
 
             foreach (KeyValuePair<string, List<string>> kvp in im.shopItems)

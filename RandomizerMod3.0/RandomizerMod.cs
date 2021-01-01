@@ -18,6 +18,7 @@ using RandomizerMod.MultiWorld;
 using System.Security.Cryptography;
 
 using Object = UnityEngine.Object;
+using RandomizerMod.Randomization.MultiWorld;
 
 namespace RandomizerMod
 {
@@ -163,10 +164,12 @@ namespace RandomizerMod
 
             try
             {
-                Randomizer rando = new Randomizer();
+                /*Randomizer rando = new Randomizer();
                 rando.Randomize();
 
-                RandoLogger.UpdateHelperLog();
+                RandoLogger.UpdateHelperLog();*/
+                MWRandomizer rando = new MWRandomizer(Settings.RandomizerSettings, 2);
+                rando.RandomizeMW();
             }
             catch (Exception e)
             {

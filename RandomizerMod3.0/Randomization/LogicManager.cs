@@ -184,8 +184,17 @@ namespace RandomizerMod.Randomization
         public static int bitMaskMax;
         public static int essenceIndex;
         public static int grubIndex;
-        public static int essenceTolerance => RandomizerMod.Instance.Settings.SpicySkips ? 50 : RandomizerMod.Instance.Settings.MildSkips ? 100 : 150;
-        public static int grubTolerance => RandomizerMod.Instance.Settings.SpicySkips ? 1 : RandomizerMod.Instance.Settings.MildSkips ? 2 : 3;
+
+        public static int essenceTolerance(RandoSettings settings = null)
+        {
+            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
+            return settings.SpicySkips ? 50 : settings.MildSkips ? 100 : 150;
+        }
+        public static int grubTolerance(RandoSettings settings = null)
+        {
+            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
+            return settings.SpicySkips ? 1 : settings.MildSkips ? 2 : 3;
+    }
 
 
         public static Dictionary<string, (int, int)> itemCountsByPool = null;
@@ -308,13 +317,14 @@ namespace RandomizerMod.Randomization
             Log("Parsed items.xml in " + watch.Elapsed.TotalSeconds + " seconds");
         }
 
-        public static string[] TransitionNames(bool area = false, bool room = false)
+        public static string[] TransitionNames(bool area = false, bool room = false, RandoSettings settings = null)
         {
+            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
             if (area) return _areaTransitions.Keys.ToArray();
             if (room) return _roomTransitions.Keys.ToArray();
 
-            if (RandomizerMod.Instance.Settings.RandomizeAreas) return _areaTransitions.Keys.ToArray();
-            else if (RandomizerMod.Instance.Settings.RandomizeRooms) return _roomTransitions.Keys.ToArray();
+            if (settings.RandomizeAreas) return _areaTransitions.Keys.ToArray();
+            else if (settings.RandomizeRooms) return _roomTransitions.Keys.ToArray();
             else return null;
         }
 
@@ -323,17 +333,18 @@ namespace RandomizerMod.Randomization
             return _roomTransitions.ContainsKey(transition);
         }
 
-        public static TransitionDef GetTransitionDef(string name)
+        public static TransitionDef GetTransitionDef(string name, RandoSettings settings = null)
         {
-            if (RandomizerMod.Instance.Settings.RandomizeAreas && _areaTransitions.TryGetValue(name, out TransitionDef def1))
+            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
+            if (settings.RandomizeAreas && _areaTransitions.TryGetValue(name, out TransitionDef def1))
             {
                 return def1;
             }
-            else if (RandomizerMod.Instance.Settings.RandomizeRooms && _roomTransitions.TryGetValue(name, out TransitionDef def2))
+            else if (settings.RandomizeRooms && _roomTransitions.TryGetValue(name, out TransitionDef def2))
             {
                 return def2;
             }
-            else if (!RandomizerMod.Instance.Settings.RandomizeAreas && !RandomizerMod.Instance.Settings.RandomizeRooms)
+            else if (!settings.RandomizeAreas && !settings.RandomizeRooms)
             {
                 LogWarn("Requested transition with ambiguous randomization settings.");
             }
@@ -360,11 +371,11 @@ namespace RandomizerMod.Randomization
             string rmSuffix = Regex.Replace(input, @"_\(\d+\)$", "");
             return Regex.Replace(rmSuffix, @"^MW\(\d+=\)_", "");
         }
-        public static (uint, string) ExtractPlayerID(string input)
+        public static (int, string) ExtractPlayerID(string input)
         {
             Regex prefix = new Regex(@"^MW\((\d+)\)_");
-            if (!prefix.IsMatch(input)) return (0, input);
-            uint id = UInt32.Parse(prefix.Match(input).Groups[1].Value);
+            if (!prefix.IsMatch(input)) return (-1, input);
+            int id = Int32.Parse(prefix.Match(input).Groups[1].Value);
             return (id, prefix.Replace(input, ""));
         }
 
@@ -403,10 +414,12 @@ namespace RandomizerMod.Randomization
             return new HashSet<string>(_poolIndexedItems[pool]);
         }
 
-        public static HashSet<string> GetLocationsByProgression(IEnumerable<string> newStuff)
+        public static HashSet<string> GetLocationsByProgression(IEnumerable<string> newStuff, RandoSettings settings = null)
         {
+            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
+
             HashSet<string> locations = new HashSet<string>();
-            if (RandomizerMod.Instance.Settings.RandomizeRooms)
+            if (settings.RandomizeRooms)
             {
                 foreach(string thing in newStuff)
                 {
@@ -417,7 +430,7 @@ namespace RandomizerMod.Randomization
                     else LogWarn($"{thing} is not indexed progression for room rando locations");
                 }
             }
-            else if (RandomizerMod.Instance.Settings.RandomizeAreas)
+            else if (settings.RandomizeAreas)
             {
                 foreach (string thing in newStuff)
                 {
@@ -447,10 +460,12 @@ namespace RandomizerMod.Randomization
 
             return locations;
         }
-        public static HashSet<string> GetTransitionsByProgression(IEnumerable<string> newStuff)
+        public static HashSet<string> GetTransitionsByProgression(IEnumerable<string> newStuff, RandoSettings settings = null)
         {
+            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
+
             HashSet<string> transitions = new HashSet<string>();
-            if (RandomizerMod.Instance.Settings.RandomizeRooms)
+            if (settings.RandomizeRooms)
             {
                 foreach (string thing in newStuff)
                 {
@@ -461,7 +476,7 @@ namespace RandomizerMod.Randomization
                     else LogWarn($"{thing} is not indexed progression for room rando transitions");
                 }
             }
-            else if (RandomizerMod.Instance.Settings.RandomizeAreas)
+            else if (settings.RandomizeAreas)
             {
                 foreach (string thing in newStuff)
                 {
@@ -512,8 +527,10 @@ namespace RandomizerMod.Randomization
             return itemCountsByPool[poolName];
         }
 
-        public static bool ParseProcessedLogic(string item, int[] obtained)
+        public static bool ParseProcessedLogic(string item, int[] obtained, IDictionary<string, int> variableCosts = null, RandoSettings settings = null)
         {
+            if (settings == null) settings = RandomizerMod.Instance.Settings.RandomizerSettings;
+
             item = RemovePrefixSuffix(item);
             List<(int, int)> logic;
             int cost = 0;
@@ -523,38 +540,39 @@ namespace RandomizerMod.Randomization
                 if (!string.IsNullOrEmpty(reqDef.shopName)) // shop item logic isn't real, and it isn't always practical to swap items out of lists for shop locations
                 {
                     ShopDef shopDef = _shops[reqDef.shopName];
-                    if (RandomizerMod.Instance.Settings.RandomizeAreas) logic = shopDef.processedAreaLogic;
-                    else if (RandomizerMod.Instance.Settings.RandomizeRooms) logic = shopDef.processedRoomLogic;
+                    if (settings.RandomizeAreas) logic = shopDef.processedAreaLogic;
+                    else if (settings.RandomizeRooms) logic = shopDef.processedRoomLogic;
                     else logic = shopDef.processedItemLogic;
                 }
                 else
                 {
-                    if (RandomizerMod.Instance.Settings.RandomizeAreas) logic = reqDef.processedAreaLogic;
-                    else if (RandomizerMod.Instance.Settings.RandomizeRooms) logic = reqDef.processedRoomLogic;
+                    if (settings.RandomizeAreas) logic = reqDef.processedAreaLogic;
+                    else if (settings.RandomizeRooms) logic = reqDef.processedRoomLogic;
                     else logic = reqDef.processedItemLogic;
                     cost = reqDef.cost;
+                    if (variableCosts != null && variableCosts.ContainsKey(item)) cost = variableCosts[item];
                 }
             }
             else if (_shops.TryGetValue(item, out ShopDef shopDef))
             {
-                if (RandomizerMod.Instance.Settings.RandomizeAreas) logic = shopDef.processedAreaLogic;
-                else if (RandomizerMod.Instance.Settings.RandomizeRooms) logic = shopDef.processedRoomLogic;
+                if (settings.RandomizeAreas) logic = shopDef.processedAreaLogic;
+                else if (settings.RandomizeRooms) logic = shopDef.processedRoomLogic;
                 else logic = shopDef.processedItemLogic;
             }
-            else if (RandomizerMod.Instance.Settings.RandomizeAreas && _areaTransitions.TryGetValue(item, out TransitionDef areaTransition))
+            else if (settings.RandomizeAreas && _areaTransitions.TryGetValue(item, out TransitionDef areaTransition))
             {
                 if (areaTransition.isolated || areaTransition.oneWay == 2) return false;
                 logic = areaTransition.processedLogic;
             }
-            else if (RandomizerMod.Instance.Settings.RandomizeRooms && _roomTransitions.TryGetValue(item, out TransitionDef roomTransition))
+            else if (settings.RandomizeRooms && _roomTransitions.TryGetValue(item, out TransitionDef roomTransition))
             {
                 if (roomTransition.isolated || roomTransition.oneWay == 2) return false;
                 logic = roomTransition.processedLogic;
             }
             else if (_waypoints.TryGetValue(item, out Waypoint waypoint))
             {
-                if (RandomizerMod.Instance.Settings.RandomizeRooms) return false;
-                else if (RandomizerMod.Instance.Settings.RandomizeAreas) logic = waypoint.processedAreaLogic;
+                if (settings.RandomizeRooms) return false;
+                else if (settings.RandomizeAreas) logic = waypoint.processedAreaLogic;
                 else logic = waypoint.processedItemLogic;
             }
             else
@@ -599,15 +617,15 @@ namespace RandomizerMod.Randomization
                         break;
                     // ESSENCECOUNT
                     case -3:
-                        stack.Push(obtained[essenceIndex] >= cost + essenceTolerance);
+                        stack.Push(obtained[essenceIndex] >= cost + essenceTolerance(settings));
                         break;
                     // GRUBCOUNT
                     case -4:
-                        stack.Push(obtained[grubIndex] >= cost + grubTolerance);
+                        stack.Push(obtained[grubIndex] >= cost + grubTolerance(settings));
                         break;
                     // 200ESSENCE -- the Resting Grounds door
                     case -5:
-                        stack.Push(obtained[essenceIndex] >= 200 + essenceTolerance);
+                        stack.Push(obtained[essenceIndex] >= 200 + essenceTolerance(settings));
                         break;
                     default:
                         stack.Push((logic[i].Item1 & obtained[logic[i].Item2]) == logic[i].Item1);

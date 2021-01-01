@@ -54,19 +54,20 @@ namespace RandomizerMod
             RandomizerMod.Instance.Settings.MarkLocationFound(location);
             UpdateHelperLog();
 
-            item = LogicManager.RemovePrefixSuffix(item);
-
             if (RandomizerMod.Instance.Settings.IsMW)
             {
-                uint player;
+                int player;
                 (player, item) = LogicManager.ExtractPlayerID(item);
+                item = LogicManager.RemovePrefixSuffix(item);
 
-                if (player > 0 && player != RandomizerMod.Instance.mwConnection.GetPID())
+                if (player > 0 && player != RandomizerMod.Instance.Settings.MWPlayerId)
                 {
                     RandomizerMod.Instance.mwConnection.SendItem(location, item, player);
                     return;
                 }
             }
+
+            item = LogicManager.RemovePrefixSuffix(item);
 
             switch (action)
             {

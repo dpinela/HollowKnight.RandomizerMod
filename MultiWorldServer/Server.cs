@@ -439,7 +439,7 @@ namespace MultiWorldServer
             SendItemTo(message.To, message.Item, sender.Session.Name);
         }
 
-        private void SendItemTo(uint player, string Item, string From)
+        private void SendItemTo(int player, string Item, string From)
         {
             lock (_clientLock)
             {
