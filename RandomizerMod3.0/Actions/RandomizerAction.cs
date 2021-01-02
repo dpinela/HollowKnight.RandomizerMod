@@ -237,7 +237,7 @@ namespace RandomizerMod.Actions
                 ShopItemDef newItemDef = new ShopItemDef
                 {
                     PlayerDataBoolName = boolName,
-                    NameConvo = newItem.nameKey,
+                    NameConvo = newItem.nameKey, // TODO add user name to this
                     DescConvo = newItem.shopDescKey,
                     RequiredPlayerDataBool = LogicManager.GetShopDef(shopName).requiredPlayerDataBool,
                     RemovalPlayerDataBool = string.Empty,

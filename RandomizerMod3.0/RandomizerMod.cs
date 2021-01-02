@@ -67,7 +67,6 @@ namespace RandomizerMod
             Ref.GM.SetStatusRecordInt("RecBossRushMode", 1);
 
             Assembly randoModDLL = GetType().Assembly;
-            Assembly randoLibDLL = Assembly.Load("RandomizerLib3.0, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = null");
 
             // Load embedded resources
             _sprites = ResourceHelper.GetSprites("RandomizerMod.Resources.");
@@ -83,7 +82,7 @@ namespace RandomizerMod
             }
 
             _logicParseThread = new Thread(() =>
-            LogicManager.ParseXML(randoModDLL));
+            LogicManager.ParseXML());
             _logicParseThread.Start();
 
             // Add hooks

@@ -306,7 +306,7 @@ namespace RandomizerLib
                 {
                     essence += essenceLocations[location];
                 }
-                if (essence >= Randomizer.MAX_ESSENCE_COST + LogicManager.essenceTolerance()) break;
+                if (essence >= Randomizer.MAX_ESSENCE_COST + LogicManager.essenceTolerance(settings)) break;
             }
             obtained[LogicManager.essenceIndex] = essence;
         }
@@ -321,7 +321,7 @@ namespace RandomizerLib
                 {
                     grubs += grubLocations[location];
                 }
-                if (grubs >= Randomizer.MAX_GRUB_COST + LogicManager.grubTolerance()) break;
+                if (grubs >= Randomizer.MAX_GRUB_COST + LogicManager.grubTolerance(settings)) break;
             }
 
             obtained[LogicManager.grubIndex] = grubs;

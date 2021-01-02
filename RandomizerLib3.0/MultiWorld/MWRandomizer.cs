@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using static RandomizerLib.PreRandomizer;
 using static RandomizerLib.Logging.LogHelper;
+using Modding;
 
 namespace RandomizerLib.MultiWorld
 {
@@ -36,7 +38,7 @@ namespace RandomizerLib.MultiWorld
             this.players = players;
         }
 
-        public void RandomizeMW()
+        public List<RandoResult> RandomizeMW()
         {
             transitionPlacements = new List<Dictionary<string, string>>();
 
@@ -68,6 +70,10 @@ namespace RandomizerLib.MultiWorld
                             Log("Starting transition randomization for player " + i);
                             transitionPlacements.Add(TransitionRandomizer.RandomizeTransitions(settings[i], rand, playerStartName, playerStartItems, playerStartProgression).transitionPlacements);
                         }
+                        else
+                        {
+                            transitionPlacements.Add(null);
+                        }
                     }
                     MWRandomizeItems();
 
@@ -76,28 +82,241 @@ namespace RandomizerLib.MultiWorld
                 catch (RandomizationError) { }
             }
 
-            //PostRandomizationTasks(ims[playerId], tms[playerId], "", startItems[playerId], modifiedCosts[playerId]);
-            //RandomizerAction.CreateActions(RandomizerMod.Instance.Settings.ItemPlacements, RandomizerMod.Instance.Settings);
+            return PrepareResult();
         }
 
         private void MWRandomizeItems()
         {
             im = new MWItemManager(players, transitionPlacements, rand, settings, startItems, startProgression, modifiedCosts);
 
-            while (im.anyItems && im.anyLocations)
+            FirstPass();
+            SecondPass();
+            PlaceDupes();
+        }
+
+        private void FirstPass()
+        {
+            Log("Beginning first pass of item placement...");
+
+            bool overflow = false;
+
             {
-                im.PlaceItem(im.NextItem(), im.NextLocation());
+                im.ResetReachableLocations();
+                im.vm.ResetReachableLocations(im);
+
+                for (int i = 0; i < players; i++)
+                {
+                    foreach (string item in startProgression[i])
+                    {
+                        im.UpdateReachableLocations(new MWItem(i, item));
+                    }
+                }
+                Log("Finished first update");
             }
 
-            if (im.anyLocations) throw new RandomizationError();
+            while (true)
+            {
+                MWItem placeItem;
+                MWItem placeLocation;
 
+                switch (im.availableCount)
+                {
+                    case 0:
+                        if (im.anyLocations)
+                        {
+                            if (im.canGuess)
+                            {
+                                if (!overflow) Log("Entered overflow state with 0 reachable locations after placing " + im.nonShopItems.Count + " locations");
+                                overflow = true;
+                                placeItem = im.GuessItem();
+                                im.PlaceProgressionToStandby(placeItem);
+                                continue;
+                            }
+                        }
+                        return;
+                    case 1:
+                        placeItem = im.ForceItem();
+                        if (placeItem is null)
+                        {
+                            if (im.canGuess)
+                            {
+                                if (!overflow) Log("Entered overflow state with 1 reachable location after placing " + im.nonShopItems.Count + " locations");
+                                overflow = true;
+                                placeItem = im.GuessItem();
+                                im.PlaceProgressionToStandby(placeItem);
+                                continue;
+                            }
+                            else placeItem = im.NextItem();
+                        }
+                        else
+                        {
+                            im.Delinearize(rand);
+                        }
+                        placeLocation = im.NextLocation();
+                        break;
+                    default:
+                        placeItem = im.NextItem();
+                        placeLocation = im.NextLocation();
+                        break;
+                }
+
+                //Log($"i: {placeItem}, l: {placeLocation}, o: {overflow}, p: {LogicManager.GetItemDef(placeItem).progression}");
+
+                if (!overflow && !LogicManager.GetItemDef(placeItem.item).progression)
+                {
+                    im.PlaceJunkItemToStandby(placeItem, placeLocation);
+                }
+                else
+                {
+                    im.PlaceItem(placeItem, placeLocation);
+                }
+            }
+        }
+
+        private void SecondPass()
+        {
+            Log("Beginning second pass of item placement...");
+            im.TransferStandby();
+
+            // We fill the remaining locations and shops with the leftover junk
             while (im.anyItems)
             {
-                im.PlaceItem(im.NextItem(), new List<MWItem>(im.shopItems.Keys)[rand.Next(im.shopItems.Keys.Count)]);
+                MWItem placeItem = im.NextItem(checkFlag: false);
+                MWItem placeLocation;
+
+                if (im.anyLocations) placeLocation = im.NextLocation(checkLogic: false);
+                else placeLocation = new MWItem(rand.Next(players), LogicManager.ShopNames[rand.Next(5)]);
+
+                im.PlaceItemFromStandby(placeItem, placeLocation);
             }
 
-            Log(im.nonShopItems);
-            Log(im.shopItems);
+            // try to guarantee no empty shops
+            if (im.normalFillShops && im.shopItems.Any(kvp => !kvp.Value.Any()))
+            {
+                Log("Exited randomizer with empty shop. Attempting repair...");
+                Dictionary<MWItem, List<MWItem>> nonprogressionShopItems = im.shopItems.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Where(i => !LogicManager.GetItemDef(i.item).progression).ToList());
+                if (nonprogressionShopItems.Select(kvp => kvp.Value.Count).Aggregate(0, (total, next) => total + next) >= 5)
+                {
+                    int i = 0;
+                    while (im.shopItems.FirstOrDefault(kvp => !kvp.Value.Any()).Key is MWItem emptyShop && nonprogressionShopItems.FirstOrDefault(kvp => kvp.Value.Count > 1).Key is MWItem fullShop)
+                    {
+                        MWItem item = im.shopItems[fullShop].First();
+                        im.shopItems[emptyShop].Add(item);
+                        im.shopItems[fullShop].Remove(item);
+                        nonprogressionShopItems[emptyShop].Add(item);
+                        nonprogressionShopItems[fullShop].Remove(item);
+                        i++;
+                        if (i > 5)
+                        {
+                            LogError("Emergency exit from shop repair.");
+                            break;
+                        }
+                    }
+                }
+                Log("Successfully repaired shops.");
+            }
+
+            if (im.anyLocations) LogError("Exited item randomizer with unfilled locations.");
+        }
+
+        private void PlaceDupes()
+        {
+            // Duplicate items should not be placed very early in logic
+            int minimumDepth = Math.Min(im.locationOrder.Count / 5, im.locationOrder.Count - 2 * im.duplicatedItems.Count);
+            int maximumDepth = im.locationOrder.Count;
+            bool ValidIndex(int i)
+            {
+                MWItem location = im.locationOrder.FirstOrDefault(kvp => kvp.Value == i).Key;
+                return location != null && !LogicManager.ShopNames.Contains(location.item) && !LogicManager.GetItemDef(im.nonShopItems[location].item).progression;
+            }
+            List<int> allowedDepths = Enumerable.Range(minimumDepth, maximumDepth).Where(i => ValidIndex(i)).ToList();
+            Random rand = new Random(settings[0].Seed + 29);
+
+            foreach (MWItem majorItem in im.duplicatedItems)
+            {
+                while (allowedDepths.Any())
+                {
+                    int depth = allowedDepths[rand.Next(allowedDepths.Count)];
+                    MWItem location = im.locationOrder.First(kvp => kvp.Value == depth).Key;
+                    MWItem swapItem = im.nonShopItems[location];
+
+                    List<MWItem> allShops = new List<MWItem>();
+                    for (int i = 0; i < players; i++)
+                    {
+                        foreach (string shop in LogicManager.ShopNames)
+                        {
+                            allShops.Add(new MWItem(i, shop));
+                        }
+                    }
+                    MWItem toShop = allShops.OrderBy(shop => im.shopItems[shop].Count).First();
+
+                    im.nonShopItems[location] = new MWItem(majorItem.playerId, majorItem.item + "_(1)");
+                    im.shopItems[toShop].Add(swapItem);
+                    allowedDepths.Remove(depth);
+                    break;
+                }
+            }
+        }
+
+        private List<RandoResult> PrepareResult()
+        {
+            List<RandoResult> results = new List<RandoResult>();
+
+            for (int i = 0; i < players; i++)
+            {
+                RandoResult result = new RandoResult();
+                result.playerId = i;
+                result.settings = settings[i];
+                result.startItems = startItems[i];
+                result.transitionPlacements = transitionPlacements[i];
+                result.variableCosts = modifiedCosts[i];
+
+                // Copy non shop items into item
+                foreach (KeyValuePair<MWItem, MWItem> kvp in im.nonShopItems.Where(kvp => kvp.Key.playerId == i))
+                {
+                    result.itemPlacements[kvp.Value] = kvp.Key.item;
+                }
+
+                // Copy shop items and create randomized prices for each
+                foreach (KeyValuePair<MWItem, List<MWItem>> kvp in im.shopItems.Where(kvp => kvp.Key.playerId == i))
+                {
+                    foreach (MWItem item in kvp.Value)
+                    {
+                        int cost = RandomizeShopCost(settings[i], item);
+                        result.itemPlacements[item] = kvp.Key.item;
+                        result.shopCosts[item] = cost;
+                    }
+                }
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        public int RandomizeShopCost(RandoSettings settings, MWItem mwItem)
+        {
+            string item = mwItem.item;
+            int cost;
+            ReqDef def = LogicManager.GetItemDef(item);
+
+            Random rand = new Random(settings.Seed + item.GetHashCode()); // make shop item cost independent from prior randomization
+
+            int baseCost = 100;
+            int increment = 10;
+            int maxCost = 500;
+
+            int priceFactor = 1;
+            if (def.geo > 0) priceFactor = 0;
+            if (item.StartsWith("Soul_Totem") || item.StartsWith("Lore_Tablet")) priceFactor = 0;
+            if (item.StartsWith("Rancid") || item.StartsWith("Mask")) priceFactor = 2;
+            if (item.StartsWith("Pale_Ore") || item.StartsWith("Charm_Notch")) priceFactor = 3;
+            if (item == "Focus") priceFactor = 10;
+            if (item.StartsWith("Godtuner") || item.StartsWith("Collector") || item.StartsWith("World_Sense")) priceFactor = 0;
+            cost = baseCost + increment * rand.Next(1 + (maxCost - baseCost) / increment); // random from 100 to 500 inclusive, multiples of 10
+            cost *= priceFactor;
+
+            return Math.Max(cost, 1);
         }
     }
 }

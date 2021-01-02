@@ -62,11 +62,11 @@
     <Compile Include="MultiWorld\MWProgressionManager.cs" />
     <Compile Include="MultiWorld\MWRandomizer.cs" />
     <Compile Include="MultiWorld\MWVanillaManager.cs" />
-    <Compile Include="PostRandomizer.cs" />
     <Compile Include="PreRandomizer.cs" />
     <Compile Include="ProgressionManager.cs" />
     <Compile Include="RandomizationError.cs" />
     <Compile Include="Randomizer.cs" />
+    <Compile Include="RandoResult.cs" />
     <Compile Include="RandoSettings.cs" />
     <Compile Include="SpanningTree.cs" />
     <Compile Include="TransitionManager.cs" />

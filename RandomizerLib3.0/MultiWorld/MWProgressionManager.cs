@@ -121,7 +121,7 @@ namespace RandomizerLib.MultiWorld
         {
             if (shareIm != null && shareIm.recentProgression != null)
             {
-                shareIm.recentProgression[item.playerId].Add(item.item);
+                shareIm.recentProgression.Add(item);
             }
 
             if (shareTm != null && shareTm.recentProgression != null)

@@ -59,7 +59,7 @@ namespace RandomizerMod
                 {
                     obtainedTransitions = new HashSet<string>();
                     uncheckedTransitions = new HashSet<string>();
-                    randomizedTransitions = new HashSet<string>(LogicManager.TransitionNames());
+                    randomizedTransitions = new HashSet<string>(LogicManager.TransitionNames(RandomizerMod.Instance.Settings.RandomizerSettings));
 
                     foreach (string transition in RandomizerMod.Instance.Settings.GetTransitionsFound())
                     {

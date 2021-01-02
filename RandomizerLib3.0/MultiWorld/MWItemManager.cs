@@ -18,7 +18,7 @@ namespace RandomizerLib.MultiWorld
         public Dictionary<MWItem, int> locationOrder; // the order in which a location was first removed from the pool (filled with progression, moved to standby, first shop item, etc). The order of an item will be the order of its location.
         public List<MWItem> duplicatedItems;
 
-        public List<HashSet<string>> recentProgression;
+        public HashSet<MWItem> recentProgression;
 
         private List<MWItem> unplacedLocations;
         private List<MWItem> unplacedItems;
@@ -41,6 +41,7 @@ namespace RandomizerLib.MultiWorld
         public int availableCount => reachableLocations.Intersect(unplacedLocations).Count();
 
         public bool anyLocations => unplacedLocations.Any();
+        public bool anyNonShopLocations => unplacedLocations.Any(loc => !LogicManager.ShopNames.Contains(loc.item));
         public bool anyItems => unplacedItems.Any();
         public bool canGuess => unplacedProgression.Any(i => LogicManager.GetItemDef(i.item).itemCandidate);
         internal MWItemManager(int players,
@@ -76,15 +77,13 @@ namespace RandomizerLib.MultiWorld
             standbyLocations = new List<MWItem>();
             standbyItems = new List<MWItem>();
             standbyProgression = new List<MWItem>();
-            recentProgression = new List<HashSet<string>>();
+            recentProgression = new HashSet<MWItem>();
 
             progressionFlag = new Queue<bool>();
             updateQueue = new Queue<MWItem>();
 
             for (int i = 0; i < players; i++)
             {
-                recentProgression.Add(new HashSet<string>());
-
                 foreach (string shopName in LogicManager.ShopNames)
                 {
                     shopItems.Add(new MWItem(i, shopName), new List<MWItem>());
@@ -296,8 +295,8 @@ namespace RandomizerLib.MultiWorld
                 updateQueue.Enqueue(newThing);
             }
 
-            HashSet<string> potentialLocations;
-            HashSet<string> potentialTransitions = new HashSet<string>();
+            HashSet<MWItem> potentialLocations;
+            HashSet<MWItem> potentialTransitions = new HashSet<MWItem>();
 
             // Seems like this would never be called while recent progression has items from a different player
             // So, just assume that everything in their is progression for the player in "new thing"
@@ -306,21 +305,19 @@ namespace RandomizerLib.MultiWorld
                 MWItem item = updateQueue.Dequeue();
                 int id = item.playerId;
 
-                potentialLocations = LogicManager.GetLocationsByProgression(recentProgression[id], settings[id]);
+                potentialLocations = LogicManager.GetLocationsByProgression(recentProgression, settings);
                 if (settings[id].RandomizeTransitions)
                 {
-                    potentialTransitions = LogicManager.GetTransitionsByProgression(recentProgression[id], settings[id]);
+                    potentialTransitions = LogicManager.GetTransitionsByProgression(recentProgression, settings);
                 }
-                recentProgression[id] = new HashSet<string>();
+                recentProgression = new HashSet<MWItem>();
 
-                foreach (string location in potentialLocations)
+                foreach (MWItem location in potentialLocations)
                 {
-                    MWItem mwLoc = new MWItem(id, location);
-
-                    if (pm.CanGet(mwLoc))
+                    if (pm.CanGet(location))
                     {
-                        reachableLocations.Add(mwLoc);
-                        if (VanillaManager.progressionLocations.Contains(location)) vm.UpdateVanillaLocations(this, mwLoc, true, pm);
+                        reachableLocations.Add(location);
+                        if (vm.progressionLocations.Contains(location)) vm.UpdateVanillaLocations(this, location, true, pm);
                     }
                 }
 
@@ -331,14 +328,13 @@ namespace RandomizerLib.MultiWorld
                         pm.Add(new MWItem(id, transition1));
                         updateQueue.Enqueue(new MWItem(id, transition1));
                     }
-                    foreach (string transition in potentialTransitions)
+                    foreach (MWItem transition in potentialTransitions)
                     {
-                        MWItem mwTrans = new MWItem(id, transition);
-                        if (!pm.Has(mwTrans) && pm.CanGet(mwTrans))
+                        if (!pm.Has(transition) && pm.CanGet(transition))
                         {
-                            pm.Add(mwTrans);
-                            updateQueue.Enqueue(mwTrans);
-                            if (transitions[id].TryGetValue(transition, out string transition2) && !pm.Has(new MWItem(id, transition2)))
+                            pm.Add(transition);
+                            updateQueue.Enqueue(transition);
+                            if (transitions[transition.playerId].TryGetValue(transition.item, out string transition2) && !pm.Has(new MWItem(id, transition2)))
                             {
                                 pm.Add(new MWItem(id, transition2));
                                 updateQueue.Enqueue(new MWItem(id, transition2));
@@ -372,34 +368,32 @@ namespace RandomizerLib.MultiWorld
             return unplacedProgression.First(item => LogicManager.GetItemDef(item.item).itemCandidate);
         }
 
-        // For now, if we need to force an item, just abort
-
-        /*public MWItem ForceItem()
+        public MWItem ForceItem()
         {
             Queue<MWItem> progressionQueue = new Queue<MWItem>();
             List<MWItem> tempProgression = new List<MWItem>();
 
             void UpdateTransitions()
             {
-                foreach (string transition in LogicManager.GetTransitionsByProgression(pm.tempItems))
+                foreach (MWItem transition in LogicManager.GetTransitionsByProgression(pm.tempItems, settings))
                 {
                     if (!pm.Has(transition) && pm.CanGet(transition))
                     {
                         tempProgression.Add(transition);
                         progressionQueue.Enqueue(transition);
                         pm.Add(transition);
-                        if (tm.transitionPlacements.TryGetValue(transition, out string transition2))
+                        if (transitions[transition.playerId].TryGetValue(transition.item, out string transition2))
                         {
-                            tempProgression.Add(transition2);
-                            progressionQueue.Enqueue(transition2);
-                            pm.Add(transition2);
+                            tempProgression.Add(new MWItem(transition.playerId, transition2));
+                            progressionQueue.Enqueue(new MWItem(transition.playerId, transition2));
+                            pm.Add(new MWItem(transition.playerId, transition2));
                         }
                     }
                 }
             }
             bool CheckForNewLocations()
             {
-                foreach (string location in LogicManager.GetLocationsByProgression(pm.tempItems))
+                foreach (MWItem location in LogicManager.GetLocationsByProgression(pm.tempItems, settings))
                 {
                     if (randomizedLocations.Contains(location) && !reachableLocations.Contains(location) && pm.CanGet(location))
                     {
@@ -412,10 +406,10 @@ namespace RandomizerLib.MultiWorld
             for (int i = 0; i < unplacedProgression.Count; i++)
             {
                 bool found = false;
-                string item = unplacedProgression[i];
+                MWItem item = unplacedProgression[i];
                 pm.AddTemp(item);
                 if (CheckForNewLocations()) found = true;
-                else if (settings.RandomizeTransitions)
+                else if (settings[item.playerId].RandomizeTransitions)
                 {
                     UpdateTransitions();
                     while (progressionQueue.Any())
@@ -432,7 +426,7 @@ namespace RandomizerLib.MultiWorld
                 }
             }
             return null;
-        }*/
+        }
         public void Delinearize(Random rand)
         {
             // add back shops for rare consideration for late progression

@@ -10,6 +10,8 @@ using static RandomizerLib.Logging.LogHelper;
 using System.Text.RegularExpressions;
 using GlobalEnums;
 
+using RandomizerLib.MultiWorld;
+
 namespace RandomizerLib
 {
     public enum ItemType
@@ -227,11 +229,11 @@ namespace RandomizerLib
         public static int essenceIndex;
         public static int grubIndex;
 
-        public static int essenceTolerance(RandoSettings settings = null)
+        public static int essenceTolerance(RandoSettings settings)
         {
             return settings.SpicySkips ? 50 : settings.MildSkips ? 100 : 150;
         }
-        public static int grubTolerance(RandoSettings settings = null)
+        public static int grubTolerance(RandoSettings settings)
         {
             return settings.SpicySkips ? 1 : settings.MildSkips ? 2 : 3;
         }
@@ -251,8 +253,10 @@ namespace RandomizerLib
 
         public static string[] StartLocations => _startLocations.Keys.ToArray();
 
-        public static void ParseXML(Assembly randoDLL)
+        public static void ParseXML(Assembly randoDLL = null)
         {
+            if (randoDLL == null) randoDLL = typeof(LogicManager).Assembly;
+
             XmlDocument additiveXml;
             XmlDocument macroXml;
             XmlDocument areaXml;
@@ -269,52 +273,52 @@ namespace RandomizerLib
 
             try
             {
-                Stream additiveStream = randoDLL.GetManifestResourceStream("RandomizerMod.Resources.additive.xml");
+                Stream additiveStream = randoDLL.GetManifestResourceStream("RandomizerLib.Resources.additive.xml");
                 additiveXml = new XmlDocument();
                 additiveXml.Load(additiveStream);
                 additiveStream.Dispose();
 
-                Stream macroStream = randoDLL.GetManifestResourceStream("RandomizerMod.Resources.macros.xml");
+                Stream macroStream = randoDLL.GetManifestResourceStream("RandomizerLib.Resources.macros.xml");
                 macroXml = new XmlDocument();
                 macroXml.Load(macroStream);
                 macroStream.Dispose();
 
-                Stream areaStream = randoDLL.GetManifestResourceStream("RandomizerMod.Resources.areas.xml");
+                Stream areaStream = randoDLL.GetManifestResourceStream("RandomizerLib.Resources.areas.xml");
                 areaXml = new XmlDocument();
                 areaXml.Load(areaStream);
                 areaStream.Dispose();
 
-                Stream roomStream = randoDLL.GetManifestResourceStream("RandomizerMod.Resources.rooms.xml");
+                Stream roomStream = randoDLL.GetManifestResourceStream("RandomizerLib.Resources.rooms.xml");
                 roomXml = new XmlDocument();
                 roomXml.Load(roomStream);
                 roomStream.Dispose();
 
-                Stream itemStream = randoDLL.GetManifestResourceStream("RandomizerMod.Resources.items.xml");
+                Stream itemStream = randoDLL.GetManifestResourceStream("RandomizerLib.Resources.items.xml");
                 itemXml = new XmlDocument();
                 itemXml.Load(itemStream);
                 itemStream.Dispose();
 
-                Stream rockStream = randoDLL.GetManifestResourceStream("RandomizerMod.Resources.rocks.xml");
+                Stream rockStream = randoDLL.GetManifestResourceStream("RandomizerLib.Resources.rocks.xml");
                 rockXml = new XmlDocument();
                 rockXml.Load(rockStream);
                 rockStream.Dispose();
 
-                Stream soulLoreStream = randoDLL.GetManifestResourceStream("RandomizerMod.Resources.soul_lore.xml");
+                Stream soulLoreStream = randoDLL.GetManifestResourceStream("RandomizerLib.Resources.soul_lore.xml");
                 soulLoreXml = new XmlDocument();
                 soulLoreXml.Load(soulLoreStream);
                 soulLoreStream.Dispose();
 
-                Stream shopStream = randoDLL.GetManifestResourceStream("RandomizerMod.Resources.shops.xml");
+                Stream shopStream = randoDLL.GetManifestResourceStream("RandomizerLib.Resources.shops.xml");
                 shopXml = new XmlDocument();
                 shopXml.Load(shopStream);
                 shopStream.Dispose();
 
-                Stream waypointStream = randoDLL.GetManifestResourceStream("RandomizerMod.Resources.waypoints.xml");
+                Stream waypointStream = randoDLL.GetManifestResourceStream("RandomizerLib.Resources.waypoints.xml");
                 waypointXml = new XmlDocument();
                 waypointXml.Load(waypointStream);
                 waypointStream.Dispose();
 
-                Stream startLocationStream = randoDLL.GetManifestResourceStream("RandomizerMod.Resources.startlocations.xml");
+                Stream startLocationStream = randoDLL.GetManifestResourceStream("RandomizerLib.Resources.startlocations.xml");
                 startLocationXml = new XmlDocument();
                 startLocationXml.Load(startLocationStream);
                 startLocationStream.Dispose();
@@ -496,6 +500,50 @@ namespace RandomizerLib
 
             return locations;
         }
+        public static HashSet<MWItem> GetLocationsByProgression(IEnumerable<MWItem> newStuff, List<RandoSettings> settings)
+        {
+            HashSet<int> playerIds = new HashSet<int>();
+            HashSet<MWItem> locations = new HashSet<MWItem>();
+
+            foreach (MWItem thing in newStuff)
+            {
+                playerIds.Add(thing.playerId);
+                if (settings[thing.playerId].RandomizeRooms)
+                {
+                    if (_progressionIndexedItemsForRoomRando.TryGetValue(thing.item, out HashSet<string> checkList))
+                    {
+                        locations.UnionWith(checkList.Select(l => new MWItem(thing.playerId, l)));
+                    }
+                    else LogWarn($"{thing} is not indexed progression for room rando locations");
+                }
+                else if (settings[thing.playerId].RandomizeAreas)
+                {
+                    if (_progressionIndexedItemsForAreaRando.TryGetValue(thing.item, out HashSet<string> checkList))
+                    {
+                        locations.UnionWith(checkList.Select(l => new MWItem(thing.playerId, l)));
+                    }
+                    else LogWarn($"{thing} is not indexed progression for area rando locations");
+                }
+                else
+                {
+                    if (IsTransition(thing.item)) continue;
+                    if (_progressionIndexedItemsForItemRando.TryGetValue(thing.item, out HashSet<string> checkList))
+                    {
+                        locations.UnionWith(checkList.Select(l => new MWItem(thing.playerId, l)));
+                    }
+                    else LogWarn($"{thing} is not indexed progression for item rando locations");
+                }
+            }
+
+            // easier to just always check these
+            foreach (int i in playerIds)
+            {
+                locations.UnionWith(grubfatherLocations.Select(l => new MWItem(i, l)));
+                locations.UnionWith(seerLocations.Select(l => new MWItem(i, l)));
+            }
+
+            return locations;
+        }
         public static HashSet<string> GetTransitionsByProgression(IEnumerable<string> newStuff, RandoSettings settings)
         {
             HashSet<string> transitions = new HashSet<string>();
@@ -524,6 +572,39 @@ namespace RandomizerLib
 
             // easier to just always check certain troublesome transitions
             transitions.UnionWith(specialTransitions);
+
+            return transitions;
+        }
+        public static HashSet<MWItem> GetTransitionsByProgression(IEnumerable<MWItem> newStuff, List<RandoSettings> settings)
+        {
+            HashSet<int> playerIds = new HashSet<int>();
+            HashSet<MWItem> transitions = new HashSet<MWItem>();
+            foreach (MWItem thing in newStuff)
+            {
+                playerIds.Add(thing.playerId);
+                if (settings[thing.playerId].RandomizeRooms)
+                {
+                    if (_progressionIndexedTransitionsForRoomRando.TryGetValue(thing.item, out HashSet<string> checkList))
+                    {
+                        transitions.UnionWith(checkList.Select(t => new MWItem(thing.playerId, t)));
+                    }
+                    else LogWarn($"{thing} is not indexed progression for room rando transitions");
+                }
+                else if (settings[thing.playerId].RandomizeAreas)
+                {
+                    if (_progressionIndexedTransitionsForAreaRando.TryGetValue(thing.item, out HashSet<string> checkList))
+                    {
+                        transitions.UnionWith(checkList.Select(t => new MWItem(thing.playerId, t)));
+                    }
+                    else LogWarn($"{thing} is not indexed progression for area rando transitions");
+                }
+            }
+
+            // easier to just always check certain troublesome transitions
+            foreach (int id in playerIds)
+            {
+                transitions.UnionWith(specialTransitions.Select(t => new MWItem(id, t)));
+            }
 
             return transitions;
         }
