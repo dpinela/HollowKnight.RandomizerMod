@@ -1,31 +1,45 @@
-﻿namespace RandomizerLib.MultiWorld
+﻿using System;
+using Newtonsoft.Json;
+
+namespace RandomizerLib.MultiWorld
 {
+    [Serializable]
     public class MWItem
     {
-        public readonly int playerId;
-        public readonly string item;
+        public int PlayerId { get; }
+        public string Item { get; }
 
         public MWItem(int playerId, string item)
         {
-            this.playerId = playerId;
-            this.item = item;
+            PlayerId = playerId;
+            Item = item;
+        }
+
+        public MWItem(string idItem)
+        {
+            (PlayerId, Item) = LogicManager.ExtractPlayerID(idItem);
         }
 
         public override bool Equals(object obj)
         {
             if (obj.GetType() != GetType()) return false;
             MWItem other = (MWItem) obj;
-            return playerId == other.playerId && item == other.item;
+            return PlayerId == other.PlayerId && Item == other.Item;
         }
 
         public override int GetHashCode()
         {
-            return (playerId, item).GetHashCode();
+            return (PlayerId, Item).GetHashCode();
         }
 
         public override string ToString()
         {
-            return "MW(" + (playerId + 1) + ")_" + item;
+            return "MW(" + (PlayerId + 1) + ")_" + Item;
+        }
+
+        public static explicit operator MWItem(string s)
+        {
+            return new MWItem(s);
         }
     }
 }

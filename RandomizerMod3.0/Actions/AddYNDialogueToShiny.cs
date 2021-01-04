@@ -107,16 +107,12 @@ namespace RandomizerMod.Actions
                 _playerId, _itemName, _cost, _type));
         }
 
-        private static void OpenYNDialogue(GameObject shiny, uint playerId, string itemName, int cost, CostType type)
+        private static void OpenYNDialogue(GameObject shiny, int playerId, string itemName, int cost, CostType type)
         {
             FSMUtility.LocateFSM(GameObject.Find("DialogueManager"), "Box Open YN").SendEvent("BOX UP YN");
             FSMUtility.LocateFSM(GameObject.Find("Text YN"), "Dialogue Page Control").FsmVariables
                 .GetFsmGameObject("Requester").Value = shiny;
             string UIName = LanguageStringManager.GetLanguageString(itemName, "UI");
-            if (playerId > 0 && RandomizerMod.Instance.Settings.IsMW && RandomizerMod.Instance.mwConnection.GetPID() != playerId)
-            {
-                UIName = RandomizerMod.Instance.Settings.GetMWPlayerName(playerId) + "'s " + UIName;
-            }
 
             switch (type)
             {

@@ -9,6 +9,10 @@ using System.Net;
 using System.Threading;
 using MultiWorldProtocol.Messaging.Definitions.Messages;
 
+using RandomizerLib;
+using Newtonsoft.Json;
+using RandomizerLib.MultiWorld;
+
 namespace MultiWorldServer
 {
     class Server
@@ -16,7 +20,6 @@ namespace MultiWorldServer
         const int PingInterval = 10000; //In milliseconds
 
         private ulong nextUID = 1;
-        private ushort nextPID = 0;
         private readonly MWMessagePacker Packer = new MWMessagePacker(new BinaryMWMessageEncoder());
         private readonly List<Client> Unidentified = new List<Client>();
 
@@ -24,20 +27,15 @@ namespace MultiWorldServer
 
         private readonly object _clientLock = new object();
         private readonly Dictionary<ulong, Client> Clients = new Dictionary<ulong, Client>();
-        private readonly Dictionary<string, Session> Sessions = new Dictionary<string, Session>();
+        private readonly Dictionary<int, GameSession> GameSessions = new Dictionary<int, GameSession>();
+        private readonly Dictionary<ulong, RandoSettings> ready = new Dictionary<ulong, RandoSettings>();
         private TcpListener _server;
         private readonly Timer ResendTimer;
 
-        private readonly ServerSettings _settings;
-        private Dictionary<string, (int, string)>[] _itemPlacements;
-
         public bool Running { get; private set; }
 
-        public Server(int port, ServerSettings settings)
+        public Server(int port)
         {
-            _settings = settings;
-            _itemPlacements = MultiworldRandomizer.Randomize(_settings);
-
             //Listen on any ip
             _server = new TcpListener(IPAddress.Parse("0.0.0.0"), port);
             _server.Start();
@@ -48,12 +46,12 @@ namespace MultiWorldServer
             PingTimer = new Timer(DoPing, Clients, 1000, PingInterval);
             ResendTimer = new Timer(DoResends, Clients, 500, 1000);
             Running = true;
-            Log("Server started!");
+            Log($"Server started on port {port}!");
         }
 
-        private void Log(string message)
+        internal static void Log(string message)
         {
-            Console.WriteLine(string.Format("[{0}] {1}", DateTime.Now.ToShortTimeString(), message));
+            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] {message}");
         }
 
         private void DoPing(object clients)
@@ -105,35 +103,6 @@ namespace MultiWorldServer
                 }
             }
         }
-
-        /*
-        private void ReadWorker()
-        {
-            //Allocating outside of the loop to not reallocate every time
-            List<(Client, MWPackedMessage)> messages = new List<(Client, MWPackedMessage)>();
-            while (true)
-            {
-                messages.Clear();
-                lock (_clientLock)
-                {
-                    foreach (Client client in Unidentified.Concat(Clients.Values))
-                    {
-                        if (client.TcpClient.Available > 0)
-                        {
-                            NetworkStream stream = client.TcpClient.GetStream();
-                            messages.Add((client, new MWPackedMessage(stream)));
-                        }
-                    }
-                }
-
-                foreach ((Client client, MWPackedMessage message) in messages)
-                {
-                    ReadFromClient(client, message);
-                }
-
-                Thread.Sleep(10);
-            }
-        }*/
 
         private void StartReadThread(Client c)
         {
@@ -241,10 +210,15 @@ namespace MultiWorldServer
             try
             {
                 //Remove first from lists so if we get a network exception at least on the server side stuff should be clean
+                lock (ready)
+                {
+                    ready.Remove(client.UID);
+                }
                 lock (_clientLock)
                 {
                     Clients.Remove(client.UID);
                     Unidentified.Remove(client);
+                    RemovePlayerFromSession(client);
                 }
                 SendMessage(new MWDisconnectMessage(), client);
                 //Wait a bit to give the message a chance to be sent at least before closing the client
@@ -254,6 +228,20 @@ namespace MultiWorldServer
             catch(Exception)
             {
                 //Do nothing, we're already disconnecting
+            }
+        }
+
+        private void RemovePlayerFromSession(Client client)
+        {
+            if (client.Session != null)
+            {
+                GameSessions[client.Session.randoId].RemovePlayer(client);
+                if (GameSessions[client.Session.randoId].isEmpty())
+                {
+                    Log($"Removing session for rando id: {client.Session.randoId}");
+                    GameSessions.Remove(client.Session.randoId);
+                }
+                client.Session = null;
             }
         }
 
@@ -288,11 +276,7 @@ namespace MultiWorldServer
                 case MWMessageType.JoinConfirmMessage:
                     break;
                 case MWMessageType.LeaveMessage:
-                    break;
-                case MWMessageType.ItemConfigurationMessage:
-                    break;
-                case MWMessageType.ItemConfigurationConfirmMessage:
-                    HandleConfigurationConfirm(sender, (MWItemConfigurationConfirmMessage)message);
+                    HandleLeaveMessage(sender, (MWLeaveMessage)message);
                     break;
                 case MWMessageType.ItemReceiveMessage:
                     break;
@@ -310,8 +294,14 @@ namespace MultiWorldServer
                 case MWMessageType.PingMessage:
                     HandlePing(sender, (MWPingMessage)message);
                     break;
-                case MWMessageType.ItemConfigurationRequestMessage:
-                    HandleItemConfigurationRequest(sender, (MWItemConfigurationRequestMessage)message);
+                case MWMessageType.ReadyMessage:
+                    HandleReadyMessage(sender, (MWReadyMessage)message);
+                    break;
+                case MWMessageType.UnreadyMessage:
+                    HandleUnreadyMessage(sender, (MWUnreadyMessage)message);
+                    break;
+                case MWMessageType.StartMessage:
+                    HandleStartMessage(sender, (MWStartMessage)message);
                     break;
                 case MWMessageType.InvalidMessage:
                 default:
@@ -329,9 +319,9 @@ namespace MultiWorldServer
                     if (message.SenderUid == 0)
                     {
                         sender.UID = nextUID++;
-                        //Log(string.Format("Assigned UID={0}", sender.UID));
+                        Log(string.Format("Assigned UID={0}", sender.UID));
                         SendMessage(new MWConnectMessage {SenderUid = sender.UID}, sender);
-                        //Log("Connect sent!");
+                        Log("Connect sent!");
                         Clients.Add(sender.UID, sender);
                         Unidentified.Remove(sender);
                     }
@@ -363,68 +353,91 @@ namespace MultiWorldServer
                     return;
                 }
 
-                if (string.IsNullOrEmpty(message.Token))
+                if (!GameSessions.ContainsKey(message.RandoId))
                 {
-                    if (nextPID > _settings.Players)
-                    {
-                        sender.TcpClient.Close();
-                        return;
-                    }
-
-                    while (sender.Session == null || Sessions.ContainsKey(sender.Session.Token))
-                    {
-                        sender.Session = new Session(message.DisplayName) {PID = nextPID++};
-                    }
-
-                    Sessions.Add(sender.Session.Token, sender.Session);
-                    sender.FullyConnected = true;
-
-                    Log($"{message.DisplayName} has token {sender.Session.Token}");
-                    SendMessage(new MWJoinConfirmMessage { Token = sender.Session.Token, DisplayName = sender.Session.Name, PlayerId = sender.Session.PID }, sender);
-                }
-                else
-                {
-                    Log($"{message.DisplayName} trying to rejoin");
-                    if (!Sessions.TryGetValue(message.Token, out Session session))
-                    {
-                        SendMessage(new MWDisconnectMessage(), sender);
-                        sender.TcpClient.Close();
-                        return;
-                    }
-
-                    sender.Session = session;
-                    sender.FullyConnected = true;
-                    Log($"{message.DisplayName} has rejoined with token {sender.Session.Token}");
-                    SendMessage(new MWJoinConfirmMessage { Token = sender.Session.Token, DisplayName = sender.Session.Name, PlayerId = sender.Session.PID }, sender);
+                    Log($"Starting session for rando id: {message.RandoId}");
+                    GameSessions[message.RandoId] = new GameSession(message.RandoId);
                 }
 
-                IEnumerable<Client> connected =
-                    Clients.Where(client => client.Value.FullyConnected).Select(client => client.Value);
+                GameSessions[message.RandoId].AddPlayer(sender, message);
+                SendMessage(new MWJoinConfirmMessage(), sender);
+            }
+        }
 
-                if (connected.Count() >= _settings.Players)
+        private void HandleLeaveMessage(Client sender, MWLeaveMessage message)
+        {
+            RemovePlayerFromSession(sender);
+        }
+
+        private void HandleReadyMessage(Client sender, MWReadyMessage message)
+        {
+            lock (ready)
+            {
+                ready.Add(sender.UID, message.Settings);
+                Log($"UID {sender.UID} readied up ({ready.Count} readied)");
+
+                foreach (Client c in Clients.Values)
                 {
-                    foreach (Client c in connected)
-                    {
-                        foreach (string loc in _itemPlacements[c.Session.PID].Keys)
-                        {
-                            (int player, string item) = _itemPlacements[c.Session.PID][loc];
-
-                            ConfigureItem(c, loc, item, (ushort)player);
-                        }
-                    }
+                    SendMessage(new MWNumReadyMessage { Ready = ready.Count }, c);
                 }
             }
+        }
+
+        private void HandleUnreadyMessage(Client sender, MWUnreadyMessage message)
+        {
+            lock (ready)
+            {
+                ready.Remove(sender.UID);
+                Log($"UID {sender.UID} unreadied ({ready.Count} readied)");
+
+                foreach (Client c in Clients.Values)
+                {
+                    SendMessage(new MWNumReadyMessage { Ready = ready.Count }, c);
+                }
+            }
+        }
+
+        private void HandleStartMessage(Client sender, MWStartMessage message)
+        {
+            List<Client> clients = new List<Client>();
+            List<RandoSettings> settings = new List<RandoSettings>();
+
+            Log($"Starting MW at request of {sender.UID}");
+
+            lock (ready)
+            {
+                // Ensure the person who called this is first, so their seed is used
+                clients.Add(sender);
+                settings.Add(ready[sender.UID]);
+
+                ready.Remove(sender.UID);
+
+                foreach (var kvp in ready)
+                {
+                    clients.Add(Clients[kvp.Key]);
+                    settings.Add(kvp.Value);
+                }
+
+                ready.Clear();
+            }
+
+            Log("Randomizing world...");
+            MWRandomizer randomizer = new MWRandomizer(settings);
+            List<RandoResult> results = randomizer.RandomizeMW();
+            Log("Done randomization");
+
+            Log("Sending to players...");
+            for (int i = 0; i < results.Count; i++)
+            {
+                Log($"Sending to player {i + 1}");
+                SendMessage(new MWResultMessage { Result = results[i] }, clients[i]);
+            }
+            Log($"Done sending to players!");
         }
 
         private void HandleNotify(Client sender, MWNotifyMessage message)
         {
             Log($"[{sender.Session?.Name}]: {message.Message}");
-        }
-
-
-        private void HandleConfigurationConfirm(Client sender, MWItemConfigurationConfirmMessage message)
-        {
-            sender.Session.ConfirmMessage(message);
         }
 
         private void HandleItemReceiveConfirm(Client sender, MWItemReceiveConfirmMessage message)
@@ -434,46 +447,11 @@ namespace MultiWorldServer
 
         private void HandleItemSend(Client sender, MWItemSendMessage message)
         {
+            if (sender.Session == null) return;  // Throw error?
+
             //Confirm sending the item to the sender
-            SendMessage(new MWItemSendConfirmMessage {Item = message.Item, To=message.To}, sender);
-            SendItemTo(message.To, message.Item, sender.Session.Name);
-        }
-
-        private void SendItemTo(int player, string Item, string From)
-        {
-            lock (_clientLock)
-            {
-                foreach (Client c in Clients.Values)
-                {
-                    if (c.Session.PID == player)
-                    {
-                        Log($"Sending item '{Item}' to '{c.Session.Name}', from '{From}'");
-
-                        c.Session.QueueConfirmableMessage(new MWItemReceiveMessage { From = From, Item = Item });
-                        return;
-                    }
-                }
-            }
-        }
-
-        private void HandleItemConfigurationRequest(Client sender, MWItemConfigurationRequestMessage msg)
-        {
-            Log("Got config request");
-            if (sender.FullyConnected && sender.Session != null)
-            {
-                Log("Responding");
-                foreach (string loc in _itemPlacements[sender.Session.PID].Keys)
-                {
-                    (int player, string item) = _itemPlacements[sender.Session.PID][loc];
-
-                    ConfigureItem(sender, loc, item, (ushort)player);
-                }
-            }
-        }
-
-        public void ConfigureItem(Client c, string Location, string Item, ushort player)
-        {
-            c.Session.QueueConfirmableMessage(new MWItemConfigurationMessage { Location = Location, Item = Item, PlayerId = player});
+            SendMessage(new MWItemSendConfirmMessage {Item = message.Item, To = message.To}, sender);
+            GameSessions[sender.Session.randoId].SendItemTo(message.To, message.Item, sender.Session.Name);
         }
 
         private Client GetClient(ulong uuid)

@@ -9,6 +9,7 @@ using static RandomizerMod.GiveItemActions;
 using Object = UnityEngine.Object;
 
 using RandomizerLib;
+using Newtonsoft.Json;
 
 namespace RandomizerMod.Actions
 {
@@ -42,11 +43,9 @@ namespace RandomizerMod.Actions
             string[] shopNames = LogicManager.ShopNames;
 
             // Loop non-shop items
-            foreach ((string newItemNameId, string location) in items.Where(item => !shopNames.Contains(item.Item2)))
+            foreach ((string newItemName, string location) in items.Where(item => !shopNames.Contains(item.Item2)))
             {
-                int playerId;
-                string newItemName;
-                (playerId, newItemName) = LogicManager.ExtractPlayerID(newItemNameId);
+                (int playerId, string itemName) = LogicManager.ExtractPlayerID(newItemName);
 
                 ReqDef oldItem = LogicManager.GetItemDef(location);
                 ReqDef newItem = LogicManager.GetItemDef(newItemName);
@@ -129,6 +128,13 @@ namespace RandomizerMod.Actions
                     Actions.Add(new ChangeBoolTest("RestingGrounds_04", "PostDreamnail", "FSM", "Check",
                         newItemName, playerdata: false,
                         altTest: () => RandomizerMod.Instance.Settings.CheckLocationFound(location)));
+                }
+
+                // Always choose other players items to be a trinket flash (don't show big pop up for other's items)
+                if (playerId > 0 && playerId != RandomizerMod.Instance.Settings.MWPlayerId)
+                {
+                    newItem.type = ItemType.Trinket;
+                    newItem.nameKey = $"MW({playerId + 1})_{newItem.nameKey}";
                 }
 
                 switch (newItem.type)
@@ -222,22 +228,30 @@ namespace RandomizerMod.Actions
             // No point rewriting this before making the shop component
             foreach ((string shopItem, string shopName) in items.Where(item => shopNames.Contains(item.Item2)))
             {
-                ReqDef newItem = LogicManager.GetItemDef(shopItem);
+                (int playerId, string newItemName) = LogicManager.ExtractPlayerID(shopItem);
+                ReqDef newItem = LogicManager.GetItemDef(newItemName);
 
-                GiveAction giveAction = newItem.action;
-                if (giveAction == GiveAction.SpawnGeo)
+                RandomizerLib.GiveAction giveAction = newItem.action;
+                if (giveAction == RandomizerLib.GiveAction.SpawnGeo)
                 {
-                    giveAction = GiveAction.AddGeo;
+                    giveAction = RandomizerLib.GiveAction.AddGeo;
                 }
 
                 string boolName = "RandomizerMod." + giveAction.ToString() + "." + shopItem + "." + shopName;
 
                 ShopItemBoolNames[(shopItem, shopName)] = boolName;
+
+                string shopListing = newItem.nameKey;
+
+                if (RandomizerMod.Instance.Settings.IsMW && RandomizerMod.Instance.Settings.MWPlayerId != playerId)
+                {
+                    shopListing = $"MW({playerId + 1})_" + shopListing;
+                }
                 
                 ShopItemDef newItemDef = new ShopItemDef
                 {
                     PlayerDataBoolName = boolName,
-                    NameConvo = newItem.nameKey, // TODO add user name to this
+                    NameConvo = shopListing,
                     DescConvo = newItem.shopDescKey,
                     RequiredPlayerDataBool = LogicManager.GetShopDef(shopName).requiredPlayerDataBool,
                     RemovalPlayerDataBool = string.Empty,

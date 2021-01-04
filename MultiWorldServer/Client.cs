@@ -13,11 +13,10 @@ namespace MultiWorldServer
     {
         public ulong UID;
         public TcpClient TcpClient;
-        public bool FullyConnected;
         public object SendLock = new object();
         public DateTime lastPing;
         public Thread ReadWorker;
 
-        public Session Session;
+        public PlayerSession Session;
     }
 }

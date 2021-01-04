@@ -18,13 +18,13 @@ namespace RandomizerMod.Actions
         private readonly string _fsmName;
         private readonly string _objectName;
         private readonly string _sceneName;
-        private readonly GiveAction _action;
+        private readonly RandomizerLib.GiveAction _action;
         private readonly string _item;
         private readonly string _location;
         private readonly string _nameKey;
         private readonly string _spriteName;
 
-        public ChangeShinyIntoItem(string sceneName, string objectName, string fsmName, GiveAction action, string item, string location, string nameKey, string spriteName)
+        public ChangeShinyIntoItem(string sceneName, string objectName, string fsmName, RandomizerLib.GiveAction action, string item, string location, string nameKey, string spriteName)
         {
             _sceneName = sceneName;
             _objectName = objectName;
@@ -70,7 +70,7 @@ namespace RandomizerMod.Actions
             trinkFlash.AddTransition("FINISHED", "Store Key");
 
             giveTrinket.RemoveActionsOfType<SetPlayerDataBool>();
-            giveTrinket.AddAction(new RandomizerExecuteLambda(() => GiveItem(_action, _item, _location)));
+            giveTrinket.AddAction(new RandomizerExecuteLambda(() => GiveItemLib(_action, _item, _location)));
 
             // Makes sure the correct icon and text appear
             giveTrinket.GetActionsOfType<GetLanguageString>().First().convName = _nameKey;

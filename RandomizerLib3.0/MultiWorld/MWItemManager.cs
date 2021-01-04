@@ -41,9 +41,9 @@ namespace RandomizerLib.MultiWorld
         public int availableCount => reachableLocations.Intersect(unplacedLocations).Count();
 
         public bool anyLocations => unplacedLocations.Any();
-        public bool anyNonShopLocations => unplacedLocations.Any(loc => !LogicManager.ShopNames.Contains(loc.item));
+        public bool anyNonShopLocations => unplacedLocations.Any(loc => !LogicManager.ShopNames.Contains(loc.Item));
         public bool anyItems => unplacedItems.Any();
-        public bool canGuess => unplacedProgression.Any(i => LogicManager.GetItemDef(i.item).itemCandidate);
+        public bool canGuess => unplacedProgression.Any(i => LogicManager.GetItemDef(i.Item).itemCandidate);
         internal MWItemManager(int players,
                                List<Dictionary<string, string>> transitions,
                                Random rnd,
@@ -59,7 +59,7 @@ namespace RandomizerLib.MultiWorld
                 players,
                 settings,
                 RandomizerState.InProgress,
-                null,
+                this,
                 null,
                 modifiedCosts: modifiedCosts
                 );
@@ -107,12 +107,12 @@ namespace RandomizerLib.MultiWorld
             {
                 MWItem i = items[rnd.Next(items.Count)];
 
-                if (settings[i.playerId].Cursed)
+                if (settings[i.PlayerId].Cursed)
                 {
-                    if (LogicManager.GetItemDef(i.item).majorItem) i = items[rnd.Next(items.Count)];
+                    if (LogicManager.GetItemDef(i.Item).majorItem) i = items[rnd.Next(items.Count)];
                 }
 
-                if (!LogicManager.GetItemDef(i.item).progression)
+                if (!LogicManager.GetItemDef(i.Item).progression)
                 {
                     unplacedItems.Add(i);
                     progressionFlag.Enqueue(false);
@@ -303,7 +303,7 @@ namespace RandomizerLib.MultiWorld
             while (updateQueue.Any())
             {
                 MWItem item = updateQueue.Dequeue();
-                int id = item.playerId;
+                int id = item.PlayerId;
 
                 potentialLocations = LogicManager.GetLocationsByProgression(recentProgression, settings);
                 if (settings[id].RandomizeTransitions)
@@ -323,7 +323,7 @@ namespace RandomizerLib.MultiWorld
 
                 if (settings[id].RandomizeTransitions)
                 {
-                    if (transitions[id].TryGetValue(item.item, out string transition1) && !pm.Has(new MWItem(id, transition1)))
+                    if (transitions[id].TryGetValue(item.Item, out string transition1) && !pm.Has(new MWItem(id, transition1)))
                     {
                         pm.Add(new MWItem(id, transition1));
                         updateQueue.Enqueue(new MWItem(id, transition1));
@@ -334,7 +334,7 @@ namespace RandomizerLib.MultiWorld
                         {
                             pm.Add(transition);
                             updateQueue.Enqueue(transition);
-                            if (transitions[transition.playerId].TryGetValue(transition.item, out string transition2) && !pm.Has(new MWItem(id, transition2)))
+                            if (transitions[transition.PlayerId].TryGetValue(transition.Item, out string transition2) && !pm.Has(new MWItem(id, transition2)))
                             {
                                 pm.Add(new MWItem(id, transition2));
                                 updateQueue.Enqueue(new MWItem(id, transition2));
@@ -365,7 +365,7 @@ namespace RandomizerLib.MultiWorld
         }
         public MWItem GuessItem()
         {
-            return unplacedProgression.First(item => LogicManager.GetItemDef(item.item).itemCandidate);
+            return unplacedProgression.First(item => LogicManager.GetItemDef(item.Item).itemCandidate);
         }
 
         public MWItem ForceItem()
@@ -382,11 +382,11 @@ namespace RandomizerLib.MultiWorld
                         tempProgression.Add(transition);
                         progressionQueue.Enqueue(transition);
                         pm.Add(transition);
-                        if (transitions[transition.playerId].TryGetValue(transition.item, out string transition2))
+                        if (transitions[transition.PlayerId].TryGetValue(transition.Item, out string transition2))
                         {
-                            tempProgression.Add(new MWItem(transition.playerId, transition2));
-                            progressionQueue.Enqueue(new MWItem(transition.playerId, transition2));
-                            pm.Add(new MWItem(transition.playerId, transition2));
+                            tempProgression.Add(new MWItem(transition.PlayerId, transition2));
+                            progressionQueue.Enqueue(new MWItem(transition.PlayerId, transition2));
+                            pm.Add(new MWItem(transition.PlayerId, transition2));
                         }
                     }
                 }
@@ -409,7 +409,7 @@ namespace RandomizerLib.MultiWorld
                 MWItem item = unplacedProgression[i];
                 pm.AddTemp(item);
                 if (CheckForNewLocations()) found = true;
-                else if (settings[item.playerId].RandomizeTransitions)
+                else if (settings[item.PlayerId].RandomizeTransitions)
                 {
                     UpdateTransitions();
                     while (progressionQueue.Any())
@@ -472,20 +472,20 @@ namespace RandomizerLib.MultiWorld
             UpdateOrder(location);
             unplacedLocations.Remove(location);
 
-            if (LogicManager.GetItemDef(item.item).progression)
+            if (LogicManager.GetItemDef(item.Item).progression)
             {
                 unplacedProgression.Remove(item);
                 UpdateReachableLocations(item);
             }
             else unplacedItems.Remove(item);
 
-            if (LogicManager.GetItemsByPool("Grub").Contains(item.item))
+            if (LogicManager.GetItemsByPool("Grub").Contains(item.Item))
             {
-                pm.AddGrubLocation(item.playerId, location);
+                pm.AddGrubLocation(item.PlayerId, location);
             }
-            else if (LogicManager.GetItemsByPool("Root").Contains(item.item))
+            else if (LogicManager.GetItemsByPool("Root").Contains(item.Item))
             {
-                pm.AddEssenceLocation(item.playerId, location, LogicManager.GetItemDef(item.item).geo);
+                pm.AddEssenceLocation(item.PlayerId, location, LogicManager.GetItemDef(item.Item).geo);
             }
         }
 

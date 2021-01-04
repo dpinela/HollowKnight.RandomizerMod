@@ -52,6 +52,7 @@
     <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\LogHelper.cs" />
+    <Compile Include="Logging\ModLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DirectedTransitions.cs" />
     <Compile Include="IProgressionManager.cs" />

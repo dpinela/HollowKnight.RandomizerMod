@@ -33,10 +33,10 @@ namespace RandomizerLib.MultiWorld
             //    Not as cool as all the hashset union stuff :(
             foreach (MWItem item in GetVanillaItems())
             {
-                ReqDef itemDef = LogicManager.GetItemDef(item.item);
+                ReqDef itemDef = LogicManager.GetItemDef(item.Item);
                 if (itemDef.type == ItemType.Shop && LogicManager.ShopNames.Contains(itemDef.shopName))
                 {
-                    MWItem mwShop = new MWItem(item.playerId, itemDef.shopName);
+                    MWItem mwShop = new MWItem(item.PlayerId, itemDef.shopName);
 
                     ItemPlacements.Add((item, mwShop));
 

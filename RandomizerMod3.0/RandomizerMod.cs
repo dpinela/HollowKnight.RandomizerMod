@@ -15,12 +15,14 @@ using static RandomizerMod.GiveItemActions;
 using RandomizerMod.SceneChanges;
 using RandomizerMod.MultiWorld;
 using System.Security.Cryptography;
+using static RandomizerMod.Randomization.PostRandomizer;
 
 using RandomizerLib;
 using RandomizerLib.MultiWorld;
-using static RandomizerMod.LogHelper;
+using RandomizerLib.Logging;
 
 using Object = UnityEngine.Object;
+using Newtonsoft.Json;
 
 namespace RandomizerMod
 {
@@ -85,6 +87,9 @@ namespace RandomizerMod
             LogicManager.ParseXML());
             _logicParseThread.Start();
 
+            // Set up RandomizerLib logger
+            RandomizerLib.Logging.LogHelper.LogTarget = new ModLogger(this);
+
             // Add hooks
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += HandleSceneChanges;
             ModHooks.Instance.LanguageGetHook += LanguageStringManager.GetLanguageString;
@@ -114,7 +119,7 @@ namespace RandomizerMod
                 {nameof(PlayerData.gotCharm_24), nameof(PlayerData.fragileGreed_unbreakable)},
                 {nameof(PlayerData.gotCharm_25), nameof(PlayerData.fragileStrength_unbreakable)}
             };
-            mwConnection = new ClientConnection(MWSettings.IP, MWSettings.Port, MWSettings.UserName);
+            mwConnection = new ClientConnection();
 
             _logicParseThread.Join(); // new update -- logic manager is needed to supply start locations to menu
             MenuChanger.EditUI();
@@ -149,33 +154,50 @@ namespace RandomizerMod
             return _logicParseThread == null || !_logicParseThread.IsAlive;
         }
 
-        public void StartNewGame()
+        public void StartNewGame(bool mw = false)
         {
-            if (!Settings.Randomizer)
+            if (mw)
             {
-                return;
+                Log("Waiting on response");
+                int i = 0;
+                while (mwConnection.LastResult == null && i < 500)
+                {
+                    Thread.Sleep(100);
+                    i++;
+                }
+                if (mwConnection.LastResult == null) return;
+                RandoLogger.InitializeTracker(mwConnection.LastResult);
+                RandoLogger.InitializeSpoiler(mwConnection.LastResult);
+
+                PostRandomizationTasks(mwConnection.LastResult);
+                mwConnection.LastResult = null;
             }
-
-            if (!LoadComplete())
+            else
             {
-                _logicParseThread.Join();
-            }
+                if (!Settings.Randomizer)
+                {
+                    return;
+                }
 
-            RandoLogger.InitializeTracker(Settings);
-            RandoLogger.InitializeSpoiler(Settings);
+                if (!LoadComplete())
+                {
+                    _logicParseThread.Join();
+                }
 
-            try
-            {
-                /*Randomizer rando = new Randomizer();
-                rando.Randomize();
+                try
+                {
+                    MWRandomizer rando = new MWRandomizer(Settings.RandomizerSettings, 2);
+                    RandoResult result = rando.RandomizeMW()[0];
 
-                RandoLogger.UpdateHelperLog();*/
-                MWRandomizer rando = new MWRandomizer(Settings.RandomizerSettings, 2);
-                rando.RandomizeMW();
-            }
-            catch (Exception e)
-            {
-                LogError("Error in randomization:\n" + e);
+                    RandoLogger.InitializeTracker(result);
+                    RandoLogger.InitializeSpoiler(result);
+
+                    PostRandomizationTasks(result);
+                }
+                catch (Exception e)
+                {
+                    LogError("Error in randomization:\n" + e);
+                }
             }
         }
 
@@ -200,7 +222,7 @@ namespace RandomizerMod
 
         public override string GetVersion()
         {
-            string ver = "3.07LR";
+            string ver = "3.07MW";
             ver += $"({Math.Abs(MakeAssemblyHash() % 997)})";
 
             int minAPI = 53;
@@ -425,11 +447,11 @@ namespace RandomizerMod
                 // format is RandomizerMod.GiveAction.ItemName.LocationName for shop bools. Only the item name is used for savesettings bools
 
                 string[] pieces = boolName.Split('.');
-                pieces[1].TryToEnum(out GiveAction giveAction);
+                pieces[1].TryToEnum(out RandomizerLib.GiveAction giveAction);
                 string item = pieces[2];
                 string location = pieces[3];
 
-                GiveItem(giveAction, item, location);
+                GiveItemLib(giveAction, item, location);
                 return;
             }
             // Send the set through to the actual set

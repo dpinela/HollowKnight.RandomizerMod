@@ -5,7 +5,6 @@ using System.Linq;
 using static RandomizerLib.Logging.LogHelper;
 using System.Text;
 using static RandomizerLib.PreRandomizer;
-using static RandomizerLib.PostRandomizer;
 using static RandomizerLib.SpanningTree;
 
 namespace RandomizerLib
@@ -366,7 +365,6 @@ namespace RandomizerLib
                     m = string.Empty;
                     foreach (string s in transitions) m += s + ",";
                     Log("Unable to get transitions: " + m);
-                    LogItemPlacements(im, pm);
                     return false;
                 }
             }

@@ -7,6 +7,9 @@ using System.Net.Sockets;
 using System.Threading;
 using Modding;
 using static RandomizerMod.LogHelper;
+using Newtonsoft.Json;
+
+using RandomizerLib;
 
 namespace RandomizerMod.MultiWorld
 {
@@ -22,35 +25,24 @@ namespace RandomizerMod.MultiWorld
         private Thread ReadThread;
 
         public delegate void ItemReceiveEvent(string from, string itemName);
-
-        public delegate void MessageReceiveEvent(string from, string message);
-
-        public delegate void JoinEvent(uint players);
+        public delegate void NumReadyEvent(int num);
 
         public event ItemReceiveEvent ItemReceived;
-        public event MessageReceiveEvent MessageReceived;
-        public event JoinEvent JoinedMW;
+        public event NumReadyEvent NumReadyReceived;
+
+        public RandoResult LastResult = null;
 
         private List<MWMessage> messageEventQueue = new List<MWMessage>();
 
-        private readonly string _host;
-        private readonly int _port;
-
-        public ClientConnection(string host, int port, string Username)
+        public ClientConnection()
         {
             State = new ConnectionState();
-            State.UserName = Username;
-
-            _host = host;
-            _port = port;
 
             ModHooks.Instance.HeroUpdateHook += SynchronizeEvents;
         }
 
-        public void Connect(string token = "")
+        public void Connect()
         {
-            State.Token = token;
-
             if (_client != null && _client.Connected)
             {
                 Disconnect();
@@ -77,7 +69,7 @@ namespace RandomizerMod.MultiWorld
                 SendTimeout = 2000
             };
 
-            _client.Connect(_host, _port);
+            _client.Connect(RandomizerMod.Instance.MWSettings.IP, RandomizerMod.Instance.MWSettings.Port);
 
             if (ReadThread != null && ReadThread.IsAlive)
             {
@@ -93,6 +85,20 @@ namespace RandomizerMod.MultiWorld
             Log("Connected to server!");
         }
 
+        public void JoinRando(int randoId, int playerId)
+        {
+            Log("Joining rando session");
+            Log(RandomizerMod.Instance.MWSettings.UserName);
+            Log(randoId);
+            Log(playerId);
+            SendMessage(new MWJoinMessage
+            {
+                DisplayName = RandomizerMod.Instance.MWSettings.UserName,
+                RandoId = randoId,
+                PlayerId = playerId
+            });
+        }
+
         public void Disconnect()
         {
             Log("Disconnecting from server");
@@ -100,6 +106,9 @@ namespace RandomizerMod.MultiWorld
 
             try
             {
+                ReadThread.Abort();
+                ReadThread = null;
+                Log($"Disconnecting (UID = {State.Uid})");
                 byte[] buf = Packer.Pack(new MWDisconnectMessage {SenderUid = State.Uid}).Buffer;
                 _client.GetStream().Write(buf, 0, buf.Length);
                 _client.Close();
@@ -113,6 +122,7 @@ namespace RandomizerMod.MultiWorld
                 State.Connected = false;
                 State.Joined = false;
                 _client = null;
+                messageEventQueue.Clear();
             }
         }
 
@@ -136,11 +146,8 @@ namespace RandomizerMod.MultiWorld
 
             switch (message)
             {
-                case MWNotifyMessage notify:
-                    MessageReceived?.Invoke(notify.From, notify.Message);
-                    break;
                 case MWItemReceiveMessage item:
-                    GiveItem(item.From, item.Item);
+                    GiveItemActions.GiveItemMW(item.Item, item.From);
                     break;
                 default:
                     Log("Unknown type in message queue: " + message.MessageType);
@@ -250,11 +257,6 @@ namespace RandomizerMod.MultiWorld
                 case MWMessageType.LeaveMessage:
                     HandleLeaveMessage((MWLeaveMessage)message);
                     break;
-                case MWMessageType.ItemConfigurationMessage:
-                    HandleItemConfiguration((MWItemConfigurationMessage)message);
-                    break;
-                case MWMessageType.ItemConfigurationConfirmMessage:
-                    break;
                 case MWMessageType.ItemReceiveMessage:
                     HandleItemReceive((MWItemReceiveMessage)message);
                     break;
@@ -270,6 +272,12 @@ namespace RandomizerMod.MultiWorld
                     break;
                 case MWMessageType.PingMessage:
                     State.LastPing = DateTime.Now;
+                    break;
+                case MWMessageType.NumReadyMessage:
+                    NumReadyReceived?.Invoke(((MWNumReadyMessage)message).Ready);
+                    break;
+                case MWMessageType.ResultMessage:
+                    HandleResult((MWResultMessage)message);
                     break;
                 case MWMessageType.InvalidMessage:
                 default:
@@ -299,35 +307,12 @@ namespace RandomizerMod.MultiWorld
         {
             State.Uid = message.SenderUid;
             State.Connected = true;
-            SendMessage(new MWJoinMessage { DisplayName = State.UserName, Token = State.Token ?? "" });
+            Log($"Connected! (UID = {State.Uid})");
         }
 
         private void HandleJoinConfirm(MWJoinConfirmMessage message)
         {
-            //Token is empty token if we connected for the first time
-            if (string.IsNullOrEmpty(State.Token))
-            {
-                State.Token = message.Token;
-                //MultiWorldMod.Instance.Config.Token = message.Token;
-                State.Joined = true;
-                Log("Joined");
-                State.PlayerId = message.PlayerId;
-            }
-            else
-            {
-                State.Token = message.Token;
-                //RandomizerMod.Instance.Settings.Token = message.Token;
-                State.Joined = true;
-                Log("Rejoined");
-            }
-        }
-
-        private void HandleItemConfiguration(MWItemConfigurationMessage message)
-        {
-            Log(message.Location + " is " + message.Item + " for player " + message.PlayerId);
-
-            //State.GameInfo.SetLocation(message.Location, message.Item, message.PlayerId);
-            SendMessage(new MWItemConfigurationConfirmMessage { Location = message.Location, Item = message.Item, PlayerId = message.PlayerId });
+            State.Joined = true;
         }
 
         private void HandleLeaveMessage(MWLeaveMessage message)
@@ -365,88 +350,38 @@ namespace RandomizerMod.MultiWorld
             ClearFromSendQueue(message.To, message.Item);
         }
 
-        public void Say(string message)
+        private void HandleResult(MWResultMessage message)
         {
-            SendMessage(new MWNotifyMessage { Message = message, To = "All", From = State.UserName });
+            RandoResult result = message.Result;
+            LastResult = result;
+        }
+
+        public void ReadyUp()
+        {
+            SendMessage(new MWReadyMessage { Settings = RandomizerMod.Instance.Settings.RandomizerSettings });
+        }
+
+        public void Unready()
+        {
+            SendMessage(new MWUnreadyMessage());
+        }
+
+        public void Start()
+        {
+            LastResult = null;
+            SendMessage(new MWStartMessage());
         }
 
         public void SendItem(string loc, string item, int playerId)
         {
+            Log($"Sending item {item} to {playerId}");
             ItemSendQueue.Add(new MWItemSendMessage { Item = item, To = playerId });
         }
 
-        public bool GetItemAtLocation(string loc, out string item)
-        {
-            //return State.GameInfo.ItemLocations.TryGetValue(loc, out item);
-            item = "";
-            return false;
-        }
-
-        public (string, string)[] GetItemsInShop(string shopName)
-        {
-            /*List<(string, PlayerItem)> items = new List<(string, PlayerItem)>();
-
-            int i = 0;
-            while (true)
-            {
-                string loc = shopName + "_" + (i++);
-                if (!GetItemAtLocation(loc, out PlayerItem item))
-                {
-                    break;
-                }
-
-                items.Add((loc, item));
-            }
-
-            return items.ToArray();*/
-            return new (string, string)[0];
-        }
-
-        public void ObtainItem(string loc)
-        {
-            /*if (!GetItemAtLocation(loc, out PlayerItem item))
-            {
-                MultiWorldMod.Instance.Log("Location " + loc + " not found");
-                return;
-            }
-
-            if (item.PlayerId != State.GameInfo.PlayerID)
-            {
-                MultiWorldMod.Instance.Log("Giving item " + item.Item + " to player " + item.PlayerId);
-                SendItem(loc, item.Item, item.PlayerId);
-                return;
-            }
-
-            GiveItem(State.UserName, item.Item);*/
-        }
-
-        public void ObtainShopItem(string shopName, string itemName)
-        {
-            /*int i = 0;
-            while (GetItemAtLocation(shopName + "_" + (i++), out PlayerItem item))
-            {
-                if (item.Item == itemName)
-                {
-                    ObtainItem(shopName + "_" + (i - 1));
-                    break;
-                }
-            }*/
-        }
-
-        private void GiveItem(string from, string item)
+        /*private void GiveItem(string from, string item)
         {
             ItemReceived?.Invoke(from, item);
-        }
-
-        public uint GetPID()
-        {
-            return State.PlayerId;
-        }
-
-        public string GetUserName()
-        {
-            return State.UserName;
-        }
+        }*/
 
         public ConnectionStatus GetStatus()
         {
@@ -457,7 +392,7 @@ namespace RandomizerMod.MultiWorld
 
             if (!State.Joined)
             {
-                return ConnectionStatus.TryingToConnect;
+                return ConnectionStatus.Unready;
             }
 
             return ConnectionStatus.Connected;
@@ -466,7 +401,8 @@ namespace RandomizerMod.MultiWorld
         public enum ConnectionStatus
         {
             NotConnected,
-            TryingToConnect,
+            Unready,
+            Ready,
             Connected
         }
     }

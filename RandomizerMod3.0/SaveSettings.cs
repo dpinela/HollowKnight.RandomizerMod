@@ -7,6 +7,7 @@ using RandomizerMod.Randomization;
 using static RandomizerMod.LogHelper;
 
 using RandomizerLib;
+using System;
 
 namespace RandomizerMod
 {
@@ -17,14 +18,14 @@ namespace RandomizerMod
          * rescuedSly is used in room randomizer to control when Sly appears in the shop, separately from when the door is unlocked
          */
 
-
         private SerializableStringDictionary _itemPlacements = new SerializableStringDictionary();
         private SerializableIntDictionary _orderedLocations = new SerializableIntDictionary();
+
         public SerializableStringDictionary _transitionPlacements = new SerializableStringDictionary();
         private SerializableIntDictionary _variableCosts = new SerializableIntDictionary();
         private SerializableIntDictionary _shopCosts = new SerializableIntDictionary();
         private SerializableIntDictionary _additiveCounts = new SerializableIntDictionary();
-        private SerializableDictionary<uint, string> _mwPlayerNames = new SerializableDictionary<uint, string>();
+        private List<string> _mwPlayerNames = new List<string>();
 
         private SerializableBoolDictionary _obtainedItems = new SerializableBoolDictionary();
         private SerializableBoolDictionary _obtainedLocations = new SerializableBoolDictionary();
@@ -42,7 +43,7 @@ namespace RandomizerMod
 
         public bool RandomizeTransitions => RandomizeAreas || RandomizeRooms;
 
-        public bool IsMW => MWNumPlayers > 1;
+        public bool IsMW => MWNumPlayers >= 1;
 
         public bool FreeLantern => !(DarkRooms || RandomizeKeys);
         public SaveSettings()
@@ -50,6 +51,13 @@ namespace RandomizerMod
             AfterDeserialize += () =>
             {
                 RandomizerAction.CreateActions(ItemPlacements, this);
+                if (IsMW)
+                {
+                    RandomizerMod.Instance.mwConnection.Disconnect();
+                    RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();
+                    RandomizerMod.Instance.mwConnection.Connect();
+                    RandomizerMod.Instance.mwConnection.JoinRando(MWRandoId, MWPlayerId);
+                }
             };
         }
 
@@ -65,6 +73,13 @@ namespace RandomizerMod
             get => GetInt(1);
             set => SetInt(value);
         }
+
+        public int MWRandoId
+        {
+            get => GetInt(0);
+            set => SetInt(value);
+        }
+
         public int JijiHintCounter
         {
             get => GetInt(0);
@@ -532,10 +547,18 @@ namespace RandomizerMod
             _additiveCounts[additiveSet[0]]++;
         }
 
-        public string GetMWPlayerName(uint playerId)
+        internal void SetMWNames(List<string> nicknames)
         {
-            string name = "Player " + playerId;
-            _mwPlayerNames.TryGetValue(playerId, out name);
+            _mwPlayerNames = nicknames;
+        }
+
+        public string GetMWPlayerName(int playerId)
+        {
+            string name = "Player " + (playerId + 1);
+            if (_mwPlayerNames != null && _mwPlayerNames.Count > playerId)
+            {
+                name = _mwPlayerNames[playerId];
+            }
             return name;
         }
     }

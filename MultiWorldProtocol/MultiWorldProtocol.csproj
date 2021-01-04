@@ -12,6 +12,10 @@
   </Target>
 
   <ItemGroup>
+    <ProjectReference Include="..\RandomizerLib3.0\RandomizerLib3.0.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>

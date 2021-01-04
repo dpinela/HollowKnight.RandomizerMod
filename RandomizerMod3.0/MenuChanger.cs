@@ -10,6 +10,10 @@ using Random = System.Random;
 using RandomizerMod.Randomization;
 
 using RandomizerLib;
+using System.Net;
+
+using MultiWorldProtocol.Messaging;
+using MultiWorldProtocol.Messaging.Definitions.Messages;
 
 namespace RandomizerMod
 {
@@ -59,7 +63,6 @@ namespace RandomizerMod
             startRandoBtn.GetComponent<StartGameEventTrigger>().bossRush = true;
             MenuButton backBtn = back.Clone("Back", MenuButton.MenuButtonType.Proceed, new Vector2(0, -100), "Back");
 
-
             //RandoMenuItem<string> gameTypeBtn = new RandoMenuItem<string>(back, new Vector2(0, 600), "Game Type", "Normal", "Steel Soul");
 
             RandoMenuItem<string> presetPoolsBtn = new RandoMenuItem<string>(back, new Vector2(900, 1120), "Preset", "Mini Super Junk Pit", "Basic", "Completionist", "Junk Pit", "Super Junk Pit", "Mini Super Geo Pit", "Super Geo Pit", "Mini Super Totem Pit", "Super Totem Pit", "EVERYTHING", "Vanilla", "Custom");
@@ -107,44 +110,79 @@ namespace RandomizerMod
 
             RandoMenuItem<string> modeBtn = new RandoMenuItem<string>(back, new Vector2(0, 1040), "Mode", "Item Randomizer", "Area Randomizer", "Connected-Area Room Randomizer", "Room Randomizer");
             RandoMenuItem<string> cursedBtn = new RandoMenuItem<string>(back, new Vector2(0, 960), "Cursed", "no", "noo", "noooo", "noooooooo", "noooooooooooooooo", "Oh yeah");
-            RandoMenuItem<bool> multiworldBtn = new RandoMenuItem<bool>(back, new Vector2(0, 880), "Connect to Multiworld", false, true);
+            RandoMenuItem<string> multiworldBtn = new RandoMenuItem<string>(back, new Vector2(0, 800), "Multiworld", "No", "Yes");
+            RandoMenuItem<bool> multiworldReadyBtn = new RandoMenuItem<bool>(back, new Vector2(0, 640), "Ready", false, true);
+            multiworldReadyBtn.Button.gameObject.SetActive(false);
             RandoMenuItem<bool> RandoSpoilerBtn = new RandoMenuItem<bool>(back, new Vector2(0, 0), "Create Spoiler Log", true, false);
 
-            // Create seed entry field
-            GameObject seedGameObject = back.Clone("Seed", MenuButton.MenuButtonType.Activate, new Vector2(0, 1130),
-                "Click to type a custom seed").gameObject;
-            Object.DestroyImmediate(seedGameObject.GetComponent<MenuButton>());
-            Object.DestroyImmediate(seedGameObject.GetComponent<EventTrigger>());
-            Object.DestroyImmediate(seedGameObject.transform.Find("Text").GetComponent<AutoLocalizeTextUI>());
-            Object.DestroyImmediate(seedGameObject.transform.Find("Text").GetComponent<FixVerticalAlign>());
-            Object.DestroyImmediate(seedGameObject.transform.Find("Text").GetComponent<ContentSizeFitter>());
+            // NGL i don't know what this does i just copied it and put it in a function
+            InputField createTextEntry()
+            {
+                // Create seed entry field
+                GameObject gameObject = back.Clone("entry", MenuButton.MenuButtonType.Activate, new Vector2(0, 1130)).gameObject;
+                Object.DestroyImmediate(gameObject.GetComponent<MenuButton>());
+                Object.DestroyImmediate(gameObject.GetComponent<EventTrigger>());
+                Object.DestroyImmediate(gameObject.transform.Find("Text").GetComponent<AutoLocalizeTextUI>());
+                Object.DestroyImmediate(gameObject.transform.Find("Text").GetComponent<FixVerticalAlign>());
+                Object.DestroyImmediate(gameObject.transform.Find("Text").GetComponent<ContentSizeFitter>());
 
-            RectTransform seedRect = seedGameObject.transform.Find("Text").GetComponent<RectTransform>();
-            seedRect.anchorMin = seedRect.anchorMax = new Vector2(0.5f, 0.5f);
-            seedRect.sizeDelta = new Vector2(337, 63.2f);
+                RectTransform rect = gameObject.transform.Find("Text").GetComponent<RectTransform>();
+                rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+                rect.sizeDelta = new Vector2(337, 63.2f);
 
-            InputField customSeedInput = seedGameObject.AddComponent<InputField>();
-            customSeedInput.transform.localPosition = new Vector3(0, 1240);
-            customSeedInput.textComponent = seedGameObject.transform.Find("Text").GetComponent<Text>();
+                InputField input = gameObject.AddComponent<InputField>();
+                input.textComponent = gameObject.transform.Find("Text").GetComponent<Text>();
+
+                input.colors = new ColorBlock
+                {
+                    highlightedColor = Color.yellow,
+                    pressedColor = Color.red,
+                    disabledColor = Color.black,
+                    normalColor = Color.white,
+                    colorMultiplier = 2f
+                };
+
+                return input;
+            }
+
+            InputField seedInput = createTextEntry();
 
             RandomizerMod.Instance.Settings.Seed = new Random().Next(999999999);
-            customSeedInput.text = RandomizerMod.Instance.Settings.Seed.ToString();
+            seedInput.text = RandomizerMod.Instance.Settings.Seed.ToString();
 
-            customSeedInput.caretColor = Color.white;
-            customSeedInput.contentType = InputField.ContentType.IntegerNumber;
-            customSeedInput.onEndEdit.AddListener(ParseSeedInput);
-            customSeedInput.navigation = Navigation.defaultNavigation;
-            customSeedInput.caretWidth = 8;
-            customSeedInput.characterLimit = 9;
+            seedInput.transform.localPosition = new Vector3(0, 1240);
+            seedInput.caretColor = Color.white;
+            seedInput.contentType = InputField.ContentType.IntegerNumber;
+            seedInput.onEndEdit.AddListener(ParseSeedInput);
+            seedInput.navigation = Navigation.defaultNavigation;
+            seedInput.caretWidth = 8;
+            seedInput.characterLimit = 9;
 
-            customSeedInput.colors = new ColorBlock
-            {
-                highlightedColor = Color.yellow,
-                pressedColor = Color.red,
-                disabledColor = Color.black,
-                normalColor = Color.white,
-                colorMultiplier = 2f
-            };
+            InputField nicknameInput = createTextEntry();
+            nicknameInput.transform.localPosition = new Vector3(0, 720);
+            nicknameInput.text = RandomizerMod.Instance.MWSettings.UserName;
+            nicknameInput.textComponent.fontSize = nicknameInput.textComponent.fontSize - 5;
+
+            nicknameInput.caretColor = Color.white;
+            nicknameInput.contentType = InputField.ContentType.Standard;
+            nicknameInput.onEndEdit.AddListener(ChangeNickname);
+            nicknameInput.navigation = Navigation.defaultNavigation;
+            nicknameInput.caretWidth = 8;
+            nicknameInput.characterLimit = 15;
+
+            nicknameInput.DeactivateInputField();
+            nicknameInput.gameObject.SetActive(false);
+
+            InputField ipInput = createTextEntry();
+            ipInput.transform.localPosition = new Vector3(0, 860);
+            ipInput.text = RandomizerMod.Instance.MWSettings.IP;
+            ipInput.textComponent.fontSize = ipInput.textComponent.fontSize - 5;
+
+            ipInput.caretColor = Color.white;
+            ipInput.contentType = InputField.ContentType.Standard;
+            ipInput.navigation = Navigation.defaultNavigation;
+            ipInput.caretWidth = 8;
+            ipInput.characterLimit = 15;
 
             // Create some labels
             CreateLabel(back, new Vector2(-900, 1130), "Required Skips");
@@ -153,6 +191,11 @@ namespace RandomizerMod
             CreateLabel(back, new Vector2(900, 160), "Open Mode");
             CreateLabel(back, new Vector2(0, 200), "Use of Benchwarp mod may be required");
             CreateLabel(back, new Vector2(0, 1300), "Seed:");
+            GameObject nicknameLabel = CreateLabel(back, new Vector2(-300, 725), "Nickname:");
+            GameObject ipLabel = CreateLabel(back, new Vector2(-150, 865), "IP:");
+            nicknameLabel.transform.localScale = new Vector3(0.8f, 0.8f);
+            ipLabel.transform.localScale = new Vector3(0.8f, 0.8f);
+            nicknameLabel.SetActive(false);
 
             // We don't need these old buttons anymore
             Object.Destroy(classic.gameObject);
@@ -214,6 +257,65 @@ namespace RandomizerMod
             RandoStartItemsBtn.Button.SetNavigation(DuplicateBtn.Button, RandoStartItemsBtn.Button, RandoStartLocationsModeBtn.Button, startRandoBtn);
             RandoStartLocationsModeBtn.Button.SetNavigation(RandoStartItemsBtn.Button, RandoStartLocationsModeBtn.Button, StartLocationsListBtn.Button, startRandoBtn);
             StartLocationsListBtn.Button.SetNavigation(RandoStartLocationsModeBtn.Button, RandoStartLocationsModeBtn.Button, StartLocationsListBtn.Button, startRandoBtn);
+
+            void CopySettings(bool rando)
+            {
+                RandomizerMod.Instance.Settings.CharmNotch = charmNotchBtn.CurrentSelection;
+                RandomizerMod.Instance.Settings.Grubfather = grubfatherBtn.CurrentSelection;
+                RandomizerMod.Instance.Settings.EarlyGeo = EarlyGeoBtn.CurrentSelection;
+
+
+                if (rando)
+                {
+                    RandomizerMod.Instance.Settings.Jiji = jijiBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.Quirrel = false;
+                    RandomizerMod.Instance.Settings.ItemDepthHints = false;
+                    RandomizerMod.Instance.Settings.LeverSkips = leverBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.ExtraPlatforms = softlockBtn.CurrentSelection;
+
+                    RandomizerMod.Instance.Settings.RandomizeDreamers = RandoDreamersBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeSkills = RandoSkillsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeCharms = RandoCharmsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeKeys = RandoKeysBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeGeoChests = RandoGeoChestsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeMaskShards = RandoMaskBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeVesselFragments = RandoVesselBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizePaleOre = RandoOreBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeCharmNotches = RandoNotchBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeRancidEggs = RandoEggBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeRelics = RandoRelicsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeMaps = RandoMapBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeStags = RandoStagBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeGrubs = RandoGrubBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeLifebloodCocoons = RandoCocoonsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeWhisperingRoots = RandoRootsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeRocks = RandoGeoRocksBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeSoulTotems = RandoSoulTotemsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizePalaceTotems = RandoPalaceTotemsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.DuplicateMajorItems = DuplicateBtn.CurrentSelection;
+
+                    RandomizerMod.Instance.Settings.CreateSpoilerLog = RandoSpoilerBtn.CurrentSelection;
+
+                    RandomizerMod.Instance.Settings.Cursed = cursedBtn.CurrentSelection.StartsWith("O");
+
+                    RandomizerMod.Instance.Settings.Randomizer = rando;
+                    RandomizerMod.Instance.Settings.RandomizeAreas = modeBtn.CurrentSelection == "Area Randomizer";
+                    RandomizerMod.Instance.Settings.RandomizeRooms = modeBtn.CurrentSelection.EndsWith("Room Randomizer");
+                    RandomizerMod.Instance.Settings.ConnectAreas = modeBtn.CurrentSelection.StartsWith("Connected-Area");
+
+                    RandomizerMod.Instance.Settings.MildSkips = mildSkipsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.ShadeSkips = shadeSkipsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.FireballSkips = fireballSkipsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.AcidSkips = acidSkipsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.SpikeTunnels = spikeTunnelsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.DarkRooms = darkRoomsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.SpicySkips = spicySkipsBtn.CurrentSelection;
+
+                    RandomizerMod.Instance.Settings.RandomizeStartItems = RandoStartItemsBtn.CurrentSelection;
+                    RandomizerMod.Instance.Settings.RandomizeStartLocation = RandoStartLocationsModeBtn.CurrentSelection == "Random";
+                    RandomizerMod.Instance.Settings.StartName = StartLocationsListBtn.GetColor() == Color.red ? "King's Pass" : StartLocationsListBtn.CurrentSelection;
+                }
+            }
 
             void UpdateSkipsButtons(RandoMenuItem<string> item)
             {
@@ -583,6 +685,109 @@ namespace RandomizerMod
             }
             HandleProgressionLock(); // call it because duplicates are on by default
 
+            void LockAll()
+            {
+                presetPoolsBtn.Lock();
+                RandoDreamersBtn.Lock();
+                RandoSkillsBtn.Lock();
+                RandoCharmsBtn.Lock();
+                RandoKeysBtn.Lock();
+                RandoGeoChestsBtn.Lock();
+                RandoMaskBtn.Lock();
+                RandoVesselBtn.Lock();
+                RandoOreBtn.Lock();
+                RandoNotchBtn.Lock();
+                RandoEggBtn.Lock();
+                RandoRelicsBtn.Lock();
+                RandoMapBtn.Lock();
+                RandoStagBtn.Lock();
+                RandoGrubBtn.Lock();
+                RandoRootsBtn.Lock();
+                RandoGeoRocksBtn.Lock();
+                RandoCocoonsBtn.Lock();
+                RandoSoulTotemsBtn.Lock();
+                RandoPalaceTotemsBtn.Lock();
+                //RandoLoreTabletsBtn.Lock();
+                DuplicateBtn.Lock();
+
+                RandoStartItemsBtn.Lock();
+                RandoStartLocationsModeBtn.Lock();
+                StartLocationsListBtn.Lock();
+
+                presetSkipsBtn.Lock();
+                mildSkipsBtn.Lock();
+                shadeSkipsBtn.Lock();
+                fireballSkipsBtn.Lock();
+                acidSkipsBtn.Lock();
+                spikeTunnelsBtn.Lock();
+                darkRoomsBtn.Lock();
+                spicySkipsBtn.Lock();
+
+                charmNotchBtn.Lock();
+                grubfatherBtn.Lock();
+                EarlyGeoBtn.Lock();
+                softlockBtn.Lock();
+                leverBtn.Lock();
+                jijiBtn.Lock();
+
+                modeBtn.Lock();
+                cursedBtn.Lock();
+                RandoSpoilerBtn.Lock();
+            }
+
+            void UnlockAll()
+            {
+                presetPoolsBtn.Unlock();
+                RandoDreamersBtn.Unlock();
+                RandoSkillsBtn.Unlock();
+                RandoCharmsBtn.Unlock();
+                RandoKeysBtn.Unlock();
+                RandoGeoChestsBtn.Unlock();
+                RandoMaskBtn.Unlock();
+                RandoVesselBtn.Unlock();
+                RandoOreBtn.Unlock();
+                RandoNotchBtn.Unlock();
+                RandoEggBtn.Unlock();
+                RandoRelicsBtn.Unlock();
+                RandoMapBtn.Unlock();
+                RandoStagBtn.Unlock();
+                RandoGrubBtn.Unlock();
+                RandoRootsBtn.Unlock();
+                RandoGeoRocksBtn.Unlock();
+                RandoCocoonsBtn.Unlock();
+                RandoSoulTotemsBtn.Unlock();
+                RandoPalaceTotemsBtn.Unlock();
+                //RandoLoreTabletsBtn.Unlock();
+                DuplicateBtn.Unlock();
+
+                RandoStartItemsBtn.Unlock();
+                RandoStartLocationsModeBtn.Unlock();
+                StartLocationsListBtn.Unlock();
+
+                presetSkipsBtn.Unlock();
+                mildSkipsBtn.Unlock();
+                shadeSkipsBtn.Unlock();
+                fireballSkipsBtn.Unlock();
+                acidSkipsBtn.Unlock();
+                spikeTunnelsBtn.Unlock();
+                darkRoomsBtn.Unlock();
+                spicySkipsBtn.Unlock();
+
+                charmNotchBtn.Unlock();
+                grubfatherBtn.Unlock();
+                EarlyGeoBtn.Unlock();
+                softlockBtn.Unlock();
+                leverBtn.Unlock();
+                jijiBtn.Unlock();
+
+                modeBtn.Unlock();
+                cursedBtn.Unlock();
+                RandoSpoilerBtn.Unlock();
+
+                HandleProgressionLock();
+                UpdateStartLocationColor();
+            }
+
             void SetShadeSkips(bool enabled)
             {
                 if (enabled)
@@ -605,15 +810,67 @@ namespace RandomizerMod
                 presetPoolsBtn.SetSelection("Custom");
             }
 
-            void MWChanged(RandoMenuItem<bool> item)
+            void MWChanged(RandoMenuItem<string> item)
             {
-                if (item.CurrentSelection)
+                if (item.CurrentSelection == "Yes")
                 {
-                    RandomizerMod.Instance.mwConnection.Connect();
+                    try
+                    {
+                        RandomizerMod.Instance.MWSettings.IP = ipInput.text;
+                        Log($"Trying to connect to {ipInput.text}");
+                        RandomizerMod.Instance.mwConnection.Disconnect();
+                        RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();
+                        RandomizerMod.Instance.mwConnection.Connect();
+                        item.SetSelection("Yes");
+                    }
+                    catch
+                    {
+                        Log("Failed to connect!");
+                        item.SetSelection("No");
+                        return;
+                    }
+
+                    startRandoBtn.transform.localPosition = startRandoBtn.transform.localPosition - new Vector3(0, 150);
+                    nicknameInput.gameObject.SetActive(true);
+                    nicknameInput.ActivateInputField();
+                    nicknameLabel.SetActive(true);
+                    ipLabel.SetActive(false);
+                    ipInput.gameObject.SetActive(false);
+                    multiworldReadyBtn.Button.gameObject.SetActive(true);
+                    multiworldReadyBtn.SetSelection(false);
+                    startRandoBtn.gameObject.SetActive(false);
                 }
                 else
                 {
+                    startRandoBtn.transform.localPosition = startRandoBtn.transform.localPosition + new Vector3(0, 150);
+                    nicknameInput.ActivateInputField();
+                    nicknameInput.gameObject.SetActive(false);
+                    nicknameLabel.SetActive(false);
+                    ipLabel.SetActive(true);
+                    ipInput.gameObject.SetActive(true);
+                    multiworldReadyBtn.SetSelection(false);
+                    multiworldReadyBtn.Button.gameObject.SetActive(false);
                     RandomizerMod.Instance.mwConnection.Disconnect();
+                    startRandoBtn.gameObject.SetActive(true);
+                    UnlockAll();
+                }
+            }
+
+            void MWReadyChanged(RandoMenuItem<bool> item)
+            {
+                if (item.CurrentSelection)
+                {
+                    LockAll();
+                    CopySettings(true);
+                    RandomizerMod.Instance.mwConnection.ReadyUp();
+                    startRandoBtn.gameObject.SetActive(true);
+                }
+                else
+                {
+                    UnlockAll();
+                    RandomizerMod.Instance.mwConnection.Unready();
+                    startRandoBtn.enabled = false;
+                    startRandoBtn.gameObject.SetActive(false);
                 }
             }
 
@@ -653,6 +910,7 @@ namespace RandomizerMod
             DuplicateBtn.Changed += s => HandleProgressionLock();
 
             multiworldBtn.Changed += MWChanged;
+            multiworldReadyBtn.Changed += MWReadyChanged;
 
             RandoStartItemsBtn.Changed += (RandoMenuItem<bool> Item) => UpdateStartLocationColor();
             RandoStartItemsBtn.Changed += s => HandleProgressionLock();
@@ -703,69 +961,31 @@ namespace RandomizerMod
             // Setup start game button events
             void StartGame(bool rando)
             {
-                RandomizerMod.Instance.Settings.CharmNotch = charmNotchBtn.CurrentSelection;
-                RandomizerMod.Instance.Settings.Grubfather = grubfatherBtn.CurrentSelection;
-                RandomizerMod.Instance.Settings.EarlyGeo = EarlyGeoBtn.CurrentSelection;
-
-
-                if (rando)
+                if (multiworldBtn.CurrentSelection == "Yes")
                 {
-                    RandomizerMod.Instance.Settings.Jiji = jijiBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.Quirrel = false;
-                    RandomizerMod.Instance.Settings.ItemDepthHints = false;
-                    RandomizerMod.Instance.Settings.LeverSkips = leverBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.ExtraPlatforms = softlockBtn.CurrentSelection;
-
-                    RandomizerMod.Instance.Settings.RandomizeDreamers = RandoDreamersBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeSkills = RandoSkillsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeCharms = RandoCharmsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeKeys = RandoKeysBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeGeoChests = RandoGeoChestsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeMaskShards = RandoMaskBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeVesselFragments = RandoVesselBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizePaleOre = RandoOreBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeCharmNotches = RandoNotchBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeRancidEggs = RandoEggBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeRelics = RandoRelicsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeMaps = RandoMapBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeStags = RandoStagBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeGrubs = RandoGrubBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeLifebloodCocoons = RandoCocoonsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeWhisperingRoots = RandoRootsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeRocks = RandoGeoRocksBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeSoulTotems = RandoSoulTotemsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizePalaceTotems = RandoPalaceTotemsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.DuplicateMajorItems = DuplicateBtn.CurrentSelection;
-
-                    RandomizerMod.Instance.Settings.CreateSpoilerLog = RandoSpoilerBtn.CurrentSelection;
-
-                    RandomizerMod.Instance.Settings.Cursed = cursedBtn.CurrentSelection.StartsWith("O");
-
-                    RandomizerMod.Instance.Settings.Randomizer = rando;
-                    RandomizerMod.Instance.Settings.RandomizeAreas = modeBtn.CurrentSelection == "Area Randomizer";
-                    RandomizerMod.Instance.Settings.RandomizeRooms = modeBtn.CurrentSelection.EndsWith("Room Randomizer");
-                    RandomizerMod.Instance.Settings.ConnectAreas = modeBtn.CurrentSelection.StartsWith("Connected-Area");
-
-                    RandomizerMod.Instance.Settings.MildSkips = mildSkipsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.ShadeSkips = shadeSkipsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.FireballSkips = fireballSkipsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.AcidSkips = acidSkipsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.SpikeTunnels = spikeTunnelsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.DarkRooms = darkRoomsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.SpicySkips = spicySkipsBtn.CurrentSelection;
-
-                    RandomizerMod.Instance.Settings.RandomizeStartItems = RandoStartItemsBtn.CurrentSelection;
-                    RandomizerMod.Instance.Settings.RandomizeStartLocation = RandoStartLocationsModeBtn.CurrentSelection == "Random";
-                    RandomizerMod.Instance.Settings.StartName = StartLocationsListBtn.GetColor() == Color.red ? "King's Pass" : StartLocationsListBtn.CurrentSelection;
+                    if (RandomizerMod.Instance.mwConnection.LastResult == null)
+                    {
+                        RandomizerMod.Instance.mwConnection.Start();
+                    }
+                    RandomizerMod.Instance.StartNewGame(true);
                 }
-
-                RandomizerMod.Instance.StartNewGame();
+                else
+                {
+                    CopySettings(rando);
+                    RandomizerMod.Instance.StartNewGame();
+                }
             }
 
             //startNormalBtn.AddEvent(EventTriggerType.Submit, garbage => StartGame(false));
             startRandoBtn.AddEvent(EventTriggerType.Submit, garbage => StartGame(true));
             //startSteelNormalBtn.AddEvent(EventTriggerType.Submit, garbage => StartGame(false));
             //startSteelRandoBtn.AddEvent(EventTriggerType.Submit, garbage => StartGame(true));
+
+
+            RandomizerMod.Instance.mwConnection.NumReadyReceived += num =>
+            {
+                multiworldReadyBtn.SetName($"Ready ({num})");
+            };
         }
 
         private static void ParseSeedInput(string input)
@@ -779,13 +999,29 @@ namespace RandomizerMod
                 LogWarn($"Seed input \"{input}\" could not be parsed to an integer");
             }
         }
+        private static void ChangeNickname(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return;
+            RandomizerMod.Instance.MWSettings.UserName = input;
+        }
+        private static void ChangeIP(string input)
+        {
+            Log(input);
+            try
+            {
+                IPAddress.Parse(input);
+                Log(input);
+                RandomizerMod.Instance.MWSettings.IP = input;
+            } catch {}
+        }
 
-        private static void CreateLabel(MenuButton baseObj, Vector2 position, string text)
+        private static GameObject CreateLabel(MenuButton baseObj, Vector2 position, string text)
         {
             GameObject label = baseObj.Clone(text + "Label", MenuButton.MenuButtonType.Activate, position, text)
                 .gameObject;
             Object.Destroy(label.GetComponent<EventTrigger>());
             Object.Destroy(label.GetComponent<MenuButton>());
+            return label;
         }
 
         private class RandoMenuItem<T> where T : IEquatable<T>
@@ -834,12 +1070,18 @@ namespace RandomizerMod
 
             public MenuButton Button { get; }
 
-            public string Name { get; }
+            public string Name { get; set; }
 
             public event RandoMenuItemChanged Changed
             {
                 add => ChangedInternal += value;
                 remove => ChangedInternal -= value;
+            }
+
+            public void SetName(string n)
+            {
+                Name = n;
+                RefreshText(false);
             }
 
             private event RandoMenuItemChanged ChangedInternal;

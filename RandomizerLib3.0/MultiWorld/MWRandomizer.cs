@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using static RandomizerLib.PreRandomizer;
 using static RandomizerLib.Logging.LogHelper;
 using Modding;
+using System.Diagnostics;
 
 namespace RandomizerLib.MultiWorld
 {
@@ -64,6 +65,7 @@ namespace RandomizerLib.MultiWorld
                         startProgression.Add(playerStartProgression);
 
                         string playerStartName = RandomizeStartingLocation(rand, settings[i], playerStartProgression);
+                        settings[i].StartName = playerStartName;
 
                         if (settings[i].RandomizeTransitions)
                         {
@@ -87,11 +89,19 @@ namespace RandomizerLib.MultiWorld
 
         private void MWRandomizeItems()
         {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
+            Log("");
+            Log("Beginning item randomization...");
+
             im = new MWItemManager(players, transitionPlacements, rand, settings, startItems, startProgression, modifiedCosts);
 
             FirstPass();
             SecondPass();
             PlaceDupes();
+
+            Log("Item randomization finished in " + watch.Elapsed.TotalSeconds + " seconds.");
         }
 
         private void FirstPass()
@@ -162,7 +172,7 @@ namespace RandomizerLib.MultiWorld
 
                 //Log($"i: {placeItem}, l: {placeLocation}, o: {overflow}, p: {LogicManager.GetItemDef(placeItem).progression}");
 
-                if (!overflow && !LogicManager.GetItemDef(placeItem.item).progression)
+                if (!overflow && !LogicManager.GetItemDef(placeItem.Item).progression)
                 {
                     im.PlaceJunkItemToStandby(placeItem, placeLocation);
                 }
@@ -194,7 +204,7 @@ namespace RandomizerLib.MultiWorld
             if (im.normalFillShops && im.shopItems.Any(kvp => !kvp.Value.Any()))
             {
                 Log("Exited randomizer with empty shop. Attempting repair...");
-                Dictionary<MWItem, List<MWItem>> nonprogressionShopItems = im.shopItems.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Where(i => !LogicManager.GetItemDef(i.item).progression).ToList());
+                Dictionary<MWItem, List<MWItem>> nonprogressionShopItems = im.shopItems.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Where(i => !LogicManager.GetItemDef(i.Item).progression).ToList());
                 if (nonprogressionShopItems.Select(kvp => kvp.Value.Count).Aggregate(0, (total, next) => total + next) >= 5)
                 {
                     int i = 0;
@@ -227,7 +237,7 @@ namespace RandomizerLib.MultiWorld
             bool ValidIndex(int i)
             {
                 MWItem location = im.locationOrder.FirstOrDefault(kvp => kvp.Value == i).Key;
-                return location != null && !LogicManager.ShopNames.Contains(location.item) && !LogicManager.GetItemDef(im.nonShopItems[location].item).progression;
+                return location != null && !LogicManager.ShopNames.Contains(location.Item) && !LogicManager.GetItemDef(im.nonShopItems[location].Item).progression;
             }
             List<int> allowedDepths = Enumerable.Range(minimumDepth, maximumDepth).Where(i => ValidIndex(i)).ToList();
             Random rand = new Random(settings[0].Seed + 29);
@@ -250,7 +260,7 @@ namespace RandomizerLib.MultiWorld
                     }
                     MWItem toShop = allShops.OrderBy(shop => im.shopItems[shop].Count).First();
 
-                    im.nonShopItems[location] = new MWItem(majorItem.playerId, majorItem.item + "_(1)");
+                    im.nonShopItems[location] = new MWItem(majorItem.PlayerId, majorItem.Item + "_(1)");
                     im.shopItems[toShop].Add(swapItem);
                     allowedDepths.Remove(depth);
                     break;
@@ -261,29 +271,34 @@ namespace RandomizerLib.MultiWorld
         private List<RandoResult> PrepareResult()
         {
             List<RandoResult> results = new List<RandoResult>();
+            List<string> nicknames = new List<string>();
 
             for (int i = 0; i < players; i++)
             {
+                nicknames.Add($"Player {i + 1}");
+
                 RandoResult result = new RandoResult();
                 result.playerId = i;
+                result.players = players;
+                result.randoId = (new Random()).Next();
                 result.settings = settings[i];
                 result.startItems = startItems[i];
                 result.transitionPlacements = transitionPlacements[i];
                 result.variableCosts = modifiedCosts[i];
 
                 // Copy non shop items into item
-                foreach (KeyValuePair<MWItem, MWItem> kvp in im.nonShopItems.Where(kvp => kvp.Key.playerId == i))
+                foreach (KeyValuePair<MWItem, MWItem> kvp in im.nonShopItems.Where(kvp => kvp.Key.PlayerId == i))
                 {
-                    result.itemPlacements[kvp.Value] = kvp.Key.item;
+                    result.itemPlacements[kvp.Value] = kvp.Key.Item;
                 }
 
                 // Copy shop items and create randomized prices for each
-                foreach (KeyValuePair<MWItem, List<MWItem>> kvp in im.shopItems.Where(kvp => kvp.Key.playerId == i))
+                foreach (KeyValuePair<MWItem, List<MWItem>> kvp in im.shopItems.Where(kvp => kvp.Key.PlayerId == i))
                 {
                     foreach (MWItem item in kvp.Value)
                     {
-                        int cost = RandomizeShopCost(settings[i], item);
-                        result.itemPlacements[item] = kvp.Key.item;
+                        int cost = RandomizeShopCost(settings[0].Seed, item);
+                        result.itemPlacements[item] = kvp.Key.Item;
                         result.shopCosts[item] = cost;
                     }
                 }
@@ -291,16 +306,21 @@ namespace RandomizerLib.MultiWorld
                 results.Add(result);
             }
 
+            foreach (RandoResult result in results)
+            {
+                result.nicknames = nicknames;
+            }
+
             return results;
         }
 
-        public int RandomizeShopCost(RandoSettings settings, MWItem mwItem)
+        public int RandomizeShopCost(int seed, MWItem mwItem)
         {
-            string item = mwItem.item;
+            string item = mwItem.Item;
             int cost;
             ReqDef def = LogicManager.GetItemDef(item);
 
-            Random rand = new Random(settings.Seed + item.GetHashCode()); // make shop item cost independent from prior randomization
+            Random rand = new Random(seed + item.GetHashCode()); // make shop item cost independent from prior randomization
 
             int baseCost = 100;
             int increment = 10;

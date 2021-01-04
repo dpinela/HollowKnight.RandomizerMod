@@ -32,43 +32,34 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="ValueTupleBridge, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ValueTupleBridge.0.1.5\lib\net35\ValueTupleBridge.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
-    <Compile Include="IListExtensions.cs" />
-    <Compile Include="LogicManager.cs" />
-    <Compile Include="MathHelper.cs" />
+    <Compile Include="GameSession.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MultiworldRandomizer.cs" />
     <Compile Include="ResendEntry.cs" />
     <Compile Include="Server.cs" />
-    <Compile Include="ServerSettings.cs" />
-    <Compile Include="Session.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="items.xml" />
+    <Compile Include="PlayerSession.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MultiWorldProtocol\MultiWorldProtocol.csproj">
       <Project>{646d3716-fe32-4f72-839a-942be24e6978}</Project>
       <Name>MultiWorldProtocol</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RandomizerMod3.0\RandomizerMod3.0.csproj">
-      <Project>{2a00b777-cba2-409b-bb29-3339c92ccacc}</Project>
-      <Name>RandomizerMod3.0</Name>
+    <ProjectReference Include="..\RandomizerLib3.0\RandomizerLib3.0.csproj">
+      <Project>{9a6e25ca-f58e-4f1b-9187-7142844a7d0a}</Project>
+      <Name>RandomizerLib3.0</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

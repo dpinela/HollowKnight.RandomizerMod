@@ -97,11 +97,11 @@ namespace RandomizerMod
             List<string> startItems = RandomizerMod.Instance.Settings.ItemPlacements.Where(pair => pair.Item2.StartsWith("Equip")).Select(pair => pair.Item1).ToList();
             foreach (string item in startItems)
             {
-                GiveAction action = LogicManager.GetItemDef(item).action;
-                if (action == GiveAction.Charm) action = GiveAction.EquippedCharm;
-                else if (action == GiveAction.SpawnGeo) action = GiveAction.AddGeo;
+                RandomizerLib.GiveAction action = LogicManager.GetItemDef(item).action;
+                if (action == RandomizerLib.GiveAction.Charm) action = RandomizerLib.GiveAction.EquippedCharm;
+                else if (action == RandomizerLib.GiveAction.SpawnGeo) action = RandomizerLib.GiveAction.AddGeo;
 
-                GiveItem(action, item, "Equipped");
+                GiveItemLib(action, item, "Equipped");
             }
 
             for (int i = 1; i < 5; i++)

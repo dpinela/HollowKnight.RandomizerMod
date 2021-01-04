@@ -411,13 +411,13 @@ namespace RandomizerLib
         public static string RemovePrefixSuffix(string input)
         {
             string rmSuffix = Regex.Replace(input, @"_\(\d+\)$", "");
-            return Regex.Replace(rmSuffix, @"^MW\(\d+=\)_", "");
+            return Regex.Replace(rmSuffix, @"^MW\(\d+\)_", "");
         }
         public static (int, string) ExtractPlayerID(string input)
         {
             Regex prefix = new Regex(@"^MW\((\d+)\)_");
             if (!prefix.IsMatch(input)) return (-1, input);
-            int id = Int32.Parse(prefix.Match(input).Groups[1].Value);
+            int id = Int32.Parse(prefix.Match(input).Groups[1].Value) - 1;
             return (id, prefix.Replace(input, ""));
         }
 
@@ -507,29 +507,29 @@ namespace RandomizerLib
 
             foreach (MWItem thing in newStuff)
             {
-                playerIds.Add(thing.playerId);
-                if (settings[thing.playerId].RandomizeRooms)
+                playerIds.Add(thing.PlayerId);
+                if (settings[thing.PlayerId].RandomizeRooms)
                 {
-                    if (_progressionIndexedItemsForRoomRando.TryGetValue(thing.item, out HashSet<string> checkList))
+                    if (_progressionIndexedItemsForRoomRando.TryGetValue(thing.Item, out HashSet<string> checkList))
                     {
-                        locations.UnionWith(checkList.Select(l => new MWItem(thing.playerId, l)));
+                        locations.UnionWith(checkList.Select(l => new MWItem(thing.PlayerId, l)));
                     }
                     else LogWarn($"{thing} is not indexed progression for room rando locations");
                 }
-                else if (settings[thing.playerId].RandomizeAreas)
+                else if (settings[thing.PlayerId].RandomizeAreas)
                 {
-                    if (_progressionIndexedItemsForAreaRando.TryGetValue(thing.item, out HashSet<string> checkList))
+                    if (_progressionIndexedItemsForAreaRando.TryGetValue(thing.Item, out HashSet<string> checkList))
                     {
-                        locations.UnionWith(checkList.Select(l => new MWItem(thing.playerId, l)));
+                        locations.UnionWith(checkList.Select(l => new MWItem(thing.PlayerId, l)));
                     }
                     else LogWarn($"{thing} is not indexed progression for area rando locations");
                 }
                 else
                 {
-                    if (IsTransition(thing.item)) continue;
-                    if (_progressionIndexedItemsForItemRando.TryGetValue(thing.item, out HashSet<string> checkList))
+                    if (IsTransition(thing.Item)) continue;
+                    if (_progressionIndexedItemsForItemRando.TryGetValue(thing.Item, out HashSet<string> checkList))
                     {
-                        locations.UnionWith(checkList.Select(l => new MWItem(thing.playerId, l)));
+                        locations.UnionWith(checkList.Select(l => new MWItem(thing.PlayerId, l)));
                     }
                     else LogWarn($"{thing} is not indexed progression for item rando locations");
                 }
@@ -581,20 +581,20 @@ namespace RandomizerLib
             HashSet<MWItem> transitions = new HashSet<MWItem>();
             foreach (MWItem thing in newStuff)
             {
-                playerIds.Add(thing.playerId);
-                if (settings[thing.playerId].RandomizeRooms)
+                playerIds.Add(thing.PlayerId);
+                if (settings[thing.PlayerId].RandomizeRooms)
                 {
-                    if (_progressionIndexedTransitionsForRoomRando.TryGetValue(thing.item, out HashSet<string> checkList))
+                    if (_progressionIndexedTransitionsForRoomRando.TryGetValue(thing.Item, out HashSet<string> checkList))
                     {
-                        transitions.UnionWith(checkList.Select(t => new MWItem(thing.playerId, t)));
+                        transitions.UnionWith(checkList.Select(t => new MWItem(thing.PlayerId, t)));
                     }
                     else LogWarn($"{thing} is not indexed progression for room rando transitions");
                 }
-                else if (settings[thing.playerId].RandomizeAreas)
+                else if (settings[thing.PlayerId].RandomizeAreas)
                 {
-                    if (_progressionIndexedTransitionsForAreaRando.TryGetValue(thing.item, out HashSet<string> checkList))
+                    if (_progressionIndexedTransitionsForAreaRando.TryGetValue(thing.Item, out HashSet<string> checkList))
                     {
-                        transitions.UnionWith(checkList.Select(t => new MWItem(thing.playerId, t)));
+                        transitions.UnionWith(checkList.Select(t => new MWItem(thing.PlayerId, t)));
                     }
                     else LogWarn($"{thing} is not indexed progression for area rando transitions");
                 }

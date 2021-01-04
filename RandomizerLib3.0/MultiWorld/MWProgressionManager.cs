@@ -57,18 +57,18 @@ namespace RandomizerLib.MultiWorld
 
         public bool CanGet(MWItem mwItem)
         {
-            return LogicManager.ParseProcessedLogic(mwItem.item, obtained[mwItem.playerId], settings[mwItem.playerId], modifiedCosts[mwItem.playerId]);
+            return LogicManager.ParseProcessedLogic(mwItem.Item, obtained[mwItem.PlayerId], settings[mwItem.PlayerId], modifiedCosts[mwItem.PlayerId]);
         }
 
         public void Add(MWItem mwItem)
         {
-            string item = LogicManager.RemovePrefixSuffix(mwItem.item);
+            string item = LogicManager.RemovePrefixSuffix(mwItem.Item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
                 LogWarn("Could not find progression value corresponding to: " + item);
                 return;
             }
-            obtained[mwItem.playerId][a.Item2] |= a.Item1;
+            obtained[mwItem.PlayerId][a.Item2] |= a.Item1;
             if (temp)
             {
                 tempItems.Add(mwItem);
@@ -86,13 +86,13 @@ namespace RandomizerLib.MultiWorld
         {
             foreach (MWItem mwItem in mwItems)
             {
-                string item = LogicManager.RemovePrefixSuffix(mwItem.item);
+                string item = LogicManager.RemovePrefixSuffix(mwItem.Item);
                 if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
                 {
                     LogWarn("Could not find progression value corresponding to: " + item);
                     return;
                 }
-                obtained[mwItem.playerId][a.Item2] |= a.Item1;
+                obtained[mwItem.PlayerId][a.Item2] |= a.Item1;
                 if (temp)
                 {
                     tempItems.Add(mwItem);
@@ -137,13 +137,13 @@ namespace RandomizerLib.MultiWorld
 
         public void Remove(MWItem mwItem)
         {
-            string item = LogicManager.RemovePrefixSuffix(mwItem.item);
+            string item = LogicManager.RemovePrefixSuffix(mwItem.Item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
                 LogWarn("Could not find progression value corresponding to: " + item);
                 return;
             }
-            obtained[mwItem.playerId][a.Item2] &= ~a.Item1;
+            obtained[mwItem.PlayerId][a.Item2] &= ~a.Item1;
             if (LogicManager.grubProgression.Contains(item)) RecalculateGrubs();
             if (LogicManager.essenceProgression.Contains(item)) RecalculateEssence();
         }
@@ -167,13 +167,13 @@ namespace RandomizerLib.MultiWorld
 
         public bool Has(MWItem mwItem)
         {
-            string item = LogicManager.RemovePrefixSuffix(mwItem.item);
+            string item = LogicManager.RemovePrefixSuffix(mwItem.Item);
             if (!LogicManager.progressionBitMask.TryGetValue(item, out (int, int) a))
             {
                 LogWarn("Could not find progression value corresponding to: " + item);
                 return false;
             }
-            return (obtained[mwItem.playerId][a.Item2] & a.Item1) == a.Item1;
+            return (obtained[mwItem.PlayerId][a.Item2] & a.Item1) == a.Item1;
         }
 
         public void UpdateWaypoints()
@@ -237,12 +237,12 @@ namespace RandomizerLib.MultiWorld
                     break;
 
                 case RandomizerState.Validating when settings[id].RandomizeGrubs && im != null:
-                    grubLocations[id] = im.nonShopItems.Where(kvp => kvp.Value.playerId == id && LogicManager.GetItemDef(kvp.Value.item).pool == "Grub").ToDictionary(kvp => kvp.Value, kvp => 1);
+                    grubLocations[id] = im.nonShopItems.Where(kvp => kvp.Value.PlayerId == id && LogicManager.GetItemDef(kvp.Value.Item).pool == "Grub").ToDictionary(kvp => kvp.Value, kvp => 1);
                     foreach (var kvp in im.shopItems)
                     {
-                        if (kvp.Value.Any(item => LogicManager.GetItemDef(item.item).pool == "Grub"))
+                        if (kvp.Value.Any(item => LogicManager.GetItemDef(item.Item).pool == "Grub"))
                         {
-                            grubLocations[id].Add(kvp.Key, kvp.Value.Count(item => item.playerId == id && LogicManager.GetItemDef(item.item).pool == "Grub"));
+                            grubLocations[id].Add(kvp.Key, kvp.Value.Count(item => item.PlayerId == id && LogicManager.GetItemDef(item.Item).pool == "Grub"));
                         }
                     }
                     break;
@@ -289,22 +289,22 @@ namespace RandomizerLib.MultiWorld
                 case RandomizerState.Validating when settings[id].RandomizeWhisperingRoots && im != null:
                     foreach (var kvp in im.nonShopItems)
                     {
-                        if (kvp.Value.playerId == id && LogicManager.GetItemDef(kvp.Value.item).pool == "Root")
+                        if (kvp.Value.PlayerId == id && LogicManager.GetItemDef(kvp.Value.Item).pool == "Root")
                         {
-                            essenceLocations[id].Add(kvp.Key, LogicManager.GetItemDef(kvp.Value.item).geo);
+                            essenceLocations[id].Add(kvp.Key, LogicManager.GetItemDef(kvp.Value.Item).geo);
                         }
                     }
                     foreach (var kvp in im.shopItems)
                     {
                         foreach (MWItem item in kvp.Value)
                         {
-                            if (item.playerId == id && LogicManager.GetItemDef(item.item).pool == "Root")
+                            if (item.PlayerId == id && LogicManager.GetItemDef(item.Item).pool == "Root")
                             {
                                 if (!essenceLocations[id].ContainsKey(kvp.Key))
                                 {
                                     essenceLocations[id].Add(kvp.Key, 0);
                                 }
-                                essenceLocations[id][kvp.Key] += LogicManager.GetItemDef(item.item).geo;
+                                essenceLocations[id][kvp.Key] += LogicManager.GetItemDef(item.Item).geo;
                             }
                         }
                     }

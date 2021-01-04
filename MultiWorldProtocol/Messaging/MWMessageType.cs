@@ -10,16 +10,17 @@
         JoinMessage,
         JoinConfirmMessage,
         LeaveMessage,
-        ItemConfigurationRequestMessage,
-        ItemConfigurationMessage,
-        ItemConfigurationConfirmMessage,
         ItemReceiveMessage,
         ItemReceiveConfirmMessage,
         ItemSendMessage,
         ItemSendConfirmMessage,
         NotifyMessage,
+        NumReadyMessage,
         PingMessage,
+        ReadyMessage,
+        ResultMessage,
         SetupMessage,
-        StartMessage
+        StartMessage,
+        UnreadyMessage
     }
 }

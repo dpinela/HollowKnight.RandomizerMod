@@ -6,6 +6,8 @@ using static RandomizerMod.LogHelper;
 
 using RandomizerLib;
 using RandomizerLib.MultiWorld;
+using Newtonsoft.Json;
+using RandomizerMod.Actions;
 
 namespace RandomizerMod.Randomization
 {
@@ -15,11 +17,19 @@ namespace RandomizerMod.Randomization
         {
             VanillaManager.SetupVanilla(result.settings);
 
+            RandomizerMod.Instance.Settings.MWPlayerId = result.playerId;
+            RandomizerMod.Instance.Settings.MWNumPlayers = result.players;
+            RandomizerMod.Instance.Settings.MWRandoId = result.randoId;
+            RandomizerMod.Instance.Settings.SetMWNames(result.nicknames);
             SaveAllPlacements(result);
-            //No vanilla'd loctions in the spoiler log, please!
-            /*(int, string, string)[] orderedILPairs = RandomizerMod.Instance.Settings.ItemPlacements.Except(VanillaManager.ItemPlacements)
-                .Select(pair => (pair.Item2.StartsWith("Equip") ? 0 : im.locationOrder[pair.Item2], pair.Item1, pair.Item2)).ToArray();
-            if (RandomizerMod.Instance.Settings.CreateSpoilerLog) RandoLogger.LogAllToSpoiler(orderedILPairs, RandomizerMod.Instance.Settings._transitionPlacements.Select(kvp => (kvp.Key, kvp.Value)).ToArray(), modifiedCosts);*/
+            if (RandomizerMod.Instance.Settings.CreateSpoilerLog) RandoLogger.LogAllToSpoiler(result);
+
+            RandomizerAction.CreateActions(RandomizerMod.Instance.Settings.ItemPlacements, RandomizerMod.Instance.Settings);
+
+            if (RandomizerMod.Instance.Settings.IsMW)
+            {
+                RandomizerMod.Instance.mwConnection.JoinRando(RandomizerMod.Instance.Settings.MWRandoId, RandomizerMod.Instance.Settings.MWPlayerId);
+            }
         }
 
         private static void SaveAllPlacements(RandoResult result)
@@ -41,8 +51,7 @@ namespace RandomizerMod.Randomization
 
             foreach (KeyValuePair<MWItem, int> kvp in result.shopCosts)
             {
-                if (kvp.Key.playerId != result.playerId) continue;
-                if (VanillaManager.GetVanillaItems(result.settings).Contains(kvp.Key.item)) continue;
+                if (kvp.Key.PlayerId == result.playerId && VanillaManager.GetVanillaItems(result.settings).Contains(kvp.Key.Item)) continue;
                 RandomizerMod.Instance.Settings.AddShopCost(kvp.Key.ToString(), kvp.Value);
             }
 
@@ -72,19 +81,6 @@ namespace RandomizerMod.Randomization
             RandomizerMod.Instance.Settings.StartRespawnMarkerName = StartSaveChanges.RESPAWN_MARKER_NAME;
             RandomizerMod.Instance.Settings.StartRespawnType = 0;
             RandomizerMod.Instance.Settings.StartMapZone = (int)startDef.zone;
-        }
-
-        public static void LogItemPlacements(RandoResult result)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("All Item Placements:");
-            foreach ((string, string) pair in GetPlacedItemPairs(im))
-            {
-                ReqDef def = LogicManager.GetItemDef(pair.Item1);
-                if (def.progression) sb.AppendLine($"--{pm.CanGet(pair.Item2)} - {pair.Item1} -at- {pair.Item2}");
-            }
-
-            Log(sb.ToString());
         }
     }
 }

@@ -11,16 +11,21 @@ namespace RandomizerLib
     public class RandoResult
     {
         public int playerId;
+        public int players;
+        public int randoId;
+
         public RandoSettings settings;
         public List<string> startItems;
         public Dictionary<MWItem, string> itemPlacements;       // item -> location
         public Dictionary<string, string> transitionPlacements; // transition -> transition
         public Dictionary<MWItem, int> shopCosts;               // MWItem (in shop) -> shop cost
         public Dictionary<string, int> variableCosts;           // grub/essence location -> randomized grub/essence count
+        public List<string> nicknames;
 
         public RandoResult()
         {
-            playerId = -1;
+            playerId = 0;
+            players = 1;
             settings = new RandoSettings();
             startItems = new List<string>();
             itemPlacements = new Dictionary<MWItem, string>();

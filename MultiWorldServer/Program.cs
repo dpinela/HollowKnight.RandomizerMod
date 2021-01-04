@@ -2,6 +2,8 @@
 using System.Diagnostics.Eventing.Reader;
 using System.Threading;
 
+using RandomizerLib;
+
 namespace MultiWorldServer
 {
     internal class Program
@@ -10,49 +12,11 @@ namespace MultiWorldServer
 
         private static void Main()
         {
-            ServerSettings settings = new ServerSettings();
+            LogicManager.ParseXML();
 
-            Console.WriteLine("Enter number of players");
-            settings.Players = int.Parse(Console.ReadLine());
-            Console.WriteLine("Enter seed (Leave blank for random)");
-            string seedStr = Console.ReadLine();
-            if (string.IsNullOrEmpty(seedStr))
-            {
-                settings.Seed = new Random().Next();
-            }
-            else if (!int.TryParse(seedStr, out settings.Seed))
-            {
-                settings.Seed = seedStr.GetHashCode();
-            }
-
-            Console.WriteLine("Seed number is " + settings.Seed);
-
-            Console.WriteLine("Shade skips? Y/N");
-            settings.ShadeSkips = ParseYN();
-            Console.WriteLine("Acid Skips? Y/N");
-            settings.AcidSkips = ParseYN();
-            Console.WriteLine("Spike Tunnels? Y/N");
-            settings.SpikeTunnels = ParseYN();
-            Console.WriteLine("Misc Skips? Y/N");
-            settings.MiscSkips = ParseYN();
-            Console.WriteLine("Fireball Skips? Y/N");
-            settings.FireballSkips = ParseYN();
-
-            Serv = new Server(38281, settings);
+            Serv = new Server(38281);
             while (Serv.Running)
                 Thread.Sleep(1000);
-        }
-
-        private static bool ParseYN()
-        {
-            string yn = Console.ReadLine();
-
-            if (string.IsNullOrEmpty(yn))
-            {
-                return false;
-            }
-
-            return yn[0] == 'Y' || yn[0] == 'y';
         }
     }
 }

@@ -8,7 +8,8 @@ namespace MultiWorldProtocol.Messaging.Definitions.Messages
     public class MWJoinMessage : MWMessage
     {
         public string DisplayName { get; set; }
-        public string Token { get; set; }
+        public int RandoId { get; set; }
+        public int PlayerId { get; set; }
 
         public MWJoinMessage()
         {
@@ -21,7 +22,8 @@ namespace MultiWorldProtocol.Messaging.Definitions.Messages
         public MWJoinMessageDefinition() : base(MWMessageType.JoinMessage)
         {
             Properties.Add(new MWMessageProperty<string, MWJoinMessage>(nameof(MWJoinMessage.DisplayName)));
-            Properties.Add(new MWMessageProperty<string, MWJoinMessage>(nameof(MWJoinMessage.Token)));
+            Properties.Add(new MWMessageProperty<int, MWJoinMessage>(nameof(MWJoinMessage.RandoId)));
+            Properties.Add(new MWMessageProperty<int, MWJoinMessage>(nameof(MWJoinMessage.PlayerId)));
         }
     }
 }

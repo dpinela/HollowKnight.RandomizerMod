@@ -7,37 +7,24 @@ using MultiWorldProtocol.Messaging.Definitions.Messages;
 
 namespace MultiWorldServer
 {
-    class Session
+    class PlayerSession
     {
-
-        private static readonly Random Rnd = new Random();
         public string Name;
-        public string Token;
-        public ushort PID;
+        public int randoId;
+        public int playerId;
 
         public readonly List<ResendEntry> MessagesToConfirm = new List<ResendEntry>();
 
-        public Session(string Name)
+        public PlayerSession(string Name, int randoId, int playerId)
         {
-            Token = GenerateToken();
             this.Name = Name;
-        }
-
-        private static string GenerateToken()
-        {
-            byte[] bytes = new byte[16];
-
-            for (int i = 0; i < 16; i++)
-            {
-                bytes[i] = (byte)Rnd.Next(33, 126);
-            }
-
-            return Encoding.ASCII.GetString(bytes);
+            this.randoId = randoId;
+            this.playerId = playerId;
         }
 
         public void QueueConfirmableMessage(MWMessage message)
         {
-            if (message.MessageType != MWMessageType.ItemConfigurationMessage && message.MessageType != MWMessageType.ItemReceiveMessage)
+            if (message.MessageType != MWMessageType.ItemReceiveMessage)
             {
                 throw new InvalidOperationException("Server should only queue ItemConfiguration and ItemReceive messages for confirmation");
             }
@@ -49,32 +36,13 @@ namespace MultiWorldServer
 
         public void ConfirmMessage(MWMessage message)
         {
-            if (message.MessageType == MWMessageType.ItemConfigurationConfirmMessage)
-            {
-                ConfirmItemConfiguration((MWItemConfigurationConfirmMessage)message);
-            }
-            else if (message.MessageType == MWMessageType.ItemReceiveConfirmMessage)
+            if (message.MessageType == MWMessageType.ItemReceiveConfirmMessage)
             {
                 ConfirmItemReceive((MWItemReceiveConfirmMessage)message);
             }
             else
             {
                 throw new InvalidOperationException("Must only confirm ItemConfiguration and ItemReceive messages.");
-            }
-        }
-
-        private void ConfirmItemConfiguration(MWItemConfigurationConfirmMessage message)
-        {
-            lock (MessagesToConfirm)
-            {
-                for (int i = MessagesToConfirm.Count - 1; i >= 0; i--)
-                {
-                    MWItemConfigurationMessage icm = MessagesToConfirm[i].Message as MWItemConfigurationMessage;
-                    if (icm.Item == message.Item && icm.PlayerId == message.PlayerId)
-                    {
-                        MessagesToConfirm.RemoveAt(i);
-                    }
-                }
             }
         }
 

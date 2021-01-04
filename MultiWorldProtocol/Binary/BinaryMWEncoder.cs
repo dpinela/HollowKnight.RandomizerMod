@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using MultiWorldProtocol.Messaging;
 using MultiWorldProtocol.Messaging.Definitions;
+using Newtonsoft.Json;
 
 namespace MultiWorldProtocol.Binary
 {
@@ -47,6 +48,9 @@ namespace MultiWorldProtocol.Binary
                 case string str:
                     dataStream.Write(str);
                     break;
+                case object obj when obj.GetType().IsSerializable:
+                    dataStream.Write(JsonConvert.SerializeObject(obj));
+                    break;
                 default:
                     throw new InvalidOperationException($"Unhandled type in {nameof(Encode)}: {val?.GetType().Name}");
             }
@@ -90,6 +94,11 @@ namespace MultiWorldProtocol.Binary
                     val = dataStream.ReadString();
                     break;
                 default:
+                    if (property.Type.IsSerializable)
+                    {
+                        val = JsonConvert.DeserializeObject(dataStream.ReadString(), property.Type);
+                        break;
+                    }
                     throw new InvalidOperationException($"Unhandled type in {nameof(Decode)}: {property.Type.Name}");
             }
             property.SetValue(message, val);

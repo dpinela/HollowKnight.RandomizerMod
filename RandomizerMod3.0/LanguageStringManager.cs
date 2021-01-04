@@ -110,6 +110,13 @@ namespace RandomizerMod
                 return $"A grub! ({PlayerData.instance.grubsCollected + 1}/46)";
             }
 
+            if (key.StartsWith("MW("))
+            {
+                int id;
+                (id, key) = LogicManager.ExtractPlayerID(key);
+                return $"{RandomizerMod.Instance.Settings.GetMWPlayerName(id)}'s {GetLanguageString(key, sheetTitle)}";
+            }
+
             if ((key == "JIJI_DOOR_NOKEY" || key == "BATH_HOUSE_NOKEY") && (sheetTitle == "Prompts") 
                 && !PlayerData.instance.openedWaterwaysManhole & PlayerData.instance.simpleKeys > 0 && PlayerData.instance.simpleKeys < 2)
             {

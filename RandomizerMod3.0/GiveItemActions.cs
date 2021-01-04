@@ -15,25 +15,88 @@ namespace RandomizerMod
     // WORK IN PROGRESS
     public static class GiveItemActions
     {
-
-        public static void GiveItem(GiveAction action, string item, string location, int geo = 0)
+        // Ugly, but need this to be here for BingoUI compatibility
+        public enum GiveAction
         {
-            LogItemToTracker(item, location);
-            RandomizerMod.Instance.Settings.MarkItemFound(item);
-            RandomizerMod.Instance.Settings.MarkLocationFound(location);
-            UpdateHelperLog();
+            Bool = 0,
+            Int,
+            Charm,
+            EquippedCharm,
+            Additive,
+            SpawnGeo,
+            AddGeo,
+
+            Map,
+            Grub,
+            Essence,
+            Stag,
+            DirtmouthStag,
+
+            MaskShard,
+            VesselFragment,
+            WanderersJournal,
+            HallownestSeal,
+            KingsIdol,
+            ArcaneEgg,
+
+            Dreamer,
+            Kingsoul,
+            Grimmchild,
+
+            SettingsBool,
+            None,
+            AddSoul,
+
+            Lifeblood
+        }
+
+        // Oh god this is terrible
+        public static GiveAction convertGiveAction(RandomizerLib.GiveAction giveAction)
+        {
+            // bad bad ugly stinky
+            return (GiveAction) (int) giveAction;
+        }
+
+        public static void GiveItemLib(RandomizerLib.GiveAction action, string rawItem, string location, int geo = 0)
+        {
+            GiveItem(convertGiveAction(action), rawItem, location, geo);
+        }
+
+        public static void GiveItemMW(string item, string from)
+        {
+            ReqDef def = LogicManager.GetItemDef(item);
+            if (def.action == RandomizerLib.GiveAction.SpawnGeo)
+                def.action = RandomizerLib.GiveAction.AddGeo;
+            GiveItemLib(def.action, item, "meme" + from);
+        }
+
+        // TODO: fix the above? the reason it's all messed up is since I thought GiveAction would make more sense as part of RandomizerLib (LogicManager specifically)
+        // However, it's only used in like one place in RandomizerLib. Since we don't want RandomizerLib to depend on RandomizerMod, maybe we could just treat actions
+        // as an int over there and convert for usage in RandomizerMod. Either way, I'm leaving this ugly hack in
+
+        // Even worse, GiveItem is fetched via reflection, so I can't even overload it based on the type of the first argument so it's gotta be named GiveItemLib
+
+        public static void GiveItem(GiveAction action, string rawItem, string location, int geo = 0)
+        {
+            (int player, string item) = LogicManager.ExtractPlayerID(rawItem);
 
             if (RandomizerMod.Instance.Settings.IsMW)
             {
-                int player;
-                (player, item) = LogicManager.ExtractPlayerID(item);
-                item = LogicManager.RemovePrefixSuffix(item);
+                LogItemToTracker(rawItem, location);
+            } else
+            {
+                LogItemToTracker(item, location);
+            }
+            RandomizerMod.Instance.Settings.MarkItemFound(rawItem);
+            RandomizerMod.Instance.Settings.MarkLocationFound(location);
+            UpdateHelperLog();
 
-                if (player > 0 && player != RandomizerMod.Instance.Settings.MWPlayerId)
-                {
-                    RandomizerMod.Instance.mwConnection.SendItem(location, item, player);
-                    return;
-                }
+            Log($"Give: action = {action} rawItem = {rawItem} item = {item} player = {player} me = {RandomizerMod.Instance.Settings.MWPlayerId}");
+
+            if (RandomizerMod.Instance.Settings.IsMW && player >= 0 && !location.StartsWith("meme")) // && player != RandomizerMod.Instance.Settings.MWPlayerId)
+            {
+                RandomizerMod.Instance.mwConnection.SendItem(location, item, player);
+                return;
             }
 
             item = LogicManager.RemovePrefixSuffix(item);
