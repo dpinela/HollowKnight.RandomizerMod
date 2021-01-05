@@ -4,7 +4,7 @@ NOTE: THIS README AND PROJECT ARE WIP
 
 For general randomizer information, see: https://github.com/JasonILTG/HollowKnight.RandomizerMod
 
-This mod is an extension of the existing Randomizer3.0 and MultiWorld mods to allow multiworld with all of the features of Randomizer3.0. A multiworld is a version of randomizer where items are not only scattered throughout your file, but through any number of linked game files. When picking up an item that belongs to another player, it is sent over the internet and they receive it in their game. This allows co-operative randomizer playthroughs, where you may need to pick up eachother's progression to go forward.
+This mod is an extension of the existing Randomizer3.0 and MultiWorld mods to allow multiworld with all of the features of Randomizer3.0. A multiworld is a version of randomizer where items are not only scattered throughout your file, but through any number of linked game files. When picking up an item that belongs to another player, it is sent over the internet and they receive it in their game. This allows co-operative randomizer playthroughs, where you may need to pick up each other's progression to go forward.
 
 ## Features
 - All randomizer features from Randomizer3.0 are supported up to Geo Rocks, Lifeblood Cocoons, and Soul Totems, including area and room randomization.
