@@ -9,7 +9,6 @@ using static RandomizerMod.GiveItemActions;
 using Object = UnityEngine.Object;
 
 using RandomizerLib;
-using Newtonsoft.Json;
 
 namespace RandomizerMod.Actions
 {
@@ -134,7 +133,6 @@ namespace RandomizerMod.Actions
                 if (settings.IsMW && playerId >= 0 && playerId != settings.MWPlayerId)
                 {
                     newItem.type = ItemType.Trinket;
-                    newItem.nameKey = $"MW({playerId + 1})_{newItem.nameKey}";
                 }
 
                 switch (newItem.type)
@@ -227,8 +225,7 @@ namespace RandomizerMod.Actions
             // No point rewriting this before making the shop component
             foreach ((string shopItem, string shopName) in items.Where(item => shopNames.Contains(item.Item2)))
             {
-                (int playerId, string newItemName) = LogicManager.ExtractPlayerID(shopItem);
-                ReqDef newItem = LogicManager.GetItemDef(newItemName);
+                ReqDef newItem = LogicManager.GetItemDef(shopItem);
 
                 RandomizerLib.GiveAction giveAction = newItem.action;
                 if (giveAction == RandomizerLib.GiveAction.SpawnGeo)
@@ -239,18 +236,11 @@ namespace RandomizerMod.Actions
                 string boolName = "RandomizerMod." + giveAction.ToString() + "." + shopItem + "." + shopName;
 
                 ShopItemBoolNames[(shopItem, shopName)] = boolName;
-
-                string shopListing = newItem.nameKey;
-
-                if (settings.IsMW && settings.MWPlayerId != playerId)
-                {
-                    shopListing = $"MW({playerId + 1})_" + shopListing;
-                }
                 
                 ShopItemDef newItemDef = new ShopItemDef
                 {
                     PlayerDataBoolName = boolName,
-                    NameConvo = shopListing,
+                    NameConvo = newItem.nameKey,
                     DescConvo = newItem.shopDescKey,
                     RequiredPlayerDataBool = LogicManager.GetShopDef(shopName).requiredPlayerDataBool,
                     RemovalPlayerDataBool = string.Empty,

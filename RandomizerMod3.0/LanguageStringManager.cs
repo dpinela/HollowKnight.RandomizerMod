@@ -110,11 +110,27 @@ namespace RandomizerMod
                 return $"A grub! ({PlayerData.instance.grubsCollected + 1}/46)";
             }
 
+            // If the key started with MW(#)_, it is for another player's item
             if (key.StartsWith("MW("))
             {
                 int id;
                 (id, key) = LogicManager.ExtractPlayerID(key);
-                return $"{RandomizerMod.Instance.Settings.GetMWPlayerName(id)}'s {GetLanguageString(key, sheetTitle)}";
+                string baseItemName = GetLanguageString(key, sheetTitle);
+
+                if (id >= 0 && id != RandomizerMod.Instance.Settings.MWPlayerId)
+                {
+                    // Special case, change grub text from "Player 2's A Grub X/46" to "Player 2's Grub"
+                    if (key.StartsWith("RANDOMIZER_NAME_GRUB"))
+                    {
+                        baseItemName = "Grub";
+                    }
+
+                    return $"{RandomizerMod.Instance.Settings.GetMWPlayerName(id)}'s {baseItemName}";
+                }
+                else
+                {
+                    return baseItemName;
+                }
             }
 
             if ((key == "JIJI_DOOR_NOKEY" || key == "BATH_HOUSE_NOKEY") && (sheetTitle == "Prompts") 

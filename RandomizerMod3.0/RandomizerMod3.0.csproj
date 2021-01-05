@@ -95,6 +95,7 @@
     <Compile Include="Actions\CreateNewShiny.cs" />
     <Compile Include="Actions\ChangeShinyIntoLifeblood.cs" />
     <Compile Include="Actions\ChangeShinyIntoSoul.cs" />
+    <Compile Include="Actions\TrinkFlash.cs" />
     <Compile Include="BenchHandler.cs" />
     <Compile Include="LogHelper.cs" />
     <Compile Include="MultiWorld\MWSettings.cs" />

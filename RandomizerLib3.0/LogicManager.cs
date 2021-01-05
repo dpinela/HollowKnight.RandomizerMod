@@ -398,11 +398,17 @@ namespace RandomizerLib
         }
         public static ReqDef GetItemDef(string name)
         {
-            string newName = RemovePrefixSuffix(name);
+            (int player, string newName) = ExtractPlayerID(name);
+            newName = RemovePrefixSuffix(newName);
             if (!_items.TryGetValue(newName, out ReqDef def))
             {
                 LogWarn($"Nonexistent item \"{name}\" requested");
                 throw new KeyNotFoundException();
+            }
+
+            if (player >= 0)
+            {
+                def.nameKey = $"MW({player + 1}_" + def.nameKey;
             }
 
             return def;

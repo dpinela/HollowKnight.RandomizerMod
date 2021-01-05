@@ -115,6 +115,12 @@ namespace RandomizerMod
             multiworldReadyBtn.Button.gameObject.SetActive(false);
             RandoMenuItem<bool> RandoSpoilerBtn = new RandoMenuItem<bool>(back, new Vector2(0, 0), "Create Spoiler Log", true, false);
 
+            // Used to show how many players readied up "Ready (1)"
+            void UpdateReady(int num)
+            {
+                multiworldReadyBtn.SetName($"Ready ({num})");
+            }
+
             // NGL i don't know what this does i just copied it and put it in a function
             InputField createTextEntry()
             {
@@ -818,9 +824,11 @@ namespace RandomizerMod
                     {
                         RandomizerMod.Instance.MWSettings.IP = ipInput.text;
                         Log($"Trying to connect to {ipInput.text}");
+                        RandomizerMod.Instance.mwConnection.NumReadyReceived -= UpdateReady;
                         RandomizerMod.Instance.mwConnection.Disconnect();
                         RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();
                         RandomizerMod.Instance.mwConnection.Connect();
+                        RandomizerMod.Instance.mwConnection.NumReadyReceived += UpdateReady;
                         item.SetSelection("Yes");
                     }
                     catch
@@ -979,12 +987,6 @@ namespace RandomizerMod
             startRandoBtn.AddEvent(EventTriggerType.Submit, garbage => StartGame(true));
             //startSteelNormalBtn.AddEvent(EventTriggerType.Submit, garbage => StartGame(false));
             //startSteelRandoBtn.AddEvent(EventTriggerType.Submit, garbage => StartGame(true));
-
-
-            RandomizerMod.Instance.mwConnection.NumReadyReceived += num =>
-            {
-                multiworldReadyBtn.SetName($"Ready ({num})");
-            };
         }
 
         private static void ParseSeedInput(string input)
@@ -1002,16 +1004,6 @@ namespace RandomizerMod
         {
             if (string.IsNullOrEmpty(input)) return;
             RandomizerMod.Instance.MWSettings.UserName = input;
-        }
-        private static void ChangeIP(string input)
-        {
-            Log(input);
-            try
-            {
-                IPAddress.Parse(input);
-                Log(input);
-                RandomizerMod.Instance.MWSettings.IP = input;
-            } catch {}
         }
 
         private static GameObject CreateLabel(MenuButton baseObj, Vector2 position, string text)

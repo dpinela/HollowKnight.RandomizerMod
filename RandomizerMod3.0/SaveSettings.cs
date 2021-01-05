@@ -65,12 +65,12 @@ namespace RandomizerMod
 
         public int MWNumPlayers
         {
-            get => GetInt();
+            get => GetInt(1);
             set => SetInt(value);
         }
         public int MWPlayerId
         {
-            get => GetInt();
+            get => GetInt(0);
             set => SetInt(value);
         }
 

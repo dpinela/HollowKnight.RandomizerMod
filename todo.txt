@@ -1,0 +1,10 @@
+- helper log
+- readme
+- flash when receiving items
+- indicate when game is starting
+- nicknames
+- server spoiler log
+- server cheat commands
+- real time items?
+- resend all when rejoining
+- disconnect when exiting file
