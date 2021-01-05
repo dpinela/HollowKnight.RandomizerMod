@@ -401,6 +401,7 @@ namespace MultiWorldServer
         {
             List<Client> clients = new List<Client>();
             List<RandoSettings> settings = new List<RandoSettings>();
+            //List<string> nicknames = new List<string>();
 
             Log($"Starting MW at request of {sender.UID}");
 
@@ -409,6 +410,7 @@ namespace MultiWorldServer
                 // Ensure the person who called this is first, so their seed is used
                 clients.Add(sender);
                 settings.Add(ready[sender.UID]);
+                //nicknames.Add(sender.Session.Name);
 
                 ready.Remove(sender.UID);
 
@@ -416,6 +418,7 @@ namespace MultiWorldServer
                 {
                     clients.Add(Clients[kvp.Key]);
                     settings.Add(kvp.Value);
+                    //nicknames.Add(Clients[kvp.Key].Session.Name);
                 }
 
                 ready.Clear();
@@ -429,6 +432,7 @@ namespace MultiWorldServer
             Log("Sending to players...");
             for (int i = 0; i < results.Count; i++)
             {
+                //results[i].nicknames = nicknames;
                 Log($"Sending to player {i + 1}");
                 SendMessage(new MWResultMessage { Result = results[i] }, clients[i]);
             }

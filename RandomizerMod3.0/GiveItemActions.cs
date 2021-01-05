@@ -67,7 +67,7 @@ namespace RandomizerMod
             ReqDef def = LogicManager.GetItemDef(item);
             if (def.action == RandomizerLib.GiveAction.SpawnGeo)
                 def.action = RandomizerLib.GiveAction.AddGeo;
-            GiveItemLib(def.action, item, "meme" + from);
+            GiveItemLib(def.action, item, from);
         }
 
         // TODO: fix the above? the reason it's all messed up is since I thought GiveAction would make more sense as part of RandomizerLib (LogicManager specifically)
@@ -93,7 +93,7 @@ namespace RandomizerMod
 
             Log($"Give: action = {action} rawItem = {rawItem} item = {item} player = {player} me = {RandomizerMod.Instance.Settings.MWPlayerId}");
 
-            if (RandomizerMod.Instance.Settings.IsMW && player >= 0 && !location.StartsWith("meme")) // && player != RandomizerMod.Instance.Settings.MWPlayerId)
+            if (RandomizerMod.Instance.Settings.IsMW && player >= 0 && player != RandomizerMod.Instance.Settings.MWPlayerId)
             {
                 RandomizerMod.Instance.mwConnection.SendItem(location, item, player);
                 return;

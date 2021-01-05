@@ -43,7 +43,7 @@ namespace RandomizerMod
 
         public bool RandomizeTransitions => RandomizeAreas || RandomizeRooms;
 
-        public bool IsMW => MWNumPlayers >= 1;
+        public bool IsMW => MWNumPlayers > 1;
 
         public bool FreeLantern => !(DarkRooms || RandomizeKeys);
         public SaveSettings()
@@ -65,18 +65,18 @@ namespace RandomizerMod
 
         public int MWNumPlayers
         {
-            get => GetInt(1);
+            get => GetInt();
             set => SetInt(value);
         }
         public int MWPlayerId
         {
-            get => GetInt(1);
+            get => GetInt();
             set => SetInt(value);
         }
 
         public int MWRandoId
         {
-            get => GetInt(0);
+            get => GetInt();
             set => SetInt(value);
         }
 

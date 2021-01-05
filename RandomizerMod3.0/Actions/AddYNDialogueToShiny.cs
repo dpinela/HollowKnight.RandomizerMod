@@ -18,14 +18,13 @@ namespace RandomizerMod.Actions
     {
         private readonly int _cost;
         private readonly string _fsmName;
-        private readonly int _playerId;
         private readonly string _itemName;
         private readonly string _objectName;
 
         private readonly string _sceneName;
         private readonly CostType _type;
 
-        public AddYNDialogueToShiny(string sceneName, string objectName, string fsmName, int playerId, string itemName, int cost,
+        public AddYNDialogueToShiny(string sceneName, string objectName, string fsmName, string itemName, int cost,
             CostType type)
         {
             if (cost < 0)
@@ -37,7 +36,6 @@ namespace RandomizerMod.Actions
             _sceneName = sceneName;
             _objectName = objectName;
             _fsmName = fsmName;
-            _playerId = playerId;
             _itemName = itemName;
             _cost = cost;
             _type = type;
@@ -104,10 +102,10 @@ namespace RandomizerMod.Actions
             fsm.GetState(yesState).AddAction(new RandomizerCallStaticMethod(GetType(), nameof(CloseYNDialogue)));
 
             charm.AddFirstAction(new RandomizerCallStaticMethod(GetType(), nameof(OpenYNDialogue), fsm.gameObject,
-                _playerId, _itemName, _cost, _type));
+                _itemName, _cost, _type));
         }
 
-        private static void OpenYNDialogue(GameObject shiny, int playerId, string itemName, int cost, CostType type)
+        private static void OpenYNDialogue(GameObject shiny, string itemName, int cost, CostType type)
         {
             FSMUtility.LocateFSM(GameObject.Find("DialogueManager"), "Box Open YN").SendEvent("BOX UP YN");
             FSMUtility.LocateFSM(GameObject.Find("Text YN"), "Dialogue Page Control").FsmVariables

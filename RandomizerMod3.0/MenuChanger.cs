@@ -869,7 +869,6 @@ namespace RandomizerMod
                 {
                     UnlockAll();
                     RandomizerMod.Instance.mwConnection.Unready();
-                    startRandoBtn.enabled = false;
                     startRandoBtn.gameObject.SetActive(false);
                 }
             }

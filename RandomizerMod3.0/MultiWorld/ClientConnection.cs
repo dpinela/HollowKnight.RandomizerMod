@@ -129,6 +129,7 @@ namespace RandomizerMod.MultiWorld
         private void SynchronizeEvents()
         {
             MWMessage message = null;
+            Log(RandomizerMod.Instance.Settings.MWNumPlayers);
 
             lock (messageEventQueue)
             {

@@ -115,23 +115,23 @@ namespace RandomizerMod.Actions
                 {
                     Actions.Add(new ChangeBoolTest("RestingGrounds_04", "Binding Shield Activate", "FSM", "Check",
                         newItemName, playerdata: false, 
-                        altTest:() => RandomizerMod.Instance.Settings.CheckLocationFound(location)));
+                        altTest:() => settings.CheckLocationFound(location)));
                     Actions.Add(new ChangeBoolTest("RestingGrounds_04", "Dreamer Plaque Inspect",
                         "Conversation Control", "End", newItemName, playerdata: false,
-                        altTest:() => RandomizerMod.Instance.Settings.CheckLocationFound(location)));
+                        altTest:() => settings.CheckLocationFound(location)));
                     Actions.Add(new ChangeBoolTest("RestingGrounds_04", "Dreamer Scene 2", "Control", "Init",
                         newItemName, playerdata: false,
-                        altTest: () => RandomizerMod.Instance.Settings.CheckLocationFound(location)));
+                        altTest: () => settings.CheckLocationFound(location)));
                     Actions.Add(new ChangeBoolTest("RestingGrounds_04", "PreDreamnail", "FSM", "Check",
                         newItemName, playerdata: false,
-                        altTest: () => RandomizerMod.Instance.Settings.CheckLocationFound(location)));
+                        altTest: () => settings.CheckLocationFound(location)));
                     Actions.Add(new ChangeBoolTest("RestingGrounds_04", "PostDreamnail", "FSM", "Check",
                         newItemName, playerdata: false,
-                        altTest: () => RandomizerMod.Instance.Settings.CheckLocationFound(location)));
+                        altTest: () => settings.CheckLocationFound(location)));
                 }
 
                 // Always choose other players items to be a trinket flash (don't show big pop up for other's items)
-                if (playerId > 0 && playerId != RandomizerMod.Instance.Settings.MWPlayerId)
+                if (settings.IsMW && playerId >= 0 && playerId != settings.MWPlayerId)
                 {
                     newItem.type = ItemType.Trinket;
                     newItem.nameKey = $"MW({playerId + 1})_{newItem.nameKey}";
@@ -215,7 +215,6 @@ namespace RandomizerMod.Actions
                         oldItem.sceneName,
                         oldItem.objectName,
                         oldItem.fsmName,
-                        playerId,
                         newItem.nameKey,
                         cost,
                         oldItem.costType));
@@ -243,7 +242,7 @@ namespace RandomizerMod.Actions
 
                 string shopListing = newItem.nameKey;
 
-                if (RandomizerMod.Instance.Settings.IsMW && RandomizerMod.Instance.Settings.MWPlayerId != playerId)
+                if (settings.IsMW && settings.MWPlayerId != playerId)
                 {
                     shopListing = $"MW({playerId + 1})_" + shopListing;
                 }
