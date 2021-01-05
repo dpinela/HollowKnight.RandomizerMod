@@ -11,7 +11,7 @@ This mod is an extension of the existing Randomizer3.0 and MultiWorld mods to al
 - Per player settings - Each player has full access to all settings of the randomizer, meaning they make their own choice of which item pools to randomize, which skips are allowed in logic for their world, whether items/areas/rooms are randomized, and starting location
 - Nicknames - Players can set a nickname for themselves which will show up when picking up their items in other worlds
 - Support for saving and rejoining - Once a multiworld file is generated, quitting and rejoining should just work, no need to fuss with player IDs or server settings
-- (Most) compatible with BingoUI - Counters may pop up at strange times, but they should be correct including items sent from other players
+- (Mostly) compatible with BingoUI - Counters may pop up at strange times, but they should be correct including items sent from other players
 
 ## Getting Started
 1. Download the zip from the releases page on github: (TODO: LINK HERE)
