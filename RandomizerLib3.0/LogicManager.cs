@@ -408,7 +408,7 @@ namespace RandomizerLib
 
             if (player >= 0)
             {
-                def.nameKey = $"MW({player + 1}_" + def.nameKey;
+                def.nameKey = $"MW({player + 1})_" + def.nameKey;
             }
 
             return def;

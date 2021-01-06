@@ -20,14 +20,12 @@ namespace RandomizerMod.MultiWorld
         private readonly MWMessagePacker Packer = new MWMessagePacker(new BinaryMWMessageEncoder());
         private TcpClient _client;
         private Timer PingTimer;
-        private ConnectionState State;
+        private readonly ConnectionState State;
         private List<MWItemSendMessage> ItemSendQueue = new List<MWItemSendMessage>();
         private Thread ReadThread;
 
-        public delegate void ItemReceiveEvent(string from, string itemName);
         public delegate void NumReadyEvent(int num);
 
-        public event ItemReceiveEvent ItemReceived;
         public event NumReadyEvent NumReadyReceived;
 
         public RandoResult LastResult = null;
@@ -352,13 +350,12 @@ namespace RandomizerMod.MultiWorld
 
         private void HandleResult(MWResultMessage message)
         {
-            RandoResult result = message.Result;
-            LastResult = result;
+            RandomizerMod.Instance.StartNewGame(true, message.Result);
         }
 
         public void ReadyUp()
         {
-            SendMessage(new MWReadyMessage { Settings = RandomizerMod.Instance.Settings.RandomizerSettings });
+            SendMessage(new MWReadyMessage { Nickname = RandomizerMod.Instance.MWSettings.UserName, Settings = RandomizerMod.Instance.Settings.RandomizerSettings });
         }
 
         public void Unready()
@@ -375,13 +372,10 @@ namespace RandomizerMod.MultiWorld
         public void SendItem(string loc, string item, int playerId)
         {
             Log($"Sending item {item} to {playerId}");
-            ItemSendQueue.Add(new MWItemSendMessage { Item = item, To = playerId });
+            MWItemSendMessage msg = new MWItemSendMessage { Item = item, To = playerId };
+            ItemSendQueue.Add(msg);
+            SendMessage(msg);
         }
-
-        /*private void GiveItem(string from, string item)
-        {
-            ItemReceived?.Invoke(from, item);
-        }*/
 
         public ConnectionStatus GetStatus()
         {

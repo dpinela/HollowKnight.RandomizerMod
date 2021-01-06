@@ -373,8 +373,9 @@ namespace MultiWorldServer
         {
             lock (ready)
             {
+                sender.nickname = message.Nickname;
                 ready.Add(sender.UID, message.Settings);
-                Log($"UID {sender.UID} readied up ({ready.Count} readied)");
+                Log($"{sender.nickname} (UID {sender.UID}) readied up ({ready.Count} readied)");
 
                 foreach (Client c in Clients.Values)
                 {
@@ -401,16 +402,18 @@ namespace MultiWorldServer
         {
             List<Client> clients = new List<Client>();
             List<RandoSettings> settings = new List<RandoSettings>();
-            //List<string> nicknames = new List<string>();
+            List<string> nicknames = new List<string>();
 
             Log($"Starting MW at request of {sender.UID}");
 
             lock (ready)
             {
+                if (!ready.ContainsKey(sender.UID)) return;
+
                 // Ensure the person who called this is first, so their seed is used
                 clients.Add(sender);
                 settings.Add(ready[sender.UID]);
-                //nicknames.Add(sender.Session.Name);
+                nicknames.Add(sender.nickname);
 
                 ready.Remove(sender.UID);
 
@@ -418,10 +421,16 @@ namespace MultiWorldServer
                 {
                     clients.Add(Clients[kvp.Key]);
                     settings.Add(kvp.Value);
-                    //nicknames.Add(Clients[kvp.Key].Session.Name);
+                    nicknames.Add(Clients[kvp.Key].nickname);
                 }
 
                 ready.Clear();
+            }
+
+            Log("Starting rando with players:");
+            foreach (string nickname in nicknames)
+            {
+                Log(nickname);
             }
 
             Log("Randomizing world...");
@@ -432,7 +441,7 @@ namespace MultiWorldServer
             Log("Sending to players...");
             for (int i = 0; i < results.Count; i++)
             {
-                //results[i].nicknames = nicknames;
+                results[i].nicknames = nicknames;
                 Log($"Sending to player {i + 1}");
                 SendMessage(new MWResultMessage { Result = results[i] }, clients[i]);
             }

@@ -554,14 +554,12 @@ namespace RandomizerMod
             void AddToLog(string message) => log += message + Environment.NewLine;
             string MWItemToString(MWItem item) => result.players > 1 ? item.ToString() : item.Item;
 
-            // TODO get order correctly
             (int, MWItem, string)[] orderedILPairs = new (int, MWItem, string)[result.itemPlacements.Count];
 
             int i = 0;
             foreach (KeyValuePair<MWItem, string> kvp in result.itemPlacements)
             {
-                orderedILPairs[i] = (i, kvp.Key, kvp.Value);
-                i++;
+                orderedILPairs[i++] = (result.itemOrder[kvp.Value], kvp.Key, kvp.Value);
             }
 
             try

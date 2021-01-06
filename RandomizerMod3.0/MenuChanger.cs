@@ -60,7 +60,7 @@ namespace RandomizerMod
                 startSteelNormalBtn.transform.localScale =
                     startSteelRandoBtn.transform.localScale = */
             startRandoBtn.transform.localScale = new Vector2(0.75f, 0.75f);
-            startRandoBtn.GetComponent<StartGameEventTrigger>().bossRush = true;
+            Object.Destroy(startRandoBtn.GetComponent<StartGameEventTrigger>());
             MenuButton backBtn = back.Clone("Back", MenuButton.MenuButtonType.Proceed, new Vector2(0, -100), "Back");
 
             //RandoMenuItem<string> gameTypeBtn = new RandoMenuItem<string>(back, new Vector2(0, 600), "Game Type", "Normal", "Steel Soul");
@@ -176,7 +176,6 @@ namespace RandomizerMod
             nicknameInput.caretWidth = 8;
             nicknameInput.characterLimit = 15;
 
-            nicknameInput.DeactivateInputField();
             nicknameInput.gameObject.SetActive(false);
 
             InputField ipInput = createTextEntry();
@@ -824,7 +823,6 @@ namespace RandomizerMod
                     {
                         RandomizerMod.Instance.MWSettings.IP = ipInput.text;
                         Log($"Trying to connect to {ipInput.text}");
-                        RandomizerMod.Instance.mwConnection.NumReadyReceived -= UpdateReady;
                         RandomizerMod.Instance.mwConnection.Disconnect();
                         RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();
                         RandomizerMod.Instance.mwConnection.Connect();
@@ -970,11 +968,7 @@ namespace RandomizerMod
             {
                 if (multiworldBtn.CurrentSelection == "Yes")
                 {
-                    if (RandomizerMod.Instance.mwConnection.LastResult == null)
-                    {
-                        RandomizerMod.Instance.mwConnection.Start();
-                    }
-                    RandomizerMod.Instance.StartNewGame(true);
+                    RandomizerMod.Instance.mwConnection.Start();
                 }
                 else
                 {

@@ -21,6 +21,13 @@ namespace RandomizerMod.Randomization
             RandomizerMod.Instance.Settings.MWNumPlayers = result.players;
             RandomizerMod.Instance.Settings.MWRandoId = result.randoId;
             RandomizerMod.Instance.Settings.SetMWNames(result.nicknames);
+
+            Log("Received rando data for multiworld with:");
+            for (int i = 0; i < result.players; i++)
+            {
+                Log(RandomizerMod.Instance.Settings.GetMWPlayerName(i));
+            }
+
             SaveAllPlacements(result);
             if (RandomizerMod.Instance.Settings.CreateSpoilerLog) RandoLogger.LogAllToSpoiler(result);
 

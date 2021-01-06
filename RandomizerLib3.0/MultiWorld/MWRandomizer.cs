@@ -273,6 +273,8 @@ namespace RandomizerLib.MultiWorld
             List<RandoResult> results = new List<RandoResult>();
             List<string> nicknames = new List<string>();
 
+            int randoId = (new Random()).Next();
+
             for (int i = 0; i < players; i++)
             {
                 nicknames.Add($"Player {i + 1}");
@@ -280,7 +282,7 @@ namespace RandomizerLib.MultiWorld
                 RandoResult result = new RandoResult();
                 result.playerId = i;
                 result.players = players;
-                result.randoId = (new Random()).Next();
+                result.randoId = randoId;
                 result.settings = settings[i];
                 result.startItems = startItems[i];
                 result.transitionPlacements = transitionPlacements[i];
@@ -290,6 +292,11 @@ namespace RandomizerLib.MultiWorld
                 foreach (KeyValuePair<MWItem, MWItem> kvp in im.nonShopItems.Where(kvp => kvp.Key.PlayerId == i))
                 {
                     result.itemPlacements[kvp.Value] = kvp.Key.Item;
+                }
+
+                foreach (KeyValuePair<MWItem, int> kvp in im.locationOrder.Where(kvp => kvp.Key.PlayerId == i))
+                {
+                    result.itemOrder.Add(kvp.Key.Item, kvp.Value);
                 }
 
                 // Copy shop items and create randomized prices for each

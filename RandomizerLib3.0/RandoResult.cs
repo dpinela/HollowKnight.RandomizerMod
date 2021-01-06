@@ -17,6 +17,7 @@ namespace RandomizerLib
         public RandoSettings settings;
         public List<string> startItems;
         public Dictionary<MWItem, string> itemPlacements;       // item -> location
+        public Dictionary<string, int> itemOrder;               // location -> index
         public Dictionary<string, string> transitionPlacements; // transition -> transition
         public Dictionary<MWItem, int> shopCosts;               // MWItem (in shop) -> shop cost
         public Dictionary<string, int> variableCosts;           // grub/essence location -> randomized grub/essence count
@@ -29,6 +30,7 @@ namespace RandomizerLib
             settings = new RandoSettings();
             startItems = new List<string>();
             itemPlacements = new Dictionary<MWItem, string>();
+            itemOrder = new Dictionary<string, int>();
             transitionPlacements = new Dictionary<string, string>();
             shopCosts = new Dictionary<MWItem, int>();
             variableCosts = new Dictionary<string, int>();

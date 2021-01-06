@@ -113,8 +113,11 @@ namespace RandomizerMod
             // If the key started with MW(#)_, it is for another player's item
             if (key.StartsWith("MW("))
             {
+                Log(key);
                 int id;
                 (id, key) = LogicManager.ExtractPlayerID(key);
+                Log(id);
+                Log(key);
                 string baseItemName = GetLanguageString(key, sheetTitle);
 
                 if (id >= 0 && id != RandomizerMod.Instance.Settings.MWPlayerId)

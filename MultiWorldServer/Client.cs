@@ -11,6 +11,7 @@ namespace MultiWorldServer
 {
     class Client
     {
+        public string nickname;
         public ulong UID;
         public TcpClient TcpClient;
         public object SendLock = new object();

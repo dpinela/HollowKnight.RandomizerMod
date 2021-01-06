@@ -154,28 +154,23 @@ namespace RandomizerMod
             return _logicParseThread == null || !_logicParseThread.IsAlive;
         }
 
-        public void StartNewGame(bool mw = false)
+        public void StartNewGame(bool mw = false, RandoResult result = null)
         {
             if (mw)
             {
-                Log("Waiting on response");
-                int i = 0;
-                while (mwConnection.LastResult == null && i < 500)
-                {
-                    Thread.Sleep(100);
-                    i++;
-                }
-                if (mwConnection.LastResult == null) return;
-                RandoLogger.InitializeTracker(mwConnection.LastResult);
-                RandoLogger.InitializeSpoiler(mwConnection.LastResult);
+                if (result == null) return;
+                RandoLogger.InitializeTracker(result);
+                RandoLogger.InitializeSpoiler(result);
 
-                PostRandomizationTasks(mwConnection.LastResult);
-                mwConnection.LastResult = null;
+                PostRandomizationTasks(result);
+
+                Ref.UI.StartNewGame(bossRush: true);
             }
             else
             {
                 if (!Settings.Randomizer)
                 {
+                    Ref.UI.StartNewGame();
                     return;
                 }
 
@@ -186,13 +181,18 @@ namespace RandomizerMod
 
                 try
                 {
-                    MWRandomizer rando = new MWRandomizer(Settings.RandomizerSettings, 2);
-                    RandoResult result = rando.RandomizeMW()[0];
+                    if (result == null)
+                    {
+                        MWRandomizer rando = new MWRandomizer(Settings.RandomizerSettings, 1);
+                        result = rando.RandomizeMW()[0];
+                    }
 
                     RandoLogger.InitializeTracker(result);
                     RandoLogger.InitializeSpoiler(result);
 
                     PostRandomizationTasks(result);
+
+                    Ref.UI.StartNewGame(bossRush: true);
                 }
                 catch (Exception e)
                 {
