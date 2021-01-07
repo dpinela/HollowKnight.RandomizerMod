@@ -11,6 +11,7 @@ namespace RandomizerMod
     internal static class ObjectCache
     {
         private static GameObject _shinyItem;
+        private static GameObject _relicMsg;
 
         private static GameObject _smallGeo;
         private static GameObject _mediumGeo;
@@ -27,6 +28,8 @@ namespace RandomizerMod
         private static GameObject _jinn;
 
         public static GameObject ShinyItem => Object.Instantiate(_shinyItem);
+
+        public static GameObject RelicMsg => Object.Instantiate(_relicMsg);
 
         public static GameObject SmallGeo => Object.Instantiate(_smallGeo);
 
@@ -51,6 +54,10 @@ namespace RandomizerMod
         {
             _shinyItem = objectsByScene[SceneNames.Tutorial_01]["_Props/Chest/Item/Shiny Item (1)"];
             _shinyItem.name = "Randomizer Shiny";
+
+            PlayMakerFSM shinyFsm = _shinyItem.LocateFSM("Shiny Control");
+            SpawnObjectFromGlobalPool[] spawns = shinyFsm.GetState("Trink Flash").GetActionsOfType<SpawnObjectFromGlobalPool>();
+            _relicMsg = spawns[1].gameObject.Value;
 
             HealthManager health = objectsByScene[SceneNames.Tutorial_01]["_Enemies/Crawler 1"].GetComponent<HealthManager>();
             _smallGeo = Object.Instantiate(

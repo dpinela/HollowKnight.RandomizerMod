@@ -1,5 +1,4 @@
 - helper log
-- flash when receiving items
 - server spoiler log
 - resend all when rejoining
 - disconnect when exiting file

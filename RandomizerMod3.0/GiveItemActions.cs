@@ -9,6 +9,7 @@ using UnityEngine;
 using MultiWorldProtocol.Messaging.Definitions.Messages;
 
 using RandomizerLib;
+using RandomizerMod.MultiWorld;
 
 namespace RandomizerMod
 {
@@ -57,17 +58,20 @@ namespace RandomizerMod
             return (GiveAction) (int) giveAction;
         }
 
-        public static void GiveItemLib(RandomizerLib.GiveAction action, string rawItem, string location, int geo = 0)
+        // Ugly wrapper which uses the RandomizerLib version of GiveAction
+        public static void GiveItemLib(RandomizerLib.GiveAction action, string rawItem, string location, int geo = 0, bool remote = false)
         {
-            GiveItem(convertGiveAction(action), rawItem, location, geo);
+            GiveItem(convertGiveAction(action), rawItem, location, geo, remote);
         }
 
         public static void GiveItemMW(string item, string from)
         {
             ReqDef def = LogicManager.GetItemDef(item);
+
+            // Geo spawning is normally handleded in the shiny, so just add geo instead
             if (def.action == RandomizerLib.GiveAction.SpawnGeo)
                 def.action = RandomizerLib.GiveAction.AddGeo;
-            GiveItemLib(def.action, item, from);
+            GiveItemLib(def.action, item, from, remote: true);
         }
 
         // TODO: fix the above? the reason it's all messed up is since I thought GiveAction would make more sense as part of RandomizerLib (LogicManager specifically)
@@ -76,10 +80,15 @@ namespace RandomizerMod
 
         // Even worse, GiveItem is fetched via reflection, so I can't even overload it based on the type of the first argument so it's gotta be named GiveItemLib
 
-        public static void GiveItem(GiveAction action, string rawItem, string location, int geo = 0)
+        // This method is hooked via reflection from BingoUI, and it uses the type "GiveItemActions.GiveAction" for the first parameter
+        public static void GiveItem(GiveAction action, string rawItem, string location, int geo = 0, bool remote = false)
         {
             (int player, string item) = LogicManager.ExtractPlayerID(rawItem);
 
+            // With multiworld we may end up receiving the same item twice due to network issues etc. so we want giving items to be idempotent (i.e. same cloak twice doesn't give shade)
+            if (remote && RandomizerMod.Instance.Settings.CheckItemFound(item)) return;
+
+            // In tracker log, we only want to show MW(X)_ when picking up items in multiworld (otherwise everything is MW(1))
             if (RandomizerMod.Instance.Settings.IsMW)
             {
                 LogItemToTracker(rawItem, location);
@@ -88,22 +97,21 @@ namespace RandomizerMod
                 LogItemToTracker(item, location);
             }
             RandomizerMod.Instance.Settings.MarkLocationFound(location);
-            UpdateHelperLog();
-
-            Log($"Give: action = {action} rawItem = {rawItem} item = {item} player = {player} me = {RandomizerMod.Instance.Settings.MWPlayerId}");
+            // UpdateHelperLog(); TODO
 
             if (RandomizerMod.Instance.Settings.IsMW && player >= 0 && player != RandomizerMod.Instance.Settings.MWPlayerId)
             {
+                // Not our item, send it to MW instead
                 RandomizerMod.Instance.mwConnection.SendItem(location, item, player);
                 return;
             }
 
-            // With multiworld we may end up receiving the same item twice due to network issues etc. so we want giving items to be idempotent (i.e. same cloak twice doesn't give shade)
-            if (RandomizerMod.Instance.Settings.CheckItemFound(item)) return;
-
             // Mark the item acquired here so it only tracks our items
             RandomizerMod.Instance.Settings.MarkItemFound(item);
             item = LogicManager.RemovePrefixSuffix(item);
+
+            // If we received this from MW, display a relic message so the player knows they got an item
+            if (remote) RelicMsg.ShowRelicItem(item, location);
 
             switch (action)
             {
