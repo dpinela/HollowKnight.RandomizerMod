@@ -27,12 +27,15 @@ namespace MultiWorldServer
                     switch (commands[0])
                     {
                         case "give":
-                            if (commands.Length < 4)
+                            if (commands.Length != 4)
                             {
                                 Console.WriteLine("Usage: give <item> <session id> <player id>");
                                 break;
                             }
                             Serv.GiveItem(commands[1], Int32.Parse(commands[2]), Int32.Parse(commands[3]) - 1);
+                            break;
+                        case "ready":
+                            Serv.ListReady();
                             break;
                         case "list":
                             Serv.ListSessions();

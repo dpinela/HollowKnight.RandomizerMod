@@ -111,7 +111,7 @@ namespace RandomizerMod
             RandoMenuItem<string> modeBtn = new RandoMenuItem<string>(back, new Vector2(0, 1040), "Mode", "Item Randomizer", "Area Randomizer", "Connected-Area Room Randomizer", "Room Randomizer");
             RandoMenuItem<string> cursedBtn = new RandoMenuItem<string>(back, new Vector2(0, 960), "Cursed", "no", "noo", "noooo", "noooooooo", "noooooooooooooooo", "Oh yeah");
             RandoMenuItem<string> multiworldBtn = new RandoMenuItem<string>(back, new Vector2(0, 800), "Multiworld", "No", "Yes");
-            RandoMenuItem<bool> multiworldReadyBtn = new RandoMenuItem<bool>(back, new Vector2(0, 640), "Ready", false, true);
+            RandoMenuItem<bool> multiworldReadyBtn = new RandoMenuItem<bool>(back, new Vector2(0, 600), "Ready", false, true);
             multiworldReadyBtn.Button.gameObject.SetActive(false);
             RandoMenuItem<bool> RandoSpoilerBtn = new RandoMenuItem<bool>(back, new Vector2(0, 0), "Create Spoiler Log", true, false);
 
@@ -164,6 +164,17 @@ namespace RandomizerMod
             seedInput.caretWidth = 8;
             seedInput.characterLimit = 9;
 
+            InputField ipInput = createTextEntry();
+            ipInput.transform.localPosition = new Vector3(0, 860);
+            ipInput.text = RandomizerMod.Instance.MWSettings.IP;
+            ipInput.textComponent.fontSize = ipInput.textComponent.fontSize - 5;
+
+            ipInput.caretColor = Color.white;
+            ipInput.contentType = InputField.ContentType.Standard;
+            ipInput.navigation = Navigation.defaultNavigation;
+            ipInput.caretWidth = 8;
+            ipInput.characterLimit = 15;
+
             InputField nicknameInput = createTextEntry();
             nicknameInput.transform.localPosition = new Vector3(0, 720);
             nicknameInput.text = RandomizerMod.Instance.MWSettings.UserName;
@@ -178,16 +189,18 @@ namespace RandomizerMod
 
             nicknameInput.gameObject.SetActive(false);
 
-            InputField ipInput = createTextEntry();
-            ipInput.transform.localPosition = new Vector3(0, 860);
-            ipInput.text = RandomizerMod.Instance.MWSettings.IP;
-            ipInput.textComponent.fontSize = ipInput.textComponent.fontSize - 5;
+            InputField roomInput = createTextEntry();
+            roomInput.transform.localPosition = new Vector3(0, 660);
+            roomInput.text = "";
+            roomInput.textComponent.fontSize = roomInput.textComponent.fontSize - 5;
 
-            ipInput.caretColor = Color.white;
-            ipInput.contentType = InputField.ContentType.Standard;
-            ipInput.navigation = Navigation.defaultNavigation;
-            ipInput.caretWidth = 8;
-            ipInput.characterLimit = 15;
+            roomInput.caretColor = Color.white;
+            roomInput.contentType = InputField.ContentType.Standard;
+            roomInput.navigation = Navigation.defaultNavigation;
+            roomInput.caretWidth = 8;
+            roomInput.characterLimit = 15;
+
+            roomInput.gameObject.SetActive(false);
 
             // Create some labels
             CreateLabel(back, new Vector2(-900, 1130), "Required Skips");
@@ -196,11 +209,14 @@ namespace RandomizerMod
             CreateLabel(back, new Vector2(900, 160), "Open Mode");
             CreateLabel(back, new Vector2(0, 200), "Use of Benchwarp mod may be required");
             CreateLabel(back, new Vector2(0, 1300), "Seed:");
-            GameObject nicknameLabel = CreateLabel(back, new Vector2(-300, 725), "Nickname:");
             GameObject ipLabel = CreateLabel(back, new Vector2(-150, 865), "IP:");
-            nicknameLabel.transform.localScale = new Vector3(0.8f, 0.8f);
             ipLabel.transform.localScale = new Vector3(0.8f, 0.8f);
+            GameObject nicknameLabel = CreateLabel(back, new Vector2(-300, 725), "Nickname:");
+            nicknameLabel.transform.localScale = new Vector3(0.8f, 0.8f);
             nicknameLabel.SetActive(false);
+            GameObject roomLabel = CreateLabel(back, new Vector2(-300, 665), "Room:");
+            roomLabel.transform.localScale = new Vector3(0.8f, 0.8f);
+            roomLabel.SetActive(false);
 
             // We don't need these old buttons anymore
             Object.Destroy(classic.gameObject);
@@ -837,25 +853,38 @@ namespace RandomizerMod
                     }
 
                     startRandoBtn.transform.localPosition = startRandoBtn.transform.localPosition - new Vector3(0, 150);
-                    nicknameInput.gameObject.SetActive(true);
-                    nicknameInput.ActivateInputField();
-                    nicknameLabel.SetActive(true);
+
                     ipLabel.SetActive(false);
                     ipInput.gameObject.SetActive(false);
+
+                    nicknameInput.gameObject.SetActive(true);
+                    nicknameLabel.SetActive(true);
+
+                    roomInput.gameObject.SetActive(true);
+                    roomLabel.SetActive(true);
+
                     multiworldReadyBtn.Button.gameObject.SetActive(true);
                     multiworldReadyBtn.SetSelection(false);
+                    multiworldReadyBtn.SetName("Ready");
+
                     startRandoBtn.gameObject.SetActive(false);
                 }
                 else
                 {
                     startRandoBtn.transform.localPosition = startRandoBtn.transform.localPosition + new Vector3(0, 150);
-                    nicknameInput.ActivateInputField();
-                    nicknameInput.gameObject.SetActive(false);
-                    nicknameLabel.SetActive(false);
+
                     ipLabel.SetActive(true);
                     ipInput.gameObject.SetActive(true);
+
+                    nicknameInput.gameObject.SetActive(false);
+                    nicknameLabel.SetActive(false);
+
+                    roomInput.gameObject.SetActive(false);
+                    roomLabel.SetActive(false);
+                    
                     multiworldReadyBtn.SetSelection(false);
                     multiworldReadyBtn.Button.gameObject.SetActive(false);
+                    
                     RandomizerMod.Instance.mwConnection.Disconnect();
                     startRandoBtn.gameObject.SetActive(true);
                     UnlockAll();
@@ -868,7 +897,7 @@ namespace RandomizerMod
                 {
                     LockAll();
                     CopySettings(true);
-                    RandomizerMod.Instance.mwConnection.ReadyUp();
+                    RandomizerMod.Instance.mwConnection.ReadyUp(roomInput.text);
                     startRandoBtn.gameObject.SetActive(true);
                 }
                 else
@@ -876,6 +905,7 @@ namespace RandomizerMod
                     UnlockAll();
                     RandomizerMod.Instance.mwConnection.Unready();
                     startRandoBtn.gameObject.SetActive(false);
+                    multiworldReadyBtn.SetName("Ready");
                 }
             }
 

@@ -58,30 +58,8 @@ namespace RandomizerMod
             return (GiveAction) (int) giveAction;
         }
 
-        // Ugly wrapper which uses the RandomizerLib version of GiveAction
-        public static void GiveItemLib(RandomizerLib.GiveAction action, string rawItem, string location, int geo = 0, bool remote = false)
-        {
-            GiveItem(convertGiveAction(action), rawItem, location, geo, remote);
-        }
-
-        public static void GiveItemMW(string item, string from)
-        {
-            ReqDef def = LogicManager.GetItemDef(item);
-
-            // Geo spawning is normally handleded in the shiny, so just add geo instead
-            if (def.action == RandomizerLib.GiveAction.SpawnGeo)
-                def.action = RandomizerLib.GiveAction.AddGeo;
-            GiveItemLib(def.action, item, from, remote: true);
-        }
-
-        // TODO: fix the above? the reason it's all messed up is since I thought GiveAction would make more sense as part of RandomizerLib (LogicManager specifically)
-        // However, it's only used in like one place in RandomizerLib. Since we don't want RandomizerLib to depend on RandomizerMod, maybe we could just treat actions
-        // as an int over there and convert for usage in RandomizerMod. Either way, I'm leaving this ugly hack in
-
-        // Even worse, GiveItem is fetched via reflection, so I can't even overload it based on the type of the first argument so it's gotta be named GiveItemLib
-
-        // This method is hooked via reflection from BingoUI, and it uses the type "GiveItemActions.GiveAction" for the first parameter
-        public static void GiveItem(GiveAction action, string rawItem, string location, int geo = 0, bool remote = false)
+        // Wrapper to allow me to change stuff without fricking up BingoUI
+        public static void GiveItemWrapper(RandomizerLib.GiveAction action, string rawItem, string location, int geo = 0, bool remote = false)
         {
             (int player, string item) = LogicManager.ExtractPlayerID(rawItem);
 
@@ -92,7 +70,8 @@ namespace RandomizerMod
             if (RandomizerMod.Instance.Settings.IsMW)
             {
                 LogItemToTracker(rawItem, location);
-            } else
+            }
+            else
             {
                 LogItemToTracker(item, location);
             }
@@ -113,6 +92,26 @@ namespace RandomizerMod
             // If we received this from MW, display a relic message so the player knows they got an item
             if (remote) RelicMsg.ShowRelicItem(item, location);
 
+            GiveItem(convertGiveAction(action), rawItem, location, geo);
+        }
+
+        public static void GiveItemMW(string item, string from)
+        {
+            ReqDef def = LogicManager.GetItemDef(item);
+
+            // Geo spawning is normally handleded in the shiny, so just add geo instead
+            if (def.action == RandomizerLib.GiveAction.SpawnGeo)
+                def.action = RandomizerLib.GiveAction.AddGeo;
+            GiveItemWrapper(def.action, item, from, remote: true);
+        }
+
+        // TODO: clean up the above? the reason it's all messed up is since I thought GiveAction would make more sense as part of RandomizerLib (LogicManager specifically)
+        // However, it's only used in like one place in RandomizerLib. Since we don't want RandomizerLib to depend on RandomizerMod, maybe we could just treat actions
+        // as an int over there and convert for usage in RandomizerMod. Either way, I'm leaving this ugly hack in
+
+        // This method is hooked via reflection from BingoUI, and it uses the type "GiveItemActions.GiveAction" for the first parameter
+        public static void GiveItem(GiveAction action, string item, string location, int geo = 0)
+        {
             switch (action)
             {
                 default:

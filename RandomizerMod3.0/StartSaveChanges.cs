@@ -101,7 +101,7 @@ namespace RandomizerMod
                 if (action == RandomizerLib.GiveAction.Charm) action = RandomizerLib.GiveAction.EquippedCharm;
                 else if (action == RandomizerLib.GiveAction.SpawnGeo) action = RandomizerLib.GiveAction.AddGeo;
 
-                GiveItemLib(action, item, "Equipped");
+                GiveItemWrapper(action, item, "Equipped");
             }
 
             for (int i = 1; i < 5; i++)

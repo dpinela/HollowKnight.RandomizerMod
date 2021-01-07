@@ -95,13 +95,13 @@
     <Compile Include="Actions\CreateNewShiny.cs" />
     <Compile Include="Actions\ChangeShinyIntoLifeblood.cs" />
     <Compile Include="Actions\ChangeShinyIntoSoul.cs" />
-    <Compile Include="Actions\TrinkFlash.cs" />
     <Compile Include="BenchHandler.cs" />
     <Compile Include="LogHelper.cs" />
     <Compile Include="MultiWorld\MWSettings.cs" />
     <Compile Include="GiveItemActions.cs" />
     <Compile Include="MultiWorld\ClientConnection.cs" />
     <Compile Include="MultiWorld\ConnectionState.cs" />
+    <Compile Include="MultiWorld\RelicMsg.cs" />
     <Compile Include="StartSaveChanges.cs" />
     <Compile Include="RandoLogger.cs" />
     <Compile Include="Components\RandomizerTinkEffect.cs" />

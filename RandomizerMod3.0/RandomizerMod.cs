@@ -72,7 +72,7 @@ namespace RandomizerMod
 
             // Load embedded resources
             _sprites = ResourceHelper.GetSprites("RandomizerMod.Resources.");
-            
+
             try
             {
                 LanguageStringManager.LoadLanguageXML(
@@ -96,10 +96,12 @@ namespace RandomizerMod
             ModHooks.Instance.GetPlayerIntHook += IntOverride;
             ModHooks.Instance.GetPlayerBoolHook += BoolGetOverride;
             ModHooks.Instance.SetPlayerBoolHook += BoolSetOverride;
+            ModHooks.Instance.ApplicationQuitHook += OnQuit;
             On.PlayMakerFSM.OnEnable += FixVoidHeart;
             On.GameManager.BeginSceneTransition += EditTransition;
             On.HeroController.CanFocus += DisableFocus;
             On.PlayerData.CountGameCompletion += RandomizerCompletion;
+            On.QuitToMenu.Start += OnQuitToMenu;
 
             RandomizerAction.Hook();
             BenchHandler.Hook();
@@ -451,7 +453,7 @@ namespace RandomizerMod
                 string item = pieces[2];
                 string location = pieces[3];
 
-                GiveItemLib(giveAction, item, location);
+                GiveItemWrapper(giveAction, item, location);
                 return;
             }
             // Send the set through to the actual set
@@ -665,6 +667,43 @@ namespace RandomizerMod
             {
                 LogError($"Error applying changes to scene {to.name}:\n" + e);
             }
+        }
+
+        private void OnQuit()
+        {
+            // Just try to clean anything up
+            try
+            {
+                mwConnection.Unready();
+            }
+            catch (Exception) { }
+
+            try
+            {
+                mwConnection.Leave();
+            }
+            catch (Exception) { }
+
+            try
+            {
+                mwConnection.Disconnect();
+            }
+            catch (Exception) { }
+        }
+
+        private IEnumerator OnQuitToMenu(On.QuitToMenu.orig_Start orig, QuitToMenu self)
+        {
+            try
+            {
+                mwConnection.Leave();
+            } catch (Exception) { }
+
+            try
+            {
+                mwConnection.Disconnect();
+            } catch (Exception) { }
+
+            return orig(self);
         }
     }
 }

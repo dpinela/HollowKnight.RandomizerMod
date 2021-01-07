@@ -97,6 +97,10 @@ namespace RandomizerMod.MultiWorld
             });
         }
 
+        public void Leave()
+        {
+            SendMessage(new MWLeaveMessage());
+        }
         public void Disconnect()
         {
             Log("Disconnecting from server");
@@ -353,9 +357,9 @@ namespace RandomizerMod.MultiWorld
             RandomizerMod.Instance.StartNewGame(true, message.Result);
         }
 
-        public void ReadyUp()
+        public void ReadyUp(string room)
         {
-            SendMessage(new MWReadyMessage { Nickname = RandomizerMod.Instance.MWSettings.UserName, Settings = RandomizerMod.Instance.Settings.RandomizerSettings });
+            SendMessage(new MWReadyMessage { Room = room, Nickname = RandomizerMod.Instance.MWSettings.UserName, Settings = RandomizerMod.Instance.Settings.RandomizerSettings });
         }
 
         public void Unready()

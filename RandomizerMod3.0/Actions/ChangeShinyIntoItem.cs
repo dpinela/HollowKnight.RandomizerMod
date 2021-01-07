@@ -70,7 +70,7 @@ namespace RandomizerMod.Actions
             trinkFlash.AddTransition("FINISHED", "Store Key");
 
             giveTrinket.RemoveActionsOfType<SetPlayerDataBool>();
-            giveTrinket.AddAction(new RandomizerExecuteLambda(() => GiveItemLib(_action, _item, _location)));
+            giveTrinket.AddAction(new RandomizerExecuteLambda(() => GiveItemWrapper(_action, _item, _location)));
 
             // Makes sure the correct icon and text appear
             giveTrinket.GetActionsOfType<GetLanguageString>().First().convName = _nameKey;

@@ -2,4 +2,6 @@
 - server spoiler log
 - resend all when rejoining
 - disconnect when exiting file
-- nicknames on file load (actions created before settings load i believe)
+- room codes
+- override seeds
+- nicknames in spoiler

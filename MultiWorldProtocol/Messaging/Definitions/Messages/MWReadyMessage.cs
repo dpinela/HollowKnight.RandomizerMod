@@ -9,6 +9,7 @@ namespace MultiWorldProtocol.Messaging.Definitions.Messages
     [MWMessageType(MWMessageType.ReadyMessage)]
     public class MWReadyMessage : MWMessage
     {
+        public string Room { get; set; }
         public string Nickname { get; set; }
         public RandoSettings Settings { get; set; }
 
@@ -22,6 +23,7 @@ namespace MultiWorldProtocol.Messaging.Definitions.Messages
     {
         public MWReadyMessageDefinition() : base(MWMessageType.ReadyMessage)
         {
+            Properties.Add(new MWMessageProperty<string, MWReadyMessage>(nameof(MWReadyMessage.Room)));
             Properties.Add(new MWMessageProperty<string, MWReadyMessage>(nameof(MWReadyMessage.Nickname)));
             Properties.Add(new MWMessageProperty<RandoSettings, MWReadyMessage>(nameof(MWReadyMessage.Settings)));
         }

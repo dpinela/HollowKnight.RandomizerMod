@@ -96,7 +96,7 @@ namespace RandomizerMod.Actions
             fsm.GetState("Trinket Type").ClearTransitions();
             trinkFlash.AddTransition("FINISHED", "Store Key");
             giveTrinket.RemoveActionsOfType<SetPlayerDataBool>();
-            giveTrinket.AddAction(new RandomizerExecuteLambda(() => GiveItemLib(RandomizerLib.GiveAction.AddGeo, _item, _location, 300)));
+            giveTrinket.AddAction(new RandomizerExecuteLambda(() => GiveItemWrapper(RandomizerLib.GiveAction.AddGeo, _item, _location, 300)));
             giveTrinket.GetActionsOfType<GetLanguageString>().First().convName = _itemDefs.Last().NameKey;
             giveTrinket.GetActionsOfType<SetSpriteRendererSprite>().First().sprite = RandomizerMod.GetSprite(LogicManager.GetItemDef(_itemDefs.Last().Name).shopSpriteKey);
 
@@ -110,7 +110,7 @@ namespace RandomizerMod.Actions
 
             // Don't actually need to set the skill here, that happens in BigItemPopup
             // Maybe change that at some point, it's not where it should happen
-            bigGetFlash.AddAction(new RandomizerExecuteLambda(() => GiveItemLib(_action, _item, _location)));
+            bigGetFlash.AddAction(new RandomizerExecuteLambda(() => GiveItemWrapper(_action, _item, _location)));
 
             // Exit the fsm after the popup
             bigGetFlash.ClearTransitions();

@@ -28,7 +28,7 @@ namespace MultiWorldServer
         private readonly object _clientLock = new object();
         private readonly Dictionary<ulong, Client> Clients = new Dictionary<ulong, Client>();
         private readonly Dictionary<int, GameSession> GameSessions = new Dictionary<int, GameSession>();
-        private readonly Dictionary<ulong, RandoSettings> ready = new Dictionary<ulong, RandoSettings>();
+        private readonly Dictionary<string, Dictionary<ulong, RandoSettings>> ready = new Dictionary<string, Dictionary<ulong, RandoSettings>>();
         private TcpListener _server;
         private readonly Timer ResendTimer;
 
@@ -76,6 +76,21 @@ namespace MultiWorldServer
             foreach (var kvp in GameSessions)
             {
                 Log($"ID: {kvp.Key} players: {kvp.Value.getPlayerString()}");
+            }
+        }
+
+        public void ListReady()
+        {
+            Log($"{ready.Count} current lobbies");
+            foreach (var kvp in ready)
+            {
+                string playerString = "";
+                foreach (var kvp2 in kvp.Value)
+                {
+                    playerString += $"{Clients[kvp2.Key].Nickname}, ";
+                }
+                if (playerString != "") playerString = playerString.Substring(0, playerString.Length - 2);
+                Log($"Room: {kvp.Key} players: {playerString}");
             }
         }
 
@@ -237,7 +252,8 @@ namespace MultiWorldServer
                 //Remove first from lists so if we get a network exception at least on the server side stuff should be clean
                 lock (ready)
                 {
-                    ready.Remove(client.UID);
+                    if (client.Room != null) ready[client.Room].Remove(client.UID);
+                    if (ready[client.Room].Count == 0) ready.Remove(client.Room);
                 }
                 lock (_clientLock)
                 {
@@ -396,15 +412,23 @@ namespace MultiWorldServer
 
         private void HandleReadyMessage(Client sender, MWReadyMessage message)
         {
+            sender.Nickname = message.Nickname;
+            sender.Room = message.Room;
             lock (ready)
             {
-                sender.nickname = message.Nickname;
-                ready.Add(sender.UID, message.Settings);
-                Log($"{sender.nickname} (UID {sender.UID}) readied up ({ready.Count} readied)");
-
-                foreach (Client c in Clients.Values)
+                if (!ready.ContainsKey(sender.Room))
                 {
-                    SendMessage(new MWNumReadyMessage { Ready = ready.Count }, c);
+                    ready[sender.Room] = new Dictionary<ulong, RandoSettings>();
+                }
+
+                ready[sender.Room][sender.UID] = message.Settings;
+
+                string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
+                Log($"{sender.Nickname} (UID {sender.UID}) readied up in {roomText} ({ready[sender.Room].Count} readied)");
+
+                foreach (ulong uid in ready[sender.Room].Keys)
+                {
+                    SendMessage(new MWNumReadyMessage { Ready = ready[sender.Room].Count }, Clients[uid]);
                 }
             }
         }
@@ -413,12 +437,15 @@ namespace MultiWorldServer
         {
             lock (ready)
             {
-                ready.Remove(sender.UID);
-                Log($"UID {sender.UID} unreadied ({ready.Count} readied)");
+                string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
+                Log($"UID {sender.UID} unreadied from {roomText} ({ready[sender.Room].Count - 1} readied)");
 
-                foreach (Client c in Clients.Values)
+                if (sender.Room != null) ready[sender.Room].Remove(sender.UID);
+                if (ready[sender.Room].Count == 0) { ready.Remove(sender.Room); return; }
+
+                foreach (ulong uid in ready[sender.Room].Keys)
                 {
-                    SendMessage(new MWNumReadyMessage { Ready = ready.Count }, c);
+                    SendMessage(new MWNumReadyMessage { Ready = ready[sender.Room].Count }, Clients[uid]);
                 }
             }
         }
@@ -429,27 +456,32 @@ namespace MultiWorldServer
             List<RandoSettings> settings = new List<RandoSettings>();
             List<string> nicknames = new List<string>();
 
-            Log($"Starting MW at request of {sender.UID}");
+            if (sender.Room == null) return;
+
+            string room = sender.Room;
+
+            string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
+            Log($"Starting MW for {roomText} at request of {sender.UID}");
 
             lock (ready)
             {
-                if (!ready.ContainsKey(sender.UID)) return;
+                if (!ready[room].ContainsKey(sender.UID)) return;
 
                 // Ensure the person who called this is first, so their seed is used
                 clients.Add(sender);
-                settings.Add(ready[sender.UID]);
-                nicknames.Add(sender.nickname);
+                settings.Add(ready[room][sender.UID]);
+                nicknames.Add(sender.Nickname);
 
-                ready.Remove(sender.UID);
+                ready[room].Remove(sender.UID);
 
-                foreach (var kvp in ready)
+                foreach (var kvp in ready[room])
                 {
                     clients.Add(Clients[kvp.Key]);
                     settings.Add(kvp.Value);
-                    nicknames.Add(Clients[kvp.Key].nickname);
+                    nicknames.Add(Clients[kvp.Key].Nickname);
                 }
 
-                ready.Clear();
+                ready[room].Clear();
             }
 
             Log("Starting rando with players:");

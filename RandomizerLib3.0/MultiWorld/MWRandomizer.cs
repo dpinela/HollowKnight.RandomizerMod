@@ -284,6 +284,7 @@ namespace RandomizerLib.MultiWorld
                 result.players = players;
                 result.randoId = randoId;
                 result.settings = settings[i];
+                result.settings.Seed = settings[0].Seed;
                 result.startItems = startItems[i];
                 result.transitionPlacements = transitionPlacements[i];
                 result.variableCosts = modifiedCosts[i];
