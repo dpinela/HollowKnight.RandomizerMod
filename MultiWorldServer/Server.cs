@@ -51,7 +51,32 @@ namespace MultiWorldServer
 
         internal static void Log(string message)
         {
+            Console.SetCursorPosition(0, Console.CursorTop);
             Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] {message}");
+            Console.Write("> ");
+        }
+
+        public void GiveItem(string item, int session, int player)
+        {
+            Log($"Giving item {item} to player {player + 1} in session {session}");
+            item = LogicManager.GetItemFromLower(item);
+
+            if (!GameSessions.ContainsKey(session))
+            {
+                Log($"Session {session} does not exist");
+                return;
+            }
+
+            GameSessions[session].SendItemTo(player, item, "Server");
+        }
+
+        public void ListSessions()
+        {
+            Log($"{GameSessions.Count} current sessions");
+            foreach (var kvp in GameSessions)
+            {
+                Log($"ID: {kvp.Key} players: {kvp.Value.getPlayerString()}");
+            }
         }
 
         private void DoPing(object clients)

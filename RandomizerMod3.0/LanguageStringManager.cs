@@ -17,6 +17,24 @@ namespace RandomizerMod
         private static readonly Dictionary<string, Dictionary<string, string>> LanguageStrings =
             new Dictionary<string, Dictionary<string, string>>();
 
+        // Storing this here since it is the only place that the nicknames are used
+        // It's easier to just update this static variable after deserializing than passing settings around since LanguageStringManager
+        // is mostly used while creating randomizer actions and the settings won't be copied into RandomizerMod yet
+        private static List<string> MWNicknames;
+        private static string GetMWPlayerName(int playerId)
+        {
+            string name = "Player " + (playerId + 1);
+            if (MWNicknames != null && MWNicknames.Count > playerId)
+            {
+                name = MWNicknames[playerId];
+            }
+            return name;
+        }
+        internal static void SetMWNames(List<string> nicknames)
+        {
+            MWNicknames = nicknames;
+        }
+
         public static void LoadLanguageXML(Stream xmlStream)
         {
             // Load XmlDocument from resource stream
@@ -128,7 +146,7 @@ namespace RandomizerMod
                         baseItemName = "Grub";
                     }
 
-                    return $"{RandomizerMod.Instance.Settings.GetMWPlayerName(id)}'s {baseItemName}";
+                    return $"{GetMWPlayerName(id)}'s {baseItemName}";
                 }
                 else
                 {

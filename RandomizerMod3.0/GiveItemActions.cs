@@ -87,7 +87,6 @@ namespace RandomizerMod
             {
                 LogItemToTracker(item, location);
             }
-            RandomizerMod.Instance.Settings.MarkItemFound(rawItem);
             RandomizerMod.Instance.Settings.MarkLocationFound(location);
             UpdateHelperLog();
 
@@ -99,6 +98,11 @@ namespace RandomizerMod
                 return;
             }
 
+            // With multiworld we may end up receiving the same item twice due to network issues etc. so we want giving items to be idempotent (i.e. same cloak twice doesn't give shade)
+            if (RandomizerMod.Instance.Settings.CheckItemFound(item)) return;
+
+            // Mark the item acquired here so it only tracks our items
+            RandomizerMod.Instance.Settings.MarkItemFound(item);
             item = LogicManager.RemovePrefixSuffix(item);
 
             switch (action)

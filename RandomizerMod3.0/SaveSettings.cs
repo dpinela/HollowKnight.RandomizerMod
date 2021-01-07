@@ -50,6 +50,7 @@ namespace RandomizerMod
         {
             AfterDeserialize += () =>
             {
+                LanguageStringManager.SetMWNames(_mwPlayerNames);
                 RandomizerAction.CreateActions(ItemPlacements, this);
                 if (IsMW)
                 {

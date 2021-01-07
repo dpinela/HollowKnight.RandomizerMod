@@ -47,23 +47,36 @@ namespace MultiWorldServer
             return players.Count == 0;
         }
 
-        public void SendItemTo(int player, string Item, string From)
+        public void SendItemTo(int player, string item, string from)
         {
             if (players.ContainsKey(player))
             {
-                Server.Log($"Sending item '{Item}' to '{players[player].Name}', from '{From}'");
+                Server.Log($"Sending item '{item}' to '{players[player].Name}', from '{from}'");
 
-                players[player].QueueConfirmableMessage(new MWItemReceiveMessage { From = From, Item = Item });
+                players[player].QueueConfirmableMessage(new MWItemReceiveMessage { From = from, Item = item });
             }
             else    // Trying to send to an offline player
             {
-                Server.Log($"Queuing item '{Item}' for offline player '{players[player].Name}', from '{From}'");
+                Server.Log($"Queuing item '{item}' for offline player '{player + 1}', from '{from}'");
                 if (!unsentItems.ContainsKey(player))
                 {
                     unsentItems.Add(player, new List<(string, string)>());
-                    unsentItems[player].Add((Item, From));
+                    unsentItems[player].Add((item, from));
                 }
             }
+        }
+
+        public string getPlayerString()
+        {
+            if (players.Count == 0) return "";
+
+            string playerString = "";
+            foreach (var kvp in players)
+            {
+                playerString += $"{kvp.Key}: {kvp.Value.Name}, ";
+            }
+
+            return playerString.Substring(0, playerString.Length - 2);
         }
     }
 }

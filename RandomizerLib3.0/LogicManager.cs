@@ -217,6 +217,7 @@ namespace RandomizerLib
         private static Dictionary<string, HashSet<string>> _progressionIndexedTransitionsForAreaRando;
         private static Dictionary<string, HashSet<string>> _progressionIndexedTransitionsForRoomRando;
         private static Dictionary<string, HashSet<string>> _poolIndexedItems;
+        private static Dictionary<string, string> _lowerCaseItems;
         public static HashSet<string> grubProgression;
         public static HashSet<string> essenceProgression;
         private static HashSet<string> grubfatherLocations;
@@ -460,6 +461,12 @@ namespace RandomizerLib
         public static HashSet<string> GetItemsByPool(string pool)
         {
             return new HashSet<string>(_poolIndexedItems[pool]);
+        }
+
+        public static string GetItemFromLower(string lower)
+        {
+            _lowerCaseItems.TryGetValue(lower, out string item);
+            return item;
         }
 
         public static HashSet<string> GetLocationsByProgression(IEnumerable<string> newStuff, RandoSettings settings)
@@ -849,6 +856,9 @@ namespace RandomizerLib
             _progressionIndexedTransitionsForRoomRando = new Dictionary<string, HashSet<string>>();
 
             _poolIndexedItems = new Dictionary<string, HashSet<string>>();
+
+            _lowerCaseItems = new Dictionary<string, string>();
+
             grubProgression = new HashSet<string>();
             essenceProgression = new HashSet<string>();
             grubfatherLocations = new HashSet<string>();
@@ -867,6 +877,8 @@ namespace RandomizerLib
                 }
                 if (!_poolIndexedItems.ContainsKey(_items[item].pool)) _poolIndexedItems.Add(_items[item].pool, new HashSet<string>());
                 _poolIndexedItems[_items[item].pool].Add(item);
+
+                _lowerCaseItems[item.ToLower()] = item;
             }
             foreach (string transition in _roomTransitions.Keys)
             {
