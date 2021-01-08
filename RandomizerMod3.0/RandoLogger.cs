@@ -26,7 +26,6 @@ namespace RandomizerMod
         public static HashSet<string> uncheckedTransitions;
         public static HashSet<string> randomizedTransitions;
 
-        // TODO this is probably all wrong
         private static void MakeHelperLists()
         {
             {
@@ -122,8 +121,8 @@ namespace RandomizerMod
 
         public static void UpdateHelperLog()
         {
-            /*new Thread(() =>
-            {*/
+            new Thread(() =>
+            {
                 Log("updating helper log");
                 RandoSettings settings = RandomizerMod.Instance.Settings.RandomizerSettings;
                 Stopwatch helperWatch = new Stopwatch();
@@ -288,7 +287,7 @@ namespace RandomizerMod
                 LogHelper("Generating helper log:");
                 LogHelper(log);
                 LogHelper("Generated helper log in " + helperWatch.Elapsed.TotalSeconds + " seconds.");
-            /*}).Start();*/
+            }).Start();
         }
 
         public static void LogTracker(string message)
