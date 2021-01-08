@@ -1,7 +1,4 @@
 - helper log
 - server spoiler log
 - resend all when rejoining
-- disconnect when exiting file
-- room codes
-- override seeds
 - nicknames in spoiler

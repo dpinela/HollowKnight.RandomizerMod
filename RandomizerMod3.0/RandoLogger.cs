@@ -390,6 +390,16 @@ namespace RandomizerMod
         {
             File.Create(Path.Combine(Application.persistentDataPath, "RandomizerSpoilerLog.txt")).Dispose();
             LogSpoiler("Randomization completed with seed: " + result.settings.Seed);
+
+            if (result.players > 1)
+            {
+                string players = result.nicknames[0];
+                for (int i = 1; i < result.nicknames.Count; i++)
+                {
+                    players += ", " + result.nicknames[i];
+                }
+                LogSpoiler("MW Players: " + players);
+            }
         }
 
         public static void LogTransitionToSpoiler(string entrance, string exit)
