@@ -574,7 +574,7 @@ namespace RandomizerMod
             int i = 0;
             foreach (KeyValuePair<MWItem, string> kvp in result.itemPlacements)
             {
-                orderedILPairs[i++] = (result.itemOrder[kvp.Value], kvp.Key, kvp.Value);
+                orderedILPairs[i++] = (result.locationOrder[kvp.Value], kvp.Key, kvp.Value);
             }
 
             try

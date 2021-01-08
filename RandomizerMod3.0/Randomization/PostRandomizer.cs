@@ -72,10 +72,10 @@ namespace RandomizerMod.Randomization
                 RandomizerMod.Instance.Settings.AddItemPlacement(result.startItems[i], "Equipped_(" + i + ")");
             }
 
-            /*foreach (var kvp in im.locationOrder)
+            foreach (var kvp in result.locationOrder)
             {
                 RandomizerMod.Instance.Settings.AddOrderedLocation(kvp.Key, kvp.Value);
-            }*/
+            }
 
             RandomizerMod.Instance.Settings.StartName = result.settings.StartName;
             StartDef startDef = LogicManager.GetStartLocation(result.settings.StartName);
@@ -83,6 +83,7 @@ namespace RandomizerMod.Randomization
             RandomizerMod.Instance.Settings.StartRespawnMarkerName = StartSaveChanges.RESPAWN_MARKER_NAME;
             RandomizerMod.Instance.Settings.StartRespawnType = 0;
             RandomizerMod.Instance.Settings.StartMapZone = (int)startDef.zone;
+            RandomizerMod.Instance.Settings.Randomizer = true;
         }
     }
 }

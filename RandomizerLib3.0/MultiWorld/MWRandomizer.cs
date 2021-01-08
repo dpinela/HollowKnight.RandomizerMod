@@ -297,7 +297,7 @@ namespace RandomizerLib.MultiWorld
 
                 foreach (KeyValuePair<MWItem, int> kvp in im.locationOrder.Where(kvp => kvp.Key.PlayerId == i))
                 {
-                    result.itemOrder.Add(kvp.Key.Item, kvp.Value);
+                    result.locationOrder.Add(kvp.Key.Item, kvp.Value);
                 }
 
                 // Copy shop items and create randomized prices for each
