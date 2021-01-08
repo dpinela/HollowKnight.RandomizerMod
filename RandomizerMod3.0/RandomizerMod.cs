@@ -166,6 +166,7 @@ namespace RandomizerMod
 
                 PostRandomizationTasks(result);
 
+                RandoLogger.UpdateHelperLog();
                 Ref.UI.StartNewGame(bossRush: true);
             }
             else
@@ -194,6 +195,7 @@ namespace RandomizerMod
 
                     PostRandomizationTasks(result);
 
+                    RandoLogger.UpdateHelperLog();
                     Ref.UI.StartNewGame(bossRush: true);
                 }
                 catch (Exception e)

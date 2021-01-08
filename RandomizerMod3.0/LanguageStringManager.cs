@@ -20,11 +20,11 @@ namespace RandomizerMod
         // Storing this here since it is the only place that the nicknames are used
         // It's easier to just update this static variable after deserializing than passing settings around since LanguageStringManager
         // is mostly used while creating randomizer actions and the settings won't be copied into RandomizerMod yet
-        private static List<string> MWNicknames;
+        private static Dictionary<int, string> MWNicknames = new Dictionary<int, string>();
         private static string GetMWPlayerName(int playerId)
         {
             string name = "Player " + (playerId + 1);
-            if (MWNicknames != null && MWNicknames.Count > playerId)
+            if (MWNicknames != null && MWNicknames.ContainsKey(playerId))
             {
                 name = MWNicknames[playerId];
             }
@@ -32,7 +32,16 @@ namespace RandomizerMod
         }
         internal static void SetMWNames(List<string> nicknames)
         {
-            MWNicknames = nicknames;
+            MWNicknames = new Dictionary<int, string>();
+            for (int i = 0; i < nicknames.Count; i++)
+            {
+                MWNicknames[i] = nicknames[i];
+            }
+        }
+        internal static void SetMWNames(IDictionary<int, string> nicknames)
+        {
+            if (nicknames == null) return;
+            MWNicknames = new Dictionary<int, string>(nicknames);
         }
 
         public static void LoadLanguageXML(Stream xmlStream)
@@ -131,11 +140,8 @@ namespace RandomizerMod
             // If the key started with MW(#)_, it is for another player's item
             if (key.StartsWith("MW("))
             {
-                Log(key);
                 int id;
                 (id, key) = LogicManager.ExtractPlayerID(key);
-                Log(id);
-                Log(key);
                 string baseItemName = GetLanguageString(key, sheetTitle);
 
                 if (id >= 0 && id != RandomizerMod.Instance.Settings.MWPlayerId)

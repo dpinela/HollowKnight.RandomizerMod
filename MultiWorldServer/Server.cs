@@ -61,6 +61,12 @@ namespace MultiWorldServer
             Log($"Giving item {item} to player {player + 1} in session {session}");
             item = LogicManager.GetItemFromLower(item);
 
+            if (item == null)
+            {
+                Log($"Invalid item: {item}");
+                return;
+            }
+
             if (!GameSessions.ContainsKey(session))
             {
                 Log($"Session {session} does not exist");
@@ -252,8 +258,11 @@ namespace MultiWorldServer
                 //Remove first from lists so if we get a network exception at least on the server side stuff should be clean
                 lock (ready)
                 {
-                    if (client.Room != null) ready[client.Room].Remove(client.UID);
-                    if (ready[client.Room].Count == 0) ready.Remove(client.Room);
+                    if (client.Room != null && ready.ContainsKey(client.Room))
+                    {
+                        ready[client.Room].Remove(client.UID);
+                        if (ready[client.Room].Count == 0) ready.Remove(client.Room);
+                    }
                 }
                 lock (_clientLock)
                 {

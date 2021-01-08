@@ -25,7 +25,7 @@ namespace RandomizerMod
         private SerializableIntDictionary _variableCosts = new SerializableIntDictionary();
         private SerializableIntDictionary _shopCosts = new SerializableIntDictionary();
         private SerializableIntDictionary _additiveCounts = new SerializableIntDictionary();
-        private List<string> _mwPlayerNames = new List<string>();
+        private SerializableDictionary<int, string> _mwPlayerNames = new SerializableDictionary<int, string>();
 
         private SerializableBoolDictionary _obtainedItems = new SerializableBoolDictionary();
         private SerializableBoolDictionary _obtainedLocations = new SerializableBoolDictionary();
@@ -550,13 +550,16 @@ namespace RandomizerMod
 
         internal void SetMWNames(List<string> nicknames)
         {
-            _mwPlayerNames = nicknames;
+            for (int i = 0; i < nicknames.Count; i++)
+            {
+                _mwPlayerNames[i] = nicknames[i];
+            }
         }
 
         public string GetMWPlayerName(int playerId)
         {
             string name = "Player " + (playerId + 1);
-            if (_mwPlayerNames != null && _mwPlayerNames.Count > playerId)
+            if (_mwPlayerNames != null && _mwPlayerNames.ContainsKey(playerId))
             {
                 name = _mwPlayerNames[playerId];
             }

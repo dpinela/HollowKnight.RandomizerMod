@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using UnityEngine;
 using Modding;
 using RandomizerMod.Randomization;
+using static RandomizerMod.LogHelper;
 
 using RandomizerLib;
 using RandomizerLib.MultiWorld;
@@ -50,9 +51,10 @@ namespace RandomizerMod
 
                 foreach (string item in RandomizerMod.Instance.Settings.GetItemsFound())
                 {
-                    if (LogicManager.GetItemDef(item).progression)
+                    (int player, string shortItem) = LogicManager.ExtractPlayerID(item);
+                    if (LogicManager.GetItemDef(item).progression && (!RandomizerMod.Instance.Settings.IsMW || player == RandomizerMod.Instance.Settings.MWPlayerId))
                     {
-                        pm.Add(LogicManager.RemovePrefixSuffix(item));
+                        pm.Add(LogicManager.RemovePrefixSuffix(shortItem));
                     }
                 }
 
@@ -121,7 +123,9 @@ namespace RandomizerMod
         public static void UpdateHelperLog()
         {
             /*new Thread(() =>
-            {
+            {*/
+                Log("updating helper log");
+                RandoSettings settings = RandomizerMod.Instance.Settings.RandomizerSettings;
                 Stopwatch helperWatch = new Stopwatch();
                 helperWatch.Start();
 
@@ -129,9 +133,10 @@ namespace RandomizerMod
                 void AddToLog(string message) => log += message + Environment.NewLine;
 
                 MakeHelperLists();
+                Log(uncheckedLocations.Count);
 
                 AddToLog($"Current scene: {GameManager.instance.sceneName}");
-                if (RandomizerMod.Instance.Settings.RandomizeTransitions)
+                if (settings.RandomizeTransitions)
                 {
                     if (!string.IsNullOrEmpty(RandomizerMod.Instance.LastRandomizedEntrance) && !string.IsNullOrEmpty(RandomizerMod.Instance.LastRandomizedExit))
                     {
@@ -143,11 +148,12 @@ namespace RandomizerMod
                     }
                 }
 
-                if (!RandomizerMod.Instance.Settings.RandomizeGrubs)
+                if (!settings.RandomizeGrubs)
                 {
-                    AddToLog(Environment.NewLine + "Reachable grubs: " + pm.obtained[LogicManager.grubIndex]);
+                    // TODO: Fix this
+                    //AddToLog(Environment.NewLine + "Reachable grubs: " + pm.obtained[LogicManager.grubIndex]);
                 }
-                if (!RandomizerMod.Instance.Settings.RandomizeWhisperingRoots)
+                if (!settings.RandomizeWhisperingRoots)
                 {
                     AddToLog("Reachable essence: " + pm.obtained[LogicManager.essenceIndex]);
                 }
@@ -191,18 +197,18 @@ namespace RandomizerMod
                 }
 
                 // UNCHECKED TRANSITIONS (AREA RANDOMIZER VERSION)
-                if (RandomizerMod.Instance.Settings.RandomizeAreas)
+                if (settings.RandomizeAreas)
                 {
                     AddToLog(Environment.NewLine + Environment.NewLine + "REACHABLE TRANSITIONS");
 
                     Dictionary<string, List<string>> AreaSortedTransitions = new Dictionary<string, List<string>>();
                     foreach (string transition in uncheckedTransitions)
                     {
-                        if (AreaSortedTransitions.ContainsKey(LogicManager.GetTransitionDef(transition).areaName)) continue;
+                        if (AreaSortedTransitions.ContainsKey(LogicManager.GetTransitionDef(transition, settings).areaName)) continue;
 
                         AreaSortedTransitions.Add(
-                            LogicManager.GetTransitionDef(transition).areaName,
-                            uncheckedTransitions.Where(t => LogicManager.GetTransitionDef(t).areaName == LogicManager.GetTransitionDef(transition).areaName).ToList()
+                            LogicManager.GetTransitionDef(transition, settings).areaName,
+                            uncheckedTransitions.Where(t => LogicManager.GetTransitionDef(t, settings).areaName == LogicManager.GetTransitionDef(transition, settings).areaName).ToList()
                             );
                     }
 
@@ -215,20 +221,20 @@ namespace RandomizerMod
                         }
                     }
                 }
-                else if (RandomizerMod.Instance.Settings.RandomizeRooms)
+                else if (settings.RandomizeRooms)
                 {
                     AddToLog(Environment.NewLine + Environment.NewLine + "REACHABLE TRANSITIONS");
 
                     Dictionary<string, List<string>> SceneSortedTransitions = new Dictionary<string, List<string>>();
                     foreach (string transition in uncheckedTransitions)
                     {
-                        if (SceneSortedTransitions.ContainsKey(LogicManager.GetTransitionDef(transition).sceneName.Split('-').First())) continue;
+                        if (SceneSortedTransitions.ContainsKey(LogicManager.GetTransitionDef(transition, settings).sceneName.Split('-').First())) continue;
 
                         SceneSortedTransitions.Add(
-                            LogicManager.GetTransitionDef(transition).sceneName.Split('-').First(),
+                            LogicManager.GetTransitionDef(transition, settings).sceneName.Split('-').First(),
                             uncheckedTransitions.Where
-                                (t => LogicManager.GetTransitionDef(t).sceneName.Split('-').First()
-                                    == LogicManager.GetTransitionDef(transition).sceneName.Split('-').First()).ToList()
+                                (t => LogicManager.GetTransitionDef(t, settings).sceneName.Split('-').First()
+                                    == LogicManager.GetTransitionDef(transition, settings).sceneName.Split('-').First()).ToList()
                             );
                     }
 
@@ -282,7 +288,7 @@ namespace RandomizerMod
                 LogHelper("Generating helper log:");
                 LogHelper(log);
                 LogHelper("Generated helper log in " + helperWatch.Elapsed.TotalSeconds + " seconds.");
-            }).Start();*/
+            /*}).Start();*/
         }
 
         public static void LogTracker(string message)
@@ -301,7 +307,7 @@ namespace RandomizerMod
             if (result.players > 1)
             {
                 AddToLog($"Multiworld players: {result.players}");
-                AddToLog($"Multiworld ID: {result.playerId}");
+                AddToLog($"Multiworld player ID: {result.playerId}");
             }
             AddToLog($"Cursed: {result.settings.Cursed}");
             AddToLog($"Start location: {result.settings.StartName}");
@@ -436,7 +442,7 @@ namespace RandomizerMod
                     if (result.players > 1)
                     {
                         AddToLog($"Multiworld players: {result.players}");
-                        AddToLog($"Multiworld ID: {result.playerId}");
+                        AddToLog($"Multiworld player ID: {result.playerId + 1}");
                     }
                     AddToLog($"Cursed: {result.settings.Cursed}");
                     AddToLog($"Start location: {result.settings.StartName}");

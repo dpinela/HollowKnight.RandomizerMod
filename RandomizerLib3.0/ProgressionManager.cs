@@ -216,7 +216,10 @@ namespace RandomizerLib
                     }
                     break;
 
-                /*case RandomizerState.Completed when settings.RandomizeGrubs:
+                case RandomizerState.Completed when settings.RandomizeGrubs:
+                    grubLocations = new Dictionary<string, int>(); // TODO not this
+                    break;
+                    /* Disabled right now due to multiworld changes, hard to implement this in RandomizerLib
                     grubLocations = settings.ItemPlacements
                         .Where(pair => LogicManager.GetItemDef(pair.Item1).pool == "Grub" && !LogicManager.ShopNames.Contains(pair.Item2))
                         .ToDictionary(pair => pair.Item2, kvp => 1);
@@ -270,7 +273,8 @@ namespace RandomizerLib
                         }
                     }
                     break;
-                /*case RandomizerState.Completed when settings.RandomizeWhisperingRoots && !concealRandomItems:
+                /* Does this case ever occur? disabled right now due to multiworld changes
+                 * case RandomizerState.Completed when settings.RandomizeWhisperingRoots && !concealRandomItems:
                     foreach (var pair in settings.ItemPlacements)
                     {
                         if (LogicManager.GetItemDef(pair.Item1).pool == "Root" && !LogicManager.ShopNames.Contains(pair.Item2))

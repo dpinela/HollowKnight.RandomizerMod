@@ -73,7 +73,7 @@ namespace MultiWorldServer
             string playerString = "";
             foreach (var kvp in players)
             {
-                playerString += $"{kvp.Key}: {kvp.Value.Name}, ";
+                playerString += $"{kvp.Key + 1}: {kvp.Value.Name}, ";
             }
 
             return playerString.Substring(0, playerString.Length - 2);

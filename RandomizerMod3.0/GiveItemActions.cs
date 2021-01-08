@@ -10,6 +10,7 @@ using MultiWorldProtocol.Messaging.Definitions.Messages;
 
 using RandomizerLib;
 using RandomizerMod.MultiWorld;
+using RandomizerLib.MultiWorld;
 
 namespace RandomizerMod
 {
@@ -64,7 +65,7 @@ namespace RandomizerMod
             (int player, string item) = LogicManager.ExtractPlayerID(rawItem);
 
             // With multiworld we may end up receiving the same item twice due to network issues etc. so we want giving items to be idempotent (i.e. same cloak twice doesn't give shade)
-            if (remote && RandomizerMod.Instance.Settings.CheckItemFound(item)) return;
+            if (remote && RandomizerMod.Instance.Settings.CheckItemFound(new MWItem(RandomizerMod.Instance.Settings.MWPlayerId + 1, item).ToString())) return;
 
             // In tracker log, we only want to show MW(X)_ when picking up items in multiworld (otherwise everything is MW(1))
             if (RandomizerMod.Instance.Settings.IsMW)
@@ -75,8 +76,9 @@ namespace RandomizerMod
             {
                 LogItemToTracker(item, location);
             }
-            RandomizerMod.Instance.Settings.MarkLocationFound(location);
-            // UpdateHelperLog(); TODO
+            RandomizerMod.Instance.Settings.MarkItemFound(rawItem);
+            if (!remote) RandomizerMod.Instance.Settings.MarkLocationFound(location);
+            UpdateHelperLog();
 
             if (RandomizerMod.Instance.Settings.IsMW && player >= 0 && player != RandomizerMod.Instance.Settings.MWPlayerId)
             {
@@ -85,19 +87,18 @@ namespace RandomizerMod
                 return;
             }
 
-            // Mark the item acquired here so it only tracks our items
-            RandomizerMod.Instance.Settings.MarkItemFound(item);
             item = LogicManager.RemovePrefixSuffix(item);
 
             // If we received this from MW, display a relic message so the player knows they got an item
             if (remote) RelicMsg.ShowRelicItem(item, location);
 
-            GiveItem(convertGiveAction(action), rawItem, location, geo);
+            GiveItem(convertGiveAction(action), item, location, geo);
         }
 
         public static void GiveItemMW(string item, string from)
         {
             ReqDef def = LogicManager.GetItemDef(item);
+            item = new MWItem(RandomizerMod.Instance.Settings.MWPlayerId, item).ToString();
 
             // Geo spawning is normally handleded in the shiny, so just add geo instead
             if (def.action == RandomizerLib.GiveAction.SpawnGeo)
