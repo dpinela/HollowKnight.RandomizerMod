@@ -1,7 +1,5 @@
 # Hollow Knight Randomizer 3.0 Multiworld
 
-NOTE: THIS README AND PROJECT ARE WIP
-
 For general randomizer information, see: https://github.com/JasonILTG/HollowKnight.RandomizerMod
 
 This mod is an extension of the existing Randomizer3.0 and MultiWorld mods to allow multiworld with all of the features of Randomizer3.0. A multiworld is a version of randomizer where items are not only scattered throughout your file, but through any number of linked game files. When picking up an item that belongs to another player, it is sent over the internet and they receive it in their game. This allows co-operative randomizer playthroughs, where you may need to pick up each other's progression to go forward.
@@ -14,7 +12,7 @@ This mod is an extension of the existing Randomizer3.0 and MultiWorld mods to al
 - (Mostly) compatible with BingoUI - Counters may pop up at strange times, but they should be correct including items sent from other players
 
 ## Getting Started
-1. Download the zip from the releases page on github: (TODO: LINK HERE)
+1. Download the zip from the releases page on github: https://github.com/CallumMoseley/HollowKnight.RandomizerMod/releases
 2. Install SeanprCore.dll if you haven't already (this can be done through the mod installer: https://www.nexusmods.com/hollowknight/mods/9)
 3. Copy MultiWorldProtocol.dll, RandomizerLib3.0.dll, and RandomizerMod3.0.dll into `Hollow Knight/hollow_knight_Data/Managed/Mods` (this will replace the existing RandomizerMod3.0 if you have it installed
 4. Download MultiWorldServer.zip from releases and extract it to wherever you would like to run the server from
