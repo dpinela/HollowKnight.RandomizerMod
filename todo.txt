@@ -1,3 +1,2 @@
 - helper log grubs/essence
-- server spoiler log
 - resend all when rejoining

@@ -367,5 +367,168 @@ namespace RandomizerLib.MultiWorld
 
             return Math.Max(cost, 1);
         }
+        /*private bool ValidateItemRandomization()
+        {
+            Log("Beginning item placement validation...");
+
+            List<MWItem> unfilledLocations;
+            if (im.normalFillShops) unfilledLocations = im.randomizedLocations.Except(im.nonShopItems.Keys).Except(im.shopItems.Keys).ToList();
+            else unfilledLocations = im.randomizedLocations.Except(im.nonShopItems.Keys).Where(item => !LogicManager.ShopNames.Contains(item.Item)).ToList();
+
+            if (unfilledLocations.Any())
+            {
+                Log("Unable to validate!");
+                string m = "The following locations were not filled: ";
+                foreach (MWItem l in unfilledLocations) m += l + ", ";
+                Log(m);
+                return false;
+            }
+
+            HashSet<(MWItem, MWItem)> LIpairs = new HashSet<(MWItem, MWItem)>(im.nonShopItems.Select(kvp => (kvp.Key, kvp.Value)));
+            foreach (var kvp in im.shopItems)
+            {
+                LIpairs.UnionWith(kvp.Value.Select(i => (kvp.Key, i)));
+            }
+
+            var lookup = LIpairs.ToLookup(pair => pair.Item2, pair => pair.Item1).Where(x => x.Count() > 1);
+            if (lookup.Any())
+            {
+                Log("Unable to validate!");
+                string m = "The following items were placed multiple times: ";
+                foreach (var x in lookup) m += x.Key + ", ";
+                Log(m);
+                string l = "The following locations were filled by these items: ";
+                foreach (var x in lookup) foreach (MWItem k in x) l += k + ", ";
+                Log(l);
+                return false;
+            }
+
+            *//*
+            // Potentially useful debug logs
+            foreach (string item in im.GetRandomizedItems())
+            {
+                if (im.nonShopItems.Any(kvp => kvp.Value == item))
+                {
+                    Log($"Placed {item} at {im.nonShopItems.First(kvp => kvp.Value == item).Key}");
+                }
+                else if (im.shopItems.Any(kvp => kvp.Value.Contains(item)))
+                {
+                    Log($"Placed {item} at {im.shopItems.First(kvp => kvp.Value.Contains(item)).Key}");
+                }
+                else LogError($"Unable to find where {item} was placed.");
+            }
+            foreach (string location in im.GetRandomizedLocations())
+            {
+                if (im.nonShopItems.TryGetValue(location, out string item))
+                {
+                    Log($"Filled {location} with {item}");
+                }
+                else if (im.shopItems.ContainsKey(location))
+                {
+                    Log($"Filled {location}");
+                }
+                else LogError($"{location} was not filled.");
+            }
+            *//*
+
+            MWProgressionManager pm = new MWProgressionManager(
+                players,
+                settings,
+                RandomizerState.Validating,
+                im,
+                tm,
+                modifiedCosts: modifiedCosts
+                );
+            pm.Add(startProgression);
+
+            HashSet<MWItem> locations = new HashSet<MWItem>(im.randomizedLocations.Union(im.vm.progressionLocations));
+            HashSet<MWItem> transitions = new HashSet<MWItem>();
+            HashSet<MWItem> items = im.randomizedItems;
+            items.ExceptWith(startItems);
+
+            if (settings.RandomizeTransitions)
+            {
+                transitions.UnionWith(LogicManager.TransitionNames(settings));
+                tm.ResetReachableTransitions();
+                tm.UpdateReachableTransitions(pm, startTransition);
+            }
+
+            im.vm.ResetReachableLocations(im, false, pm);
+
+            int passes = 0;
+            while (locations.Any() || items.Any() || transitions.Any())
+            {
+                if (settings.RandomizeTransitions) transitions.ExceptWith(tm.reachableTransitions);
+
+                foreach (MWItem location in locations.Where(loc => pm.CanGet(loc)).ToList())
+                {
+                    locations.Remove(location);
+
+                    if (VanillaManager.progressionLocations.Contains(location))
+                    {
+                        im.vm.UpdateVanillaLocations(im, location, false, pm);
+                        if (settings.RandomizeTransitions && !LogicManager.ShopNames.Contains(location)) tm.UpdateReachableTransitions(pm, location, true);
+                        else if (settings.RandomizeTransitions)
+                        {
+                            foreach (string i in VanillaManager.progressionShopItems[location])
+                            {
+                                tm.UpdateReachableTransitions(pm, i, true);
+                            }
+                        }
+                    }
+
+                    else if (im.nonShopItems.TryGetValue(location, out MWItem item))
+                    {
+                        items.Remove(item);
+
+                        if (LogicManager.GetItemDef(item).progression)
+                        {
+                            pm.Add(item);
+                            if (settings.RandomizeTransitions) tm.UpdateReachableTransitions(pm, item, true);
+                        }
+                    }
+
+                    else if (im.shopItems.TryGetValue(location, out List<MWItem> shopItems))
+                    {
+                        foreach (string newItem in shopItems)
+                        {
+                            items.Remove(newItem);
+                            if (LogicManager.GetItemDef(newItem).progression)
+                            {
+                                pm.Add(newItem);
+                                if (settings.RandomizeTransitions) tm.UpdateReachableTransitions(pm, newItem, true);
+                            }
+                        }
+                    }
+
+                    else
+                    {
+                        Log("Unable to validate!");
+                        Log($"Location {location} did not correspond to any known placement.");
+                        return false;
+                    }
+                }
+
+                passes++;
+                if (passes > 400)
+                {
+                    Log("Unable to validate!");
+                    Log("Progression: " + pm.ListObtainedProgression() + Environment.NewLine + "Grubs: " + pm.obtained[LogicManager.grubIndex] + Environment.NewLine + "Essence: " + pm.obtained[LogicManager.essenceIndex]);
+                    string m = string.Empty;
+                    foreach (string s in items) m += s + ", ";
+                    Log("Unable to get items: " + m);
+                    m = string.Empty;
+                    foreach (string s in locations) m += s + ", ";
+                    Log("Unable to get locations: " + m);
+                    m = string.Empty;
+                    foreach (string s in transitions) m += s + ",";
+                    Log("Unable to get transitions: " + m);
+                    return false;
+                }
+            }
+            //LogItemPlacements(pm);
+            Log("Validation successful.");
+            return true;
+        }*/
     }
 }
