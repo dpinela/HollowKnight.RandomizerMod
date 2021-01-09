@@ -16,10 +16,13 @@ This mod is an extension of the existing Randomizer3.0 and MultiWorld mods to al
 ## Getting Started
 1. Download the zip from the releases page on github: https://github.com/CallumMoseley/HollowKnight.RandomizerMod/releases
 2. Install SeanprCore.dll and modding API if you haven't already (this can be done through the mod installer: https://www.nexusmods.com/hollowknight/mods/9)
-3. Copy `MultiWorldProtocol.dll`, `RandomizerLib3.0.dll`, and `RandomizerMod3.0.dll` into `Hollow Knight/hollow_knight_Data/Managed/Mods` (this will replace the existing RandomizerMod3.0 if you have it installed
-4. Download `MultiWorldServer.zip` from releases and extract it to wherever you would like to run the server from
-5. Port forward 38281 to the machine running the server (look up tutorials online for your router)
-6. Run `MultiWorldServer.exe`, and ensure that it is allowed through Windows firewall
+3. Copy `MultiWorldProtocol.dll`, `RandomizerLib3.0.dll`, and `RandomizerMod3.0.dll` into `Hollow Knight/hollow_knight_Data/Managed/Mods` (this will replace the existing RandomizerMod3.0 if you have it installed)
+
+To set up a server:
+
+1. Download `MultiWorldServer.zip` from releases and extract it to wherever you would like to run the server from
+2. Port forward 38281 to the machine running the server (look up tutorials online for your router)
+3. Run `MultiWorldServer.exe`, and ensure that it is allowed through Windows firewall
 
 This is all that is needed in terms of setup. To play multiworld:
 
@@ -50,3 +53,5 @@ A few useful commands are implemented on the server:
 - Item placements are currently not validated for feasibility. In theory, they should be correct as they are placed, but if there are bugs an impossible seed may be generated
 - If you have an issue with Grimmchild not spawning for Grimm, then quitting out will quit without saving, potentially losing recent items. So, make sure to use Benchwarp to make Grimmchild appear before trying to fight Grimm.
 - In the future, I will hopefully store all items on the server and use that to restore players when joining
+- Currently, grubs and essence aren't properly shown on the helper log
+- There is no indicator in-game if you disconnect from the server. I plan to hopefully add better UI for managing and surfacing server connections
