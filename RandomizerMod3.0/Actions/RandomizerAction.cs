@@ -236,7 +236,7 @@ namespace RandomizerMod.Actions
                 string boolName = "RandomizerMod." + giveAction.ToString() + "." + shopItem + "." + shopName;
 
                 ShopItemBoolNames[(shopItem, shopName)] = boolName;
-                
+
                 ShopItemDef newItemDef = new ShopItemDef
                 {
                     PlayerDataBoolName = boolName,

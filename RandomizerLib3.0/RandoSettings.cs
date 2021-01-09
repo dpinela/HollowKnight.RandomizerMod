@@ -125,5 +125,59 @@ namespace RandomizerLib
                     return false;
             }
         }
+
+        public RandoSettings Clone()
+        {
+            RandoSettings result = new RandoSettings();
+            result.AllBosses = AllBosses;
+            result.AllSkills = AllSkills;
+            result.AllCharms = AllCharms;
+            result.CharmNotch = CharmNotch;
+            result.Grubfather = Grubfather;
+            result.Jiji = Jiji;
+            result.Quirrel = Quirrel; // Unused?
+            result.ItemDepthHints = ItemDepthHints; // Unused?
+            result.EarlyGeo = EarlyGeo;
+            result.LeverSkips = LeverSkips;
+            result.ExtraPlatforms = ExtraPlatforms;
+            result.RandomizeAreas = RandomizeAreas;
+            result.RandomizeRooms = RandomizeRooms;
+            result.ConnectAreas = ConnectAreas;
+            result.RandomizeDreamers = RandomizeDreamers;
+            result.RandomizeSkills = RandomizeSkills;
+            result.RandomizeCharms = RandomizeCharms;
+            result.RandomizeKeys = RandomizeKeys;
+            result.RandomizeGeoChests = RandomizeGeoChests;
+            result.RandomizeMaskShards = RandomizeMaskShards;
+            result.RandomizeVesselFragments = RandomizeVesselFragments;
+            result.RandomizeCharmNotches = RandomizeCharmNotches;
+            result.RandomizePaleOre = RandomizePaleOre;
+            result.RandomizeRancidEggs = RandomizeRancidEggs;
+            result.RandomizeRelics = RandomizeRelics;
+            result.RandomizeMaps = RandomizeMaps;
+            result.RandomizeStags = RandomizeStags;
+            result.RandomizeGrubs = RandomizeGrubs;
+            result.RandomizeWhisperingRoots = RandomizeWhisperingRoots;
+            result.RandomizeRocks = RandomizeRocks;
+            result.RandomizeSoulTotems = RandomizeSoulTotems;
+            result.RandomizePalaceTotems = RandomizePalaceTotems;
+            result.RandomizeLoreTablets = RandomizeLoreTablets;
+            result.RandomizeLifebloodCocoons = RandomizeLifebloodCocoons;
+            result.StartName = StartName;
+            result.DuplicateMajorItems = DuplicateMajorItems;
+            result.CreateSpoilerLog = CreateSpoilerLog;
+            result.Cursed = Cursed;
+            result.RandomizeStartItems = RandomizeStartItems;
+            result.RandomizeStartLocation = RandomizeStartLocation;
+            result.ShadeSkips = ShadeSkips;
+            result.AcidSkips = AcidSkips;
+            result.SpikeTunnels = SpikeTunnels;
+            result.MildSkips = MildSkips;
+            result.SpicySkips = SpicySkips;
+            result.FireballSkips = FireballSkips;
+            result.DarkRooms = DarkRooms;
+
+            return result;
+        }
     }
 }

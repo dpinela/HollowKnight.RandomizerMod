@@ -123,7 +123,6 @@ namespace RandomizerMod
         {
             new Thread(() =>
             {
-                Log("updating helper log");
                 RandoSettings settings = RandomizerMod.Instance.Settings.RandomizerSettings;
                 Stopwatch helperWatch = new Stopwatch();
                 helperWatch.Start();
@@ -132,7 +131,6 @@ namespace RandomizerMod
                 void AddToLog(string message) => log += message + Environment.NewLine;
 
                 MakeHelperLists();
-                Log(uncheckedLocations.Count);
 
                 AddToLog($"Current scene: {GameManager.instance.sceneName}");
                 if (settings.RandomizeTransitions)
@@ -567,12 +565,14 @@ namespace RandomizerMod
         {
             string log = string.Empty;
             void AddToLog(string message) => log += message + Environment.NewLine;
+
+            // If this is a single player world, leave out MW tags
             string MWItemToString(MWItem item) => result.players > 1 ? item.ToString() : item.Item;
 
-            (int, MWItem, string)[] orderedILPairs = new (int, MWItem, string)[result.itemPlacements.Count];
+            (int, MWItem, MWItem)[] orderedILPairs = new (int, MWItem, MWItem)[result.itemPlacements.Count];
 
             int i = 0;
-            foreach (KeyValuePair<MWItem, string> kvp in result.itemPlacements)
+            foreach (var kvp in result.itemPlacements)
             {
                 orderedILPairs[i++] = (result.locationOrder[kvp.Value], kvp.Key, kvp.Value);
             }
@@ -581,13 +581,13 @@ namespace RandomizerMod
             {
                 orderedILPairs = orderedILPairs.OrderBy(triplet => triplet.Item1).ToArray();
 
-                Dictionary<string, List<string>> areaItemLocations = new Dictionary<string, List<string>>();
+                Dictionary<MWItem, List<string>> areaItemLocations = new Dictionary<MWItem, List<string>>();
                 foreach (var triplet in orderedILPairs)
                 {
-                    string location = triplet.Item3;
+                    MWItem location = triplet.Item3;
                     if (LogicManager.TryGetItemDef(location, out ReqDef locationDef))
                     {
-                        string area = locationDef.areaName;
+                        MWItem area = new MWItem(location.PlayerId, locationDef.areaName);
                         if (!areaItemLocations.ContainsKey(area))
                         {
                             areaItemLocations[area] = new List<string>();
@@ -600,7 +600,7 @@ namespace RandomizerMod
                 }
 
                 List<string> progression = new List<string>();
-                foreach ((int, MWItem, string) pair in orderedILPairs)
+                foreach ((int, MWItem, MWItem) pair in orderedILPairs)
                 {
                     string cost = "";
                     if (LogicManager.TryGetItemDef(pair.Item3, out ReqDef itemDef)) {
@@ -608,10 +608,10 @@ namespace RandomizerMod
                     }
                     else cost = $" [{result.shopCosts[pair.Item2]} Geo]";
 
-                    if (LogicManager.GetItemDef(pair.Item2.Item).progression) progression.Add($"({pair.Item1}) {MWItemToString(pair.Item2)}<---at--->{pair.Item3}{cost}");
+                    if (LogicManager.GetItemDef(pair.Item2.Item).progression) progression.Add($"({pair.Item1}) {MWItemToString(pair.Item2)}<---at--->{MWItemToString(pair.Item3)}{cost}");
                     if (LogicManager.TryGetItemDef(pair.Item3, out ReqDef locationDef))
                     {
-                        areaItemLocations[locationDef.areaName].Add($"({pair.Item1}) {MWItemToString(pair.Item2)}<---at--->{pair.Item3}{cost}");
+                        areaItemLocations[new MWItem(pair.Item3.PlayerId, locationDef.areaName)].Add($"({pair.Item1}) {MWItemToString(pair.Item2)}<---at--->{MWItemToString(pair.Item3)}{cost}");
                     }
                     else areaItemLocations[pair.Item3].Add($"{MWItemToString(pair.Item2)}{cost}");
                 }
@@ -620,13 +620,14 @@ namespace RandomizerMod
                 foreach (string item in progression) AddToLog(item.Replace('_', ' '));
 
                 AddToLog(Environment.NewLine + "ALL ITEMS");
-                foreach (KeyValuePair<string, List<string>> kvp in areaItemLocations)
+                foreach (KeyValuePair<MWItem, List<string>> kvp in areaItemLocations)
                 {
                     if (kvp.Value.Count > 0)
                     {
-                        string title = kvp.Key;
-                        if (LogicManager.ShopNames.Contains(title)) title = $"({orderedILPairs.First(triplet => triplet.Item3 == title).Item1}) {title}";
+                        string title = kvp.Key.Item;
+                        if (LogicManager.ShopNames.Contains(title)) title = $"({orderedILPairs.First(triplet => triplet.Item3 == kvp.Key).Item1}) {title}";
                         title = CleanAreaName(title);
+                        if (result.players > 1) title = $"MW({kvp.Key.PlayerId + 1}) {title}";
                         AddToLog(Environment.NewLine + title + ":");
                         foreach (string item in kvp.Value) AddToLog(item.Replace('_', ' '));
                     }

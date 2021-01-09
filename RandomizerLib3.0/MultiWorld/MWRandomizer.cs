@@ -21,6 +21,8 @@ namespace RandomizerLib.MultiWorld
         private List<List<string>> startProgression;
         private List<List<string>> startItems;
 
+        private Dictionary<MWItem, int> shopCosts;
+
         public MWRandomizer(List<RandoSettings> settings)
         {
             this.settings = settings;
@@ -33,7 +35,7 @@ namespace RandomizerLib.MultiWorld
             this.settings = new List<RandoSettings>();
             for (int i = 0; i < players; i++)
             {
-                this.settings.Add(settings);
+                this.settings.Add(settings.Clone());
             }
             rand = new Random(settings.Seed);
             this.players = players;
@@ -100,6 +102,7 @@ namespace RandomizerLib.MultiWorld
             FirstPass();
             SecondPass();
             PlaceDupes();
+            CreateShopCosts();
 
             Log("Item randomization finished in " + watch.Elapsed.TotalSeconds + " seconds.");
         }
@@ -267,6 +270,18 @@ namespace RandomizerLib.MultiWorld
                 }
             }
         }
+        private void CreateShopCosts()
+        {
+            shopCosts = new Dictionary<MWItem, int>();
+            foreach (KeyValuePair<MWItem, List<MWItem>> kvp in im.shopItems)
+            {
+                foreach (MWItem item in kvp.Value)
+                {
+                    int cost = RandomizeShopCost(settings[0].Seed, item);
+                    shopCosts[item] = cost;
+                }
+            }
+        }
 
         private List<RandoResult> PrepareResult()
         {
@@ -274,6 +289,16 @@ namespace RandomizerLib.MultiWorld
             List<string> nicknames = new List<string>();
 
             int randoId = (new Random()).Next();
+
+            Dictionary<MWItem, int> allModifiedCosts = new Dictionary<MWItem, int>();
+
+            for (int i = 0; i < players; i++)
+            {
+                foreach (var kvp in modifiedCosts[i])
+                {
+                    allModifiedCosts.Add(new MWItem(i, kvp.Key), kvp.Value);
+                }
+            }
 
             for (int i = 0; i < players; i++)
             {
@@ -287,27 +312,23 @@ namespace RandomizerLib.MultiWorld
                 result.settings.Seed = settings[0].Seed;
                 result.startItems = startItems[i];
                 result.transitionPlacements = transitionPlacements[i];
-                result.variableCosts = modifiedCosts[i];
+                result.variableCosts = allModifiedCosts;
+                result.itemPlacements = new Dictionary<MWItem, MWItem>();
+                result.locationOrder = im.locationOrder;
+                result.shopCosts = shopCosts;
 
-                // Copy non shop items into item
-                foreach (KeyValuePair<MWItem, MWItem> kvp in im.nonShopItems.Where(kvp => kvp.Key.PlayerId == i))
+                // Need to flip L -> I to I -> L since each item is unique but locations (shops in particular) are not
+                foreach (var kvp in im.nonShopItems)
                 {
-                    result.itemPlacements[kvp.Value] = kvp.Key.Item;
+                    result.itemPlacements[kvp.Value] = kvp.Key;
                 }
 
-                foreach (KeyValuePair<MWItem, int> kvp in im.locationOrder.Where(kvp => kvp.Key.PlayerId == i))
-                {
-                    result.locationOrder.Add(kvp.Key.Item, kvp.Value);
-                }
-
-                // Copy shop items and create randomized prices for each
-                foreach (KeyValuePair<MWItem, List<MWItem>> kvp in im.shopItems.Where(kvp => kvp.Key.PlayerId == i))
+                // Add item locations to placements
+                foreach (KeyValuePair<MWItem, List<MWItem>> kvp in im.shopItems)
                 {
                     foreach (MWItem item in kvp.Value)
                     {
-                        int cost = RandomizeShopCost(settings[0].Seed, item);
-                        result.itemPlacements[item] = kvp.Key.Item;
-                        result.shopCosts[item] = cost;
+                        result.itemPlacements[item] = kvp.Key;
                     }
                 }
 

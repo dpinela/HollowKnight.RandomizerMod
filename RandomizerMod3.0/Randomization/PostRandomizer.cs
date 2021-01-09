@@ -46,12 +46,12 @@ namespace RandomizerMod.Randomization
                 }
             }
 
-            foreach (KeyValuePair<string, int> kvp in result.variableCosts)
+            foreach (KeyValuePair<MWItem, int> kvp in result.variableCosts.Where(kvp => kvp.Key.PlayerId == result.playerId))
             {
-                RandomizerMod.Instance.Settings.AddNewCost(kvp.Key, kvp.Value);
+                RandomizerMod.Instance.Settings.AddNewCost(kvp.Key.Item, kvp.Value);
             }
 
-            foreach (KeyValuePair<MWItem, int> kvp in result.shopCosts)
+            foreach (KeyValuePair<MWItem, int> kvp in result.shopCosts.Where(kvp => kvp.Key.PlayerId == result.playerId))
             {
                 if (kvp.Key.PlayerId == result.playerId && VanillaManager.GetVanillaItems(result.settings).Contains(kvp.Key.Item)) continue;
                 RandomizerMod.Instance.Settings.AddShopCost(kvp.Key.ToString(), kvp.Value);
@@ -62,9 +62,14 @@ namespace RandomizerMod.Randomization
                 RandomizerMod.Instance.Settings.AddShopCost(item, LogicManager.GetItemDef(item).shopCost);
             }
 
-            foreach (KeyValuePair<MWItem, string> kvp in result.itemPlacements)
+            foreach (var kvp in result.itemPlacements.Where(kvp => kvp.Value.PlayerId == result.playerId))
             {
-                RandomizerMod.Instance.Settings.AddItemPlacement(kvp.Key.ToString(), kvp.Value);
+                RandomizerMod.Instance.Settings.AddItemPlacement(kvp.Key.ToString(), kvp.Value.Item);
+
+                if (LogicManager.ShopNames.Contains(kvp.Value.Item) && !(kvp.Key.PlayerId == result.playerId && VanillaManager.GetVanillaItems(result.settings).Contains(kvp.Key.Item)))
+                {
+                    RandomizerMod.Instance.Settings.AddShopCost(kvp.Key.ToString(), result.shopCosts[kvp.Key]);
+                }
             }
 
             for (int i = 0; i < result.startItems.Count; i++)
@@ -72,9 +77,9 @@ namespace RandomizerMod.Randomization
                 RandomizerMod.Instance.Settings.AddItemPlacement(result.startItems[i], "Equipped_(" + i + ")");
             }
 
-            foreach (var kvp in result.locationOrder)
+            foreach (var kvp in result.locationOrder.Where(kvp => kvp.Key.PlayerId == result.playerId))
             {
-                RandomizerMod.Instance.Settings.AddOrderedLocation(kvp.Key, kvp.Value);
+                RandomizerMod.Instance.Settings.AddOrderedLocation(kvp.Key.Item, kvp.Value);
             }
 
             RandomizerMod.Instance.Settings.StartName = result.settings.StartName;

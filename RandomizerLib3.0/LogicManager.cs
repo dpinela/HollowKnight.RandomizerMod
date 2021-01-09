@@ -439,6 +439,10 @@ namespace RandomizerLib
             def = def2;
             return true;
         }
+        public static bool TryGetItemDef(MWItem name, out ReqDef def)
+        {
+            return TryGetItemDef(name.Item, out def);
+        }
 
         public static void EditItemDef(string item, ReqDef newDef)
         {
