@@ -9,6 +9,12 @@ namespace RandomizerLib.MultiWorld
         public int PlayerId { get; }
         public string Item { get; }
 
+        public MWItem()
+        {
+            PlayerId = -1;
+            Item = "";
+        }
+
         public MWItem(int playerId, string item)
         {
             PlayerId = playerId;

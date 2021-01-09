@@ -64,4 +64,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>zip MultiWorldServer.zip Assembly-CSharp.dll SeanprCore.dll MultiWorldProtocol.dll RandomizerLib3.0.dll MultiWorldServer.exe</PostBuildEvent>
+  </PropertyGroup>
 </Project>

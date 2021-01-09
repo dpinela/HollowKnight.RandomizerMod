@@ -446,8 +446,9 @@ namespace MultiWorldServer
         {
             lock (ready)
             {
+                if (!ready.ContainsKey(sender.Room)) return;
                 string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
-                Log($"UID {sender.UID} unreadied from {roomText} ({ready[sender.Room].Count - 1} readied)");
+                Log($"{sender.Nickname} (UID {sender.UID}) unreadied from {roomText} ({ready[sender.Room].Count - 1} readied)");
 
                 if (sender.Room != null) ready[sender.Room].Remove(sender.UID);
                 if (ready[sender.Room].Count == 0) { ready.Remove(sender.Room); return; }
@@ -469,8 +470,10 @@ namespace MultiWorldServer
 
             string room = sender.Room;
 
+            if (!ready.ContainsKey(room)) return;
+
             string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
-            Log($"Starting MW for {roomText} at request of {sender.UID}");
+            Log($"Starting MW for {roomText} at request of {sender.Nickname}");
 
             lock (ready)
             {
