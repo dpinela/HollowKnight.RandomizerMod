@@ -99,6 +99,7 @@ namespace RandomizerMod.MultiWorld
 
         public void Leave()
         {
+            State.Joined = false;
             SendMessage(new MWLeaveMessage());
         }
         public void Disconnect()
@@ -390,18 +391,17 @@ namespace RandomizerMod.MultiWorld
 
             if (!State.Joined)
             {
-                return ConnectionStatus.Unready;
+                return ConnectionStatus.Connected;
             }
 
-            return ConnectionStatus.Connected;
+            return ConnectionStatus.Joined;
         }
 
         public enum ConnectionStatus
         {
             NotConnected,
-            Unready,
-            Ready,
-            Connected
+            Connected,
+            Joined
         }
     }
 }

@@ -493,7 +493,7 @@ namespace MultiWorldServer
                     nicknames.Add(Clients[kvp.Key].Nickname);
                 }
 
-                ready[room].Clear();
+                ready.Remove(room);
             }
 
             Log("Starting rando with players:");

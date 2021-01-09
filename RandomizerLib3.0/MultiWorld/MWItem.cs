@@ -6,8 +6,8 @@ namespace RandomizerLib.MultiWorld
     [Serializable]
     public class MWItem
     {
-        public int PlayerId { get; }
-        public string Item { get; }
+        public int PlayerId { get; set; }
+        public string Item { get; set; }
 
         public MWItem()
         {

@@ -158,32 +158,32 @@ namespace RandomizerMod
 
         public void StartNewGame(bool mw = false, RandoResult result = null)
         {
-            if (mw)
+            try
             {
-                if (result == null) return;
-                RandoLogger.InitializeTracker(result);
-                RandoLogger.InitializeSpoiler(result);
-
-                PostRandomizationTasks(result);
-
-                RandoLogger.UpdateHelperLog();
-                Ref.UI.StartNewGame(bossRush: true);
-            }
-            else
-            {
-                if (!Settings.Randomizer)
+                if (mw)
                 {
-                    Ref.UI.StartNewGame();
-                    return;
+                    if (result == null) return;
+                    RandoLogger.InitializeTracker(result);
+                    RandoLogger.InitializeSpoiler(result);
+
+                    PostRandomizationTasks(result);
+
+                    RandoLogger.UpdateHelperLog();
+                    Ref.UI.StartNewGame(bossRush: true);
                 }
-
-                if (!LoadComplete())
+                else
                 {
-                    _logicParseThread.Join();
-                }
+                    if (!Settings.Randomizer)
+                    {
+                        Ref.UI.StartNewGame();
+                        return;
+                    }
 
-                try
-                {
+                    if (!LoadComplete())
+                    {
+                        _logicParseThread.Join();
+                    }
+
                     if (result == null)
                     {
                         MWRandomizer rando = new MWRandomizer(Settings.RandomizerSettings, 1);
@@ -198,10 +198,10 @@ namespace RandomizerMod
                     RandoLogger.UpdateHelperLog();
                     Ref.UI.StartNewGame(bossRush: true);
                 }
-                catch (Exception e)
-                {
-                    LogError("Error in randomization:\n" + e);
-                }
+            }
+            catch (Exception e)
+            {
+                LogError("Error starting randomizer:\n" + e);
             }
         }
 

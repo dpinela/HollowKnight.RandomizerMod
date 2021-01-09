@@ -64,7 +64,7 @@ namespace MWRandomizerTest
             MWRandomizer rando = new MWRandomizer(settings, 2);
 
             List<RandoResult> results = rando.RandomizeMW();
-            Console.WriteLine(JsonConvert.SerializeObject(results[0]));
+            RandoResult res = JsonConvert.DeserializeObject<RandoResult>(JsonConvert.SerializeObject(results[0]));
 
             Console.Read();
         }

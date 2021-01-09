@@ -30,7 +30,14 @@ namespace RandomizerMod.Randomization
 
             if (RandomizerMod.Instance.Settings.IsMW)
             {
-                RandomizerMod.Instance.mwConnection.JoinRando(RandomizerMod.Instance.Settings.MWRandoId, RandomizerMod.Instance.Settings.MWPlayerId);
+                try
+                {
+                    RandomizerMod.Instance.mwConnection.JoinRando(RandomizerMod.Instance.Settings.MWRandoId, RandomizerMod.Instance.Settings.MWPlayerId);
+                }
+                catch (Exception)
+                {
+
+                }
             }
         }
 

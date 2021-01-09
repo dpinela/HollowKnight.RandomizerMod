@@ -54,10 +54,17 @@ namespace RandomizerMod
                 RandomizerAction.CreateActions(ItemPlacements, this);
                 if (IsMW)
                 {
-                    RandomizerMod.Instance.mwConnection.Disconnect();
-                    RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();
-                    RandomizerMod.Instance.mwConnection.Connect();
-                    RandomizerMod.Instance.mwConnection.JoinRando(MWRandoId, MWPlayerId);
+                    try
+                    {
+                        RandomizerMod.Instance.mwConnection.Disconnect();
+                        RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();
+                        RandomizerMod.Instance.mwConnection.Connect();
+                        RandomizerMod.Instance.mwConnection.JoinRando(MWRandoId, MWPlayerId);
+                    }
+                    catch (Exception)
+                    {
+
+                    }
                 }
             };
         }
