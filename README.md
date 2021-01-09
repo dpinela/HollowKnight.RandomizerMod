@@ -19,7 +19,7 @@ This mod is an extension of the existing Randomizer3.0 and MultiWorld mods to al
 3. Copy `MultiWorldProtocol.dll`, `RandomizerLib3.0.dll`, and `RandomizerMod3.0.dll` into `Hollow Knight/hollow_knight_Data/Managed/Mods` (this will replace the existing RandomizerMod3.0 if you have it installed
 4. Download `MultiWorldServer.zip` from releases and extract it to wherever you would like to run the server from
 5. Port forward 38281 to the machine running the server (look up tutorials online for your router)
-6. Run `MultiWorldServer.exe`
+6. Run `MultiWorldServer.exe`, and ensure that it is allowed through Windows firewall
 
 This is all that is needed in terms of setup. To play multiworld:
 
