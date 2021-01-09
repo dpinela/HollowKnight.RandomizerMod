@@ -40,11 +40,11 @@ A few useful commands are implemented on the server:
 
 ## Gallery
 
-![Menu MW: No](/images/menu_no.png)
-![Menu MW: Yes](/images/menu_no.png)
-![Send Item](/images/send.png)
-![Receive Item](/images/recv.png)
-![Colo Hint](/images/colo.png)
+![Menu MW: No](/images/menu_no.jpg?raw=true)
+![Menu MW: Yes](/images/menu_yes.jpg?raw=true)
+![Send Item](/images/send.jpg?raw=true)
+![Receive Item](/images/recv.jpg?raw=true)
+![Colo Hint](/images/colo.jpg?raw=true)
 
 ## Future Plans/Known Issues
 - Item placements are currently not validated for feasibility. In theory, they should be correct as they are placed, but if there are bugs an impossible seed may be generated
