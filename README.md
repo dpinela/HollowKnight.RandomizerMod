@@ -38,6 +38,14 @@ A few useful commands are implemented on the server:
 2. `list` - Lists the currently active game sessions, and the players in each
 3. `give <item> <session> <playerid>` - Sends `item` to player `playerId` in session `session`. Use this if an item gets lost somehow (crash or Alt-F4)
 
+## Gallery
+
+![Menu MW: No](/images/menu_no.png)
+![Menu MW: Yes](/images/menu_no.png)
+![Send Item](/images/send.png)
+![Receive Item](/images/recv.png)
+![Colo Hint](/images/colo.png)
+
 ## Future Plans/Known Issues
 - Item placements are currently not validated for feasibility. In theory, they should be correct as they are placed, but if there are bugs an impossible seed may be generated
 - If you have an issue with Grimmchild not spawning for Grimm, then quitting out will quit without saving, potentially losing recent items. So, make sure to use Benchwarp to make Grimmchild appear before trying to fight Grimm.
