@@ -1,112 +1,35 @@
-# Randomizer 3
+# Hollow Knight Randomizer 3.0 Multiworld
 
-Randomizer 3 expands on previous versions of the Hollow Knight randomizer by allowing you to randomize more items than ever before and, for the first time, to randomize area or room transitions.
-- Randomizer 3 requires SeanprCore.dll and Modding Api version 53 or greater to run. These are both automatically downloaded by the ModInstaller.
-- We are planning a tournament for this randomizer, beginning June 2020, open to people of all skill levels willing to commit to least 5 races! For more details and to sign up, visit https://challonge.com/HKRandomizer2020
-- There is a new map tracker for area and room randomizer available at https://github.com/homothetyhk/RandomizerTracker/releases
-- There is a community randomizer guide published here: https://tinyurl.com/HollowKnightRandomizerGuide
+NOTE: THIS README AND PROJECT ARE WIP
 
-Details on all of the various settings follow:
+For general randomizer information, see: https://github.com/JasonILTG/HollowKnight.RandomizerMod
 
-## Restrictions
+This mod is an extension of the existing Randomizer3.0 and MultiWorld mods to allow multiworld with all of the features of Randomizer3.0. A multiworld is a version of randomizer where items are not only scattered throughout your file, but through any number of linked game files. When picking up an item that belongs to another player, it is sent over the internet and they receive it in their game. This allows co-operative randomizer playthroughs, where you may need to pick up each other's progression to go forward.
 
-These settings control which difficult skips the randomizer may require. If you are not familiar with these skips, especially as they are used in speedrunning, you are advised to turn them off.
+## Features
+- All randomizer features from Randomizer3.0 are supported up to Geo Rocks, Lifeblood Cocoons, and Soul Totems, including area and room randomization.
+- Per player settings - Each player has full access to all settings of the randomizer, meaning they make their own choice of which item pools to randomize, which skips are allowed in logic for their world, whether items/areas/rooms are randomized, and starting location
+- Nicknames - Players can set a nickname for themselves which will show up when picking up their items in other worlds
+- Support for saving and rejoining - Once a multiworld file is generated, quitting and rejoining should just work, no need to fuss with player IDs or server settings
+- (Mostly) compatible with BingoUI - Counters may pop up at strange times, but they should be correct including items sent from other players
 
-With these skips allowed, the player is advised to take care to not lock out of certain required pogos. Obtain:
-- No more than 1 nail upgrade before claw or wings
-- No more than 3 nail upgrades before claw
+## Getting Started
+1. Download the zip from the releases page on github: (TODO: LINK HERE)
+2. Install SeanprCore.dll if you haven't already (this can be done through the mod installer: https://www.nexusmods.com/hollowknight/mods/9)
+3. Copy MultiWorldProtocol.dll, RandomizerLib3.0.dll, and RandomizerMod3.0.dll into `Hollow Knight/hollow_knight_Data/Managed/Mods` (this will replace the existing RandomizerMod3.0 if you have it installed
+4. Download MultiWorldServer.zip from releases and extract it to wherever you would like to run the server from
+5. Port forward 38281 to the machine running the server (look up tutorials online for your router)
+6. Run MultiWorldServer.exe
 
-## Quality of Life
+This is all that is needed in terms of setup. To play multiworld:
 
-- Salubra Notches: automatically gives you each Salubra charm notch upon acquiring the required number of charms
-- Fast Grubfather: all unlocked grub geo rewards are given at once by Grubfather
-- Early Geo: start the game with between 200 and 600 geo.
-- Extra Platforms: platforms in various places that prevent softlocks. For example, there are several platforms added to Ancient Basin to prevent having to quit-out after checking certain locations without vertical movement.
-- 1.2.2.1 Levers: Restores the larger hitboxes of levers from past patches, allowing them to sometimes be hit from the other side. Note that not all levers were fixable. Lever skips are never required in logic.
-- Jiji Hints: trade a rancid egg for information on which areas contain which items. Hints are given for progression items, in the order that they were intended to be collected. Already obtained items are skipped.
+1. Open Hollow Knight and start a new file
+2. Enter the IP address of the server, and set Multiworld to "Yes". This will connect to the server. If the connection fails, Multiworld will stay set to "No"
+3. Enter the nickname you would like to use in the "Nickname" field
+4. Configure your randomizer settings however you would like
+5. Click "Ready" to toggle your ready status. The buttton will show how many players on the server are currently ready, and this will lock your settings in. If you would like to change settings, click again to become unready
+6. Once everyone you are playing with is connected and readied up, one player should click start, and this will begin the randomizer for everyone. The player who clicks start will be marked as "Player 1", and their seed will be used for all randomization.
 
-## Randomization
-
-These settings control which items are randomized.
-- Dreamers: Lurien, Monomon, Herrah, and World Sense. World Sense is the Black Egg Temple pickup to view your completion percentage
-- Skills: all spells, nail arts, and movement abilities, excluding the Awoken Dream Nail, which is never randomized
-- Charms
-- Keys: all key objects, as well as King's Brand, Godtuner, and Collector's Map
-- Mask Shards
-- Vessel Fragments
-- Pale Ore
-- Charm Notches: all charm notches, except those sold by Salubra
-- Geo Chests: all geo chests, except the one above Baldur Shell and those in the Junk Pit
-- Rancid Eggs
-- Relics: all wanderers journals, hallownest seals, king's idols, and arcane eggs.
-- Maps
-- Stags
-- Grubs
-- Whispering Roots
-- Geo Rocks
-- Lifeblood Cocoons
-- Soul Totems
-
-Note: several items are randomized progressively, meaning that collecting any item in a given family always gives the first upgrade, collecting another gives the second upgrade, etc. The families this pertains to are:
-	- Dream Nail, Dream Gate, Awoken Dream Nail
-	- Mothwing Cloak, Shade Cloak
-	- Vengeful Spirit, Shade Soul
-	- Desolate Dive, Descending Dark
-	- Howling Wraiths, Abyss Shriek
-Any of the above pickups may be forced by randomizer logic.
-
-Note: the following items can be used to kill baldurs:
-	- All difficulties: Vengeful Spirit (or upgrades), Desolate Dive (or upgrades), Grubberfly's Elegy, Glowing Womb, Dash Slash with Dash
-	- With Mild skips: Weaversong, Spore Shroom
-	- With Spicy skips: Cyclone Slash, Mark of Pride
-	- Not in logic, but feel free to try if you have time on your hands: Longnail, Mothwing Cloak, Sprintmaster+Dashmaster
-Baldur hp is reduced to 5 to make slower baldur kills less tedious, and to reduce rng.
-
-Note: the lifeblood door in Abyss opens if you enter the room with a single lifeblood mask. In logic, it requires a lifeblood charm.
-
-Note: while lifeblood cocoons and soul totems noramlly reset after sitting on a bench, this is no longer true if you randomize them. Instead, picking up a randomized lifeblood cocoon will give a large number of lifeblood masks immediately, and picking up a randomized soul totem will completely fill up all soul.
-
-- Duplicate Major Items: adds second copies of the following important items:
-		Dreamer (interchangeable for any of the three dreamers in opening black egg temple), Void Heart,
-		Mothwing Cloak, Shade Cloak, Mantis Claw, Monarch Wings, 
-		Crystal Heart, Isma's Tear, Dream Nail, 
-		Vengeful Spirit, Desolate Dive, Howling Wraiths
-	Picking up an excess copy after collecting all other copies of an item gives 100 geo.
-	Duplicate items are *not* placed using randomizer logic.
-- Randomize Starting Items: begin the game with several items already in the inventory, including at least one vertical movement upgrade.
-- Starting Location: you may select a starting location from the menu, or set it to be random. Some locations may be unavailable depending on your settings.
-- Create spoiler log: creates a file in the save directory with all item/transition placements
-
-## Additional features
-
-There are three logs created in the save directory to help you with your playthrough.
-- Tracker Log: this log continuously records item locations, transition connections, and hints as you discover them.
-- Helper Log: this log computes which locations/transitions are accessible with your current equipment.
-- Spoiler Log: this log lists the exact locations of every randomized item and/or transition.
-
-The "cursed" option is a special hard mode for randomizer veterans. Features include:
-- Masks, Vessels, Ore, Notches, Geo Chests, Eggs, and Relics are replaced by 1 geo pickups, if randomized.
-- Shade Soul, Descending Dark, and Abyss Shriek are removed.
-- Major items are less likely to be placed as early progression items.
-- Focus (the ability to heal) is randomized, and is no longer available from the start of the game.
-
-## Area/Room randomizer
-
-- Area randomizer randomizes items and connections between areas, which are understood to be any region of the game with a name which appears as onscreen text, excluding dream areas, trams, and elevators.
-- Room randomizer randomzies items and nearly every transition between different rooms. Not included are:
-    - Warps of any kind, including those entering dream areas
-	- Trams and elevators
-	- Transitions within Godhome and the Shrine of Believers
-	- The transitions leading to Sly's storeroom, Bretta's basement, or to any trial of the colosseum
-- The Connected-Area Room randomizer works similarly to Room randomizer, with the additional constraint that it attempts to keep rooms from the same area connected, up to a certain extent, and not affecting single entrance rooms.
-Also, note the following:
-- Due to an imbalance in the number of left and right transitions, the Divine and Grimm tents are included in the randomization, but their vanilla entrances have been removed, and will not spawn in Dirtmouth
-- The nightmare lantern must be lit to obtain Grimmchild
-- Sly must be rescued to use his shop
-
-## New game mechanics
-- Collecting Grimmchild activates the Nightmare Lantern, and Grimmchild is given with the first 6 flames already collected.
-- You can preview the items at Colosseum, Grey Mourner, and King Fragment by interaction.
-
-## Known issues
-- Using Benchwarp may cause some room changes to fail to occur. This can be fixed by exiting and reentering the room.
+## Upcoming features
+- Items flash in the bottom of the screen when receiving from other players
+- Server commands, for example giving items to break hardlocks (unlikely, but can happen when Alt-F4ing)
