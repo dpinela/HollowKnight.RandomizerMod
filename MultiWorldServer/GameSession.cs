@@ -33,6 +33,7 @@ namespace MultiWorldServer
                 {
                     players[join.PlayerId].QueueConfirmableMessage(new MWItemReceiveMessage { From = From, Item = Item });
                 }
+                unsentItems.Remove(join.PlayerId);
             }
         }
 
@@ -61,8 +62,8 @@ namespace MultiWorldServer
                 if (!unsentItems.ContainsKey(player))
                 {
                     unsentItems.Add(player, new List<(string, string)>());
-                    unsentItems[player].Add((item, from));
                 }
+                unsentItems[player].Add((item, from));
             }
         }
 

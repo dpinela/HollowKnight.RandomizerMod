@@ -38,6 +38,8 @@ namespace RandomizerLib.MultiWorld
             return (PlayerId, Item).GetHashCode();
         }
 
+        // TODO: Maybe this was a mistake... right now player IDs in code are 0 indexed, and in anything user facing are 1 indexed
+        // This has caused its fair share of bugs however
         public override string ToString()
         {
             return "MW(" + (PlayerId + 1) + ")_" + Item;
