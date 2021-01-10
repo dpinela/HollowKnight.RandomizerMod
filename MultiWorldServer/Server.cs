@@ -73,7 +73,7 @@ namespace MultiWorldServer
                 return;
             }
 
-            GameSessions[session].SendItemTo(player, item, "Server");
+            GameSessions[session].SendItemTo(player, item, "Magic", "Server");
         }
 
         public void ListSessions()
@@ -532,8 +532,8 @@ namespace MultiWorldServer
             if (sender.Session == null) return;  // Throw error?
 
             //Confirm sending the item to the sender
-            SendMessage(new MWItemSendConfirmMessage {Item = message.Item, To = message.To}, sender);
-            GameSessions[sender.Session.randoId].SendItemTo(message.To, message.Item, sender.Session.Name);
+            SendMessage(new MWItemSendConfirmMessage { Location = message.Location, Item = message.Item, To = message.To}, sender);
+            GameSessions[sender.Session.randoId].SendItemTo(message.To, message.Item, message.Location, sender.Session.Name);
         }
 
         private Client GetClient(ulong uuid)

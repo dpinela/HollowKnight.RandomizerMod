@@ -396,12 +396,11 @@ namespace RandomizerMod
 
             if (result.players > 1)
             {
-                string players = result.nicknames[0];
-                for (int i = 1; i < result.nicknames.Count; i++)
+                LogSpoiler("MW Players:");
+                for (int i = 0; i < result.nicknames.Count; i++)
                 {
-                    players += ", " + result.nicknames[i];
+                    LogSpoiler($"{i + 1}: {result.nicknames[i]}");
                 }
-                LogSpoiler("MW Players: " + players);
             }
         }
 
@@ -419,8 +418,8 @@ namespace RandomizerMod
         public static void LogAllToSpoiler(RandoResult result)
         {
             RandomizerMod.Instance.Log("Generating spoiler log...");
-            /*new Thread(() =>
-            {*/
+            new Thread(() =>
+            {
                 Stopwatch spoilerWatch = new Stopwatch();
                 spoilerWatch.Start();
 
@@ -486,7 +485,7 @@ namespace RandomizerMod
                 spoilerWatch.Stop();
                 LogSpoiler(log);
                 LogSpoiler("Generated spoiler log in " + spoilerWatch.Elapsed.TotalSeconds + " seconds.");
-            /*}).Start();*/
+            }).Start();
         }
 
         private static string GetTransitionSpoiler(RandoSettings settings, (string, string)[] transitionPlacements)
@@ -574,8 +573,6 @@ namespace RandomizerMod
             int i = 0;
             foreach (var kvp in result.itemPlacements)
             {
-                Log("item: " + kvp.Key);
-                Log("location: " + kvp.Value);
                 orderedILPairs[i++] = (result.locationOrder[kvp.Value], kvp.Key, kvp.Value);
             }
 

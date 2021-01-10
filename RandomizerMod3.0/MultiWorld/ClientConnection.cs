@@ -10,6 +10,7 @@ using static RandomizerMod.LogHelper;
 using Newtonsoft.Json;
 
 using RandomizerLib;
+using RandomizerLib.MultiWorld;
 
 namespace RandomizerMod.MultiWorld
 {
@@ -150,7 +151,7 @@ namespace RandomizerMod.MultiWorld
             switch (message)
             {
                 case MWItemReceiveMessage item:
-                    GiveItemActions.GiveItemMW(item.Item, item.From);
+                    GiveItemActions.GiveItemMW(item.Item, item.Location, item.From);
                     break;
                 default:
                     Log("Unknown type in message queue: " + message.MessageType);
@@ -350,6 +351,9 @@ namespace RandomizerMod.MultiWorld
 
         private void HandleItemSendConfirm(MWItemSendConfirmMessage message)
         {
+            // Mark the item found here, just to make sure it makes it to the server before we mark it found
+            RandomizerMod.Instance.Settings.MarkItemFound(new MWItem(message.To, message.Item).ToString());
+            RandomizerMod.Instance.Settings.MarkLocationFound(message.Location);
             ClearFromSendQueue(message.To, message.Item);
         }
 
@@ -377,7 +381,7 @@ namespace RandomizerMod.MultiWorld
         public void SendItem(string loc, string item, int playerId)
         {
             Log($"Sending item {item} to {playerId}");
-            MWItemSendMessage msg = new MWItemSendMessage { Item = item, To = playerId };
+            MWItemSendMessage msg = new MWItemSendMessage { Location = loc, Item = item, To = playerId };
             ItemSendQueue.Add(msg);
             SendMessage(msg);
         }

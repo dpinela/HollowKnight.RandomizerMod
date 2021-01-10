@@ -10,13 +10,13 @@ namespace MultiWorldServer
     {
         private int randoId;
         private Dictionary<int, PlayerSession> players;
-        private Dictionary<int, List<(string, string)>> unsentItems;
+        private Dictionary<int, List<(string, string, string)>> unsentItems;
 
         public GameSession(int id)
         {
             randoId = id;
             players = new Dictionary<int, PlayerSession>();
-            unsentItems = new Dictionary<int, List<(string, string)>>();
+            unsentItems = new Dictionary<int, List<(string, string, string)>>();
         }
 
         public void AddPlayer(Client c, MWJoinMessage join)
@@ -29,9 +29,9 @@ namespace MultiWorldServer
 
             if (unsentItems.ContainsKey(join.PlayerId))
             {
-                foreach ((string Item, string From) in unsentItems[join.PlayerId])
+                foreach ((string Item, string Location, string From) in unsentItems[join.PlayerId])
                 {
-                    players[join.PlayerId].QueueConfirmableMessage(new MWItemReceiveMessage { From = From, Item = Item });
+                    players[join.PlayerId].QueueConfirmableMessage(new MWItemReceiveMessage { Location = Location, From = From, Item = Item });
                 }
                 unsentItems.Remove(join.PlayerId);
             }
@@ -48,22 +48,22 @@ namespace MultiWorldServer
             return players.Count == 0;
         }
 
-        public void SendItemTo(int player, string item, string from)
+        public void SendItemTo(int player, string item, string location, string from)
         {
             if (players.ContainsKey(player))
             {
                 Server.Log($"Sending item '{item}' to '{players[player].Name}', from '{from}'");
 
-                players[player].QueueConfirmableMessage(new MWItemReceiveMessage { From = from, Item = item });
+                players[player].QueueConfirmableMessage(new MWItemReceiveMessage { Location = location, From = from, Item = item });
             }
             else    // Trying to send to an offline player
             {
                 Server.Log($"Queuing item '{item}' for offline player '{player + 1}', from '{from}'");
                 if (!unsentItems.ContainsKey(player))
                 {
-                    unsentItems.Add(player, new List<(string, string)>());
+                    unsentItems.Add(player, new List<(string, string, string)>());
                 }
-                unsentItems[player].Add((item, from));
+                unsentItems[player].Add((item, location, from));
             }
         }
 

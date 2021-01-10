@@ -33,11 +33,7 @@ namespace RandomizerMod.Randomization
                 try
                 {
                     RandomizerMod.Instance.mwConnection.JoinRando(RandomizerMod.Instance.Settings.MWRandoId, RandomizerMod.Instance.Settings.MWPlayerId);
-                }
-                catch (Exception)
-                {
-
-                }
+                } catch (Exception) {}
             }
         }
 

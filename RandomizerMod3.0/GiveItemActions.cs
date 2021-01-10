@@ -62,10 +62,10 @@ namespace RandomizerMod
         // Wrapper to allow me to change stuff without fricking up BingoUI
         public static void GiveItemWrapper(RandomizerLib.GiveAction action, string rawItem, string location, int geo = 0, bool remote = false)
         {
-            (int player, string item) = LogicManager.ExtractPlayerID(rawItem);
-
             // With multiworld we may end up receiving the same item twice due to network issues etc. so we want giving items to be idempotent (i.e. same cloak twice doesn't give shade)
-            if (remote && RandomizerMod.Instance.Settings.CheckItemFound(new MWItem(RandomizerMod.Instance.Settings.MWPlayerId + 1, item).ToString())) return;
+            if (RandomizerMod.Instance.Settings.CheckItemFound(rawItem)) return;
+
+            (int player, string item) = LogicManager.ExtractPlayerID(rawItem);
 
             // In tracker log, we only want to show MW(X)_ when picking up items in multiworld (otherwise everything is MW(1))
             if (RandomizerMod.Instance.Settings.IsMW)
@@ -76,9 +76,6 @@ namespace RandomizerMod
             {
                 LogItemToTracker(item, location);
             }
-            RandomizerMod.Instance.Settings.MarkItemFound(rawItem);
-            if (!remote) RandomizerMod.Instance.Settings.MarkLocationFound(location);
-            UpdateHelperLog();
 
             if (RandomizerMod.Instance.Settings.IsMW && player >= 0 && player != RandomizerMod.Instance.Settings.MWPlayerId)
             {
@@ -87,15 +84,21 @@ namespace RandomizerMod
                 return;
             }
 
+            // Remove duplicate _(1)
             item = LogicManager.RemovePrefixSuffix(item);
 
             // If we received this from MW, display a relic message so the player knows they got an item
             if (remote) RelicMsg.ShowRelicItem(item, location);
 
             GiveItem(convertGiveAction(action), item, location, geo);
+
+            // Mark the item/location as picked up only once we have actually given the item (there was a bug where sometimes items would not be given but flagged as given?)
+            RandomizerMod.Instance.Settings.MarkItemFound(rawItem);
+            if (!remote) RandomizerMod.Instance.Settings.MarkLocationFound(location);
+            UpdateHelperLog();
         }
 
-        public static void GiveItemMW(string item, string from)
+        public static void GiveItemMW(string item, string location, string from)
         {
             ReqDef def = LogicManager.GetItemDef(item);
             item = new MWItem(RandomizerMod.Instance.Settings.MWPlayerId, item).ToString();
@@ -103,7 +106,7 @@ namespace RandomizerMod
             // Geo spawning is normally handleded in the shiny, so just add geo instead
             if (def.action == RandomizerLib.GiveAction.SpawnGeo)
                 def.action = RandomizerLib.GiveAction.AddGeo;
-            GiveItemWrapper(def.action, item, from, remote: true);
+            GiveItemWrapper(def.action, item, $"{from}-{location}", remote: true);
         }
 
         // TODO: clean up the above? the reason it's all messed up is since I thought GiveAction would make more sense as part of RandomizerLib (LogicManager specifically)
@@ -113,6 +116,7 @@ namespace RandomizerMod
         // This method is hooked via reflection from BingoUI, and it uses the type "GiveItemActions.GiveAction" for the first parameter
         public static void GiveItem(GiveAction action, string item, string location, int geo = 0)
         {
+            item = LogicManager.RemovePrefixSuffix(item); // just to be safe
             switch (action)
             {
                 default:

@@ -49,7 +49,9 @@ namespace RandomizerMod.Actions
                 ReqDef oldItem = LogicManager.GetItemDef(location);
                 ReqDef newItem = LogicManager.GetItemDef(newItemName);
 
-                if (!settings.RandomizeMaps && newItem.pool == "Map")
+                // Disable this for multiworld, since we might have items from other people's worlds
+
+                /*if (!settings.RandomizeMaps && newItem.pool == "Map")
                 {
                     continue;
                 }
@@ -72,7 +74,7 @@ namespace RandomizerMod.Actions
                 if (!settings.RandomizeLoreTablets && newItem.pool == "Lore") 
                 {
                     continue;
-                }
+                }*/
 
                 if (oldItem.replace)
                 {

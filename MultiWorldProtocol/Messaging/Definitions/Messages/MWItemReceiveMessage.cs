@@ -8,6 +8,7 @@ namespace MultiWorldProtocol.Messaging.Definitions.Messages
     public class MWItemReceiveMessage : MWMessage
     {
         public string Item { get; set; }
+        public string Location { get; set; }
         public string From { get; set; }
 
         public MWItemReceiveMessage()
@@ -21,6 +22,7 @@ namespace MultiWorldProtocol.Messaging.Definitions.Messages
         public MWItemReceiveDefinition() : base(MWMessageType.ItemReceiveMessage)
         {
             Properties.Add(new MWMessageProperty<string, MWItemReceiveMessage>(nameof(MWItemReceiveMessage.Item)));
+            Properties.Add(new MWMessageProperty<string, MWItemReceiveMessage>(nameof(MWItemReceiveMessage.Location)));
             Properties.Add(new MWMessageProperty<string, MWItemReceiveMessage>(nameof(MWItemReceiveMessage.From)));
         }
     }
