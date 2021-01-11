@@ -14,15 +14,9 @@ This mod is an extension of the existing Randomizer3.0 and MultiWorld mods to al
 - Concurrent sessions - Once a randomization is generated, a random identifier is included with it which is used to spin up a new session when connecting to the server. This way, multiple concurrent rando sessions can run simultaneously on the same server
 
 ## Getting Started
-1. Download the zip from the releases page on github: https://github.com/CallumMoseley/HollowKnight.RandomizerMod/releases
+1. Download `RandomizerModMW.zip` from the releases page on github: https://github.com/CallumMoseley/HollowKnight.RandomizerMod/releases
 2. Install SeanprCore.dll and modding API if you haven't already (this can be done through the mod installer: https://www.nexusmods.com/hollowknight/mods/9)
 3. Copy `MultiWorldProtocol.dll`, `RandomizerLib3.0.dll`, and `RandomizerMod3.0.dll` into `Hollow Knight/hollow_knight_Data/Managed/Mods` (this will replace the existing RandomizerMod3.0 if you have it installed)
-
-To set up a server:
-
-1. Download `MultiWorldServer.zip` from releases and extract it to wherever you would like to run the server from
-2. Port forward 38281 to the machine running the server (look up tutorials online for your router)
-3. Run `MultiWorldServer.exe`, and ensure that it is allowed through Windows firewall
 
 This is all that is needed in terms of setup. To play multiworld:
 
@@ -33,6 +27,13 @@ This is all that is needed in terms of setup. To play multiworld:
 5. Enter a room code to coordinate with other players, or leave blank for the default room (easier if only one group is trying to rando at once)
 6. Click "Ready" to toggle your ready status. The buttton will show how many players in the room are currently ready, and this will lock your settings in. If you would like to change settings, click again to become unready
 7. Once everyone you are playing with is connected and readied up, one player should click start, and this will begin the randomizer for everyone. The player who clicks start will be marked as "Player 1", and their seed will be used for all randomization.
+
+## Setting up a Server
+Currently, I have an instance of the server running at 3.96.213.176. If you want to host your own server, follow these instructions:
+
+1. Download `MultiWorldServer.zip` from releases and extract it to wherever you would like to run the server from
+2. Port forward 38281 to the machine running the server (look up tutorials online for your router)
+3. Run `MultiWorldServer.exe`, and ensure that it is allowed through Windows firewall
 
 ## Server Commands
 
