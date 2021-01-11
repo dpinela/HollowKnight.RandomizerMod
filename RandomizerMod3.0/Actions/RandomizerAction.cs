@@ -102,7 +102,7 @@ namespace RandomizerMod.Actions
                     oldItem.type = ItemType.Charm;
                 }
 
-                else if (oldItem.type == ItemType.Geo && newItem.type != ItemType.Geo)
+                else if (oldItem.type == ItemType.Geo && (playerId != settings.MWPlayerId || newItem.type != ItemType.Geo))
                 {
                     Actions.Add(new AddShinyToChest(oldItem.sceneName, oldItem.objectName, oldItem.fsmName,
                         "Randomizer Chest Shiny"));

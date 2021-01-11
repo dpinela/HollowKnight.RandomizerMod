@@ -415,11 +415,32 @@ namespace RandomizerLib
             return def;
         }
 
+        public static int GetMaxAdditiveLevel(string item)
+        {
+            string[] itemSet = AdditiveItemSets.FirstOrDefault(set => set.Contains(item));
+            if (itemSet == null) return 0;
+            return itemSet.Length;
+        }
+
+        public static string RemoveSuffix(string input)
+        {
+            return Regex.Replace(input, @"_\(\d+\)$", "");
+        }
+
         public static string RemovePrefixSuffix(string input)
         {
             string rmSuffix = Regex.Replace(input, @"_\(\d+\)$", "");
             return Regex.Replace(rmSuffix, @"^MW\(\d+\)_", "");
         }
+
+        public static (string, string) ExtractSuffix(string input)
+        {
+            Regex suffix = new Regex(@"_\(\d+\)$");
+            if (!suffix.IsMatch(input)) return (input, "");
+            Match m = suffix.Match(input);
+            return (suffix.Replace(input, ""), m.Groups[0].Value);
+        }
+
         public static (int, string) ExtractPlayerID(string input)
         {
             Regex prefix = new Regex(@"^MW\((\d+)\)_");

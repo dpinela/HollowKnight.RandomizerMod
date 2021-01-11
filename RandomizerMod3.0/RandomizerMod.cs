@@ -186,7 +186,7 @@ namespace RandomizerMod
 
                     if (result == null)
                     {
-                        MWRandomizer rando = new MWRandomizer(Settings.RandomizerSettings, 1);
+                        MWRandomizer rando = new MWRandomizer(Settings.RandomizerSettings, 2);
                         result = rando.RandomizeMW()[0];
                     }
 
@@ -255,7 +255,7 @@ namespace RandomizerMod
                 return;
             }
 
-            float rawPercent = ((float)RandomizerMod.Instance.Settings.GetItemsFound().Length / placedItems) * 100f;
+            float rawPercent = ((float)RandomizerMod.Instance.Settings.GetLocationsFound().Length / placedItems) * 100f;
 
             PlayerData.instance.completionPercentage = (float)Math.Floor(rawPercent);
         }
@@ -673,19 +673,6 @@ namespace RandomizerMod
 
         private void OnQuit()
         {
-            // Just try to clean anything up
-            try
-            {
-                mwConnection.Unready();
-            }
-            catch (Exception) { }
-
-            try
-            {
-                mwConnection.Leave();
-            }
-            catch (Exception) { }
-
             try
             {
                 mwConnection.Disconnect();
@@ -695,11 +682,6 @@ namespace RandomizerMod
 
         private IEnumerator OnQuitToMenu(On.QuitToMenu.orig_Start orig, QuitToMenu self)
         {
-            try
-            {
-                mwConnection.Leave();
-            } catch (Exception) { }
-
             try
             {
                 mwConnection.Disconnect();

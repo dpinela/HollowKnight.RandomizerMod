@@ -59,6 +59,8 @@ namespace MultiWorldServer
         public void GiveItem(string item, int session, int player)
         {
             Log($"Giving item {item} to player {player + 1} in session {session}");
+            string suffix;
+            (item, suffix) = LogicManager.ExtractSuffix(item);
             item = LogicManager.GetItemFromLower(item);
 
             if (item == null)
@@ -73,7 +75,7 @@ namespace MultiWorldServer
                 return;
             }
 
-            GameSessions[session].SendItemTo(player, item, "Magic", "Server");
+            GameSessions[session].SendItemTo(player, item + suffix, "Magic", "Server");
         }
 
         public void ListSessions()
@@ -256,14 +258,7 @@ namespace MultiWorldServer
             try
             {
                 //Remove first from lists so if we get a network exception at least on the server side stuff should be clean
-                lock (ready)
-                {
-                    if (client.Room != null && ready.ContainsKey(client.Room))
-                    {
-                        ready[client.Room].Remove(client.UID);
-                        if (ready[client.Room].Count == 0) ready.Remove(client.Room);
-                    }
-                }
+                Unready(client.UID);
                 lock (_clientLock)
                 {
                     Clients.Remove(client.UID);
@@ -442,22 +437,29 @@ namespace MultiWorldServer
             }
         }
 
-        private void HandleUnreadyMessage(Client sender, MWUnreadyMessage message)
+        private void Unready(ulong uid)
         {
+            Client c = Clients[uid];
+
             lock (ready)
             {
-                if (!ready.ContainsKey(sender.Room)) return;
-                string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
-                Log($"{sender.Nickname} (UID {sender.UID}) unreadied from {roomText} ({ready[sender.Room].Count - 1} readied)");
+                if (!ready.ContainsKey(c.Room) || !ready[c.Room].ContainsKey(uid)) return;
+                string roomText = string.IsNullOrEmpty(c.Room) ? "default room" : $"room \"{c.Room}\"";
+                Log($"{c.Nickname} (UID {c.UID}) unreadied from {roomText} ({ready[c.Room].Count - 1} readied)");
 
-                if (sender.Room != null) ready[sender.Room].Remove(sender.UID);
-                if (ready[sender.Room].Count == 0) { ready.Remove(sender.Room); return; }
+                if (c.Room != null) ready[c.Room].Remove(c.UID);
+                if (ready[c.Room].Count == 0) { ready.Remove(c.Room); return; }
 
-                foreach (ulong uid in ready[sender.Room].Keys)
+                foreach (ulong uid2 in ready[c.Room].Keys)
                 {
-                    SendMessage(new MWNumReadyMessage { Ready = ready[sender.Room].Count }, Clients[uid]);
+                    SendMessage(new MWNumReadyMessage { Ready = ready[c.Room].Count }, Clients[uid2]);
                 }
             }
+        }
+
+        private void HandleUnreadyMessage(Client sender, MWUnreadyMessage message)
+        {
+            Unready(sender.UID);
         }
 
         private void HandleStartMessage(Client sender, MWStartMessage message)

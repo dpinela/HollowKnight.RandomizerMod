@@ -103,11 +103,34 @@ namespace RandomizerLib.MultiWorld
                 locations.Remove(l);
             }
 
+            // Keep track of current item candidates per player
+            int[] candidatesPerPlayer = new int[players];
+
             while (items.Any())
             {
                 MWItem i = items[rnd.Next(items.Count)];
 
-                if (settings[i.PlayerId].Cursed)
+                if (LogicManager.GetItemDef(i.Item).itemCandidate)
+                {
+                    int min = candidatesPerPlayer.Min();
+
+                    // Good item socialism: don't give more candidate items to those who have at least 2 more than the minimum
+                    if (candidatesPerPlayer[i.PlayerId] >= min + 2)
+                    {
+                        Log($"Trying to place {i} when player {i.PlayerId + 1} already has {candidatesPerPlayer[i.PlayerId]} candidate items (min: {min})");
+                        // Try to pick an item for someone who has less candidate items placed
+                        List<MWItem> replacement = new List<MWItem>(items.Where(mwItem => candidatesPerPlayer[mwItem.PlayerId] < min + 2 && LogicManager.GetItemDef(mwItem.Item).itemCandidate));
+                        Log($"{replacement.Count} possible replacements for {i}");
+                        if (replacement.Count > 0)
+                        {
+                            i = replacement[rnd.Next(replacement.Count)];
+                        }
+                    }
+                    candidatesPerPlayer[i.PlayerId]++;
+                }
+
+                // For now, only do this in 1 player since delaying one players checks just means they don't get to play
+                if (players == 1 && settings[i.PlayerId].Cursed)
                 {
                     if (LogicManager.GetItemDef(i.Item).majorItem) i = items[rnd.Next(items.Count)];
                 }

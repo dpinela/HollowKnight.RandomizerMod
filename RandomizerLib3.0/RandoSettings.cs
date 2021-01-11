@@ -176,6 +176,7 @@ namespace RandomizerLib
             result.SpicySkips = SpicySkips;
             result.FireballSkips = FireballSkips;
             result.DarkRooms = DarkRooms;
+            result.Seed = Seed;
 
             return result;
         }

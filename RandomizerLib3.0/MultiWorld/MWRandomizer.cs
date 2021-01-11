@@ -41,6 +41,14 @@ namespace RandomizerLib.MultiWorld
             this.players = players;
         }
 
+        public MWRandomizer(RandoSettings settings)
+        {
+            this.settings = new List<RandoSettings>();
+            this.settings.Add(settings);
+            rand = new Random(settings.Seed);
+            this.players = 1;
+        }
+
         public List<RandoResult> RandomizeMW()
         {
             transitionPlacements = new List<Dictionary<string, string>>();

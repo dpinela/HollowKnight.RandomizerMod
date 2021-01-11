@@ -10,13 +10,13 @@ namespace MultiWorldServer
     {
         private int randoId;
         private Dictionary<int, PlayerSession> players;
-        private Dictionary<int, List<(string, string, string)>> unsentItems;
+        private Dictionary<int, List<MWItemReceiveMessage>> unsentItems;
 
         public GameSession(int id)
         {
             randoId = id;
             players = new Dictionary<int, PlayerSession>();
-            unsentItems = new Dictionary<int, List<(string, string, string)>>();
+            unsentItems = new Dictionary<int, List<MWItemReceiveMessage>>();
         }
 
         public void AddPlayer(Client c, MWJoinMessage join)
@@ -29,9 +29,9 @@ namespace MultiWorldServer
 
             if (unsentItems.ContainsKey(join.PlayerId))
             {
-                foreach ((string Item, string Location, string From) in unsentItems[join.PlayerId])
+                foreach (var msg in unsentItems[join.PlayerId])
                 {
-                    players[join.PlayerId].QueueConfirmableMessage(new MWItemReceiveMessage { Location = Location, From = From, Item = Item });
+                    players[join.PlayerId].QueueConfirmableMessage(msg);
                 }
                 unsentItems.Remove(join.PlayerId);
             }
@@ -41,6 +41,19 @@ namespace MultiWorldServer
         {
             Server.Log($"Player {c.Session.playerId + 1} removed from session {c.Session.randoId}");
             players.Remove(c.Session.playerId);
+
+            // If someone has unconfirmed items, put them into unsent items to make sure they aren't lost
+            foreach (ResendEntry re in c.Session.MessagesToConfirm)
+            {
+                if (re.Message.MessageType == MultiWorldProtocol.Messaging.MWMessageType.ItemReceiveMessage)
+                {
+                    if (!unsentItems.ContainsKey(c.Session.playerId))
+                    {
+                        unsentItems.Add(c.Session.playerId, new List<MWItemReceiveMessage>());
+                    }
+                    unsentItems[c.Session.playerId].Add((MWItemReceiveMessage) re.Message);
+                }
+            }
         }
 
         public bool isEmpty()
@@ -50,20 +63,21 @@ namespace MultiWorldServer
 
         public void SendItemTo(int player, string item, string location, string from)
         {
+            MWItemReceiveMessage msg = new MWItemReceiveMessage { Location = location, From = from, Item = item };
             if (players.ContainsKey(player))
             {
                 Server.Log($"Sending item '{item}' to '{players[player].Name}', from '{from}'");
 
-                players[player].QueueConfirmableMessage(new MWItemReceiveMessage { Location = location, From = from, Item = item });
+                players[player].QueueConfirmableMessage(msg);
             }
             else    // Trying to send to an offline player
             {
                 Server.Log($"Queuing item '{item}' for offline player '{player + 1}', from '{from}'");
                 if (!unsentItems.ContainsKey(player))
                 {
-                    unsentItems.Add(player, new List<(string, string, string)>());
+                    unsentItems.Add(player, new List<MWItemReceiveMessage>());
                 }
-                unsentItems[player].Add((item, location, from));
+                unsentItems[player].Add(msg);
             }
         }
 

@@ -315,8 +315,8 @@ namespace RandomizerMod
                     RandomizerMod.Instance.Settings.RandomizePalaceTotems = RandoPalaceTotemsBtn.CurrentSelection;
                     RandomizerMod.Instance.Settings.DuplicateMajorItems = DuplicateBtn.CurrentSelection;
 
+                    ParseSeedInput(seedInput.textComponent.text);
                     RandomizerMod.Instance.Settings.CreateSpoilerLog = RandoSpoilerBtn.CurrentSelection;
-
                     RandomizerMod.Instance.Settings.Cursed = cursedBtn.CurrentSelection.StartsWith("O");
 
                     RandomizerMod.Instance.Settings.Randomizer = rando;
@@ -1017,7 +1017,7 @@ namespace RandomizerMod
         {
             if (int.TryParse(input, out int newSeed))
             {
-                RandomizerMod.Instance.Settings.Seed = newSeed;
+                RandomizerMod.Instance.Settings.RandomizerSettings.Seed = newSeed;
             }
             else
             {

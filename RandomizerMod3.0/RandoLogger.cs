@@ -370,7 +370,7 @@ namespace RandomizerMod
             // don't spoil duplicate items!
             if (LogicManager.GetItemDef(item).majorItem && RandomizerMod.Instance.Settings.DuplicateMajorItems)
             {
-                item = LogicManager.RemovePrefixSuffix(item) + $"({new System.Random().Next(10)}?)";
+                item = LogicManager.RemoveSuffix(item) + $"({new System.Random().Next(10)}?)";
             }
 
             string message = $"ITEM --- {{{item}}} at {{{location}}}";

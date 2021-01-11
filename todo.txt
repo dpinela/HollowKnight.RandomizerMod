@@ -1,2 +1,12 @@
 - helper log grubs/essence
 - resend all when rejoining
+- startname = king's pass (can't reproduce?)
+- percent
+
+done:
+- seed is -1 in tracker
+- MW next to duplicated things in tracker log
+- no locations in flashes
+- Give 300 geo on receiving dupes from other players
+- turn off cursed progression for MW
+- try to even out the order in which good items are placed, so nobody gets too far ahead

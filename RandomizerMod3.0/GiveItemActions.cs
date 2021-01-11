@@ -60,7 +60,7 @@ namespace RandomizerMod
         }
 
         // Wrapper to allow me to change stuff without fricking up BingoUI
-        public static void GiveItemWrapper(RandomizerLib.GiveAction action, string rawItem, string location, int geo = 0, bool remote = false)
+        public static void GiveItemWrapper(RandomizerLib.GiveAction action, string rawItem, string location, string from = null, int geo = 0, bool remote = false)
         {
             // With multiworld we may end up receiving the same item twice due to network issues etc. so we want giving items to be idempotent (i.e. same cloak twice doesn't give shade)
             if (RandomizerMod.Instance.Settings.CheckItemFound(rawItem)) return;
@@ -70,14 +70,16 @@ namespace RandomizerMod
             // In tracker log, we only want to show MW(X)_ when picking up items in multiworld (otherwise everything is MW(1))
             if (RandomizerMod.Instance.Settings.IsMW)
             {
-                LogItemToTracker(rawItem, location);
+                string loc = location;
+                if (remote) loc = $"{from}-{location}";
+                LogItemToTracker(rawItem, loc);
             }
             else
             {
                 LogItemToTracker(item, location);
             }
 
-            if (RandomizerMod.Instance.Settings.IsMW && player >= 0 && player != RandomizerMod.Instance.Settings.MWPlayerId)
+            if (!remote && RandomizerMod.Instance.Settings.IsMW && player >= 0 && player != RandomizerMod.Instance.Settings.MWPlayerId)
             {
                 // Not our item, send it to MW instead
                 RandomizerMod.Instance.mwConnection.SendItem(location, item, player);
@@ -88,7 +90,7 @@ namespace RandomizerMod
             item = LogicManager.RemovePrefixSuffix(item);
 
             // If we received this from MW, display a relic message so the player knows they got an item
-            if (remote) RelicMsg.ShowRelicItem(item, location);
+            if (remote) RelicMsg.ShowRelicItem(item, from);
 
             GiveItem(convertGiveAction(action), item, location, geo);
 
@@ -106,7 +108,7 @@ namespace RandomizerMod
             // Geo spawning is normally handleded in the shiny, so just add geo instead
             if (def.action == RandomizerLib.GiveAction.SpawnGeo)
                 def.action = RandomizerLib.GiveAction.AddGeo;
-            GiveItemWrapper(def.action, item, $"{from}-{location}", remote: true);
+            GiveItemWrapper(def.action, item, location, from, remote: true);
         }
 
         // TODO: clean up the above? the reason it's all messed up is since I thought GiveAction would make more sense as part of RandomizerLib (LogicManager specifically)
@@ -422,6 +424,13 @@ namespace RandomizerMod
             if (LogicManager.AdditiveItemSets.Any(set => set.Contains(item)))
             {
                 RandomizerMod.Instance.Settings.IncrementAdditiveCount(item);
+
+                // Give bonus 300 geo here so it works with MW items
+                int max = LogicManager.GetMaxAdditiveLevel(item);
+                if (RandomizerMod.Instance.Settings.GetAdditiveCount(item) > max)
+                {
+                    HeroController.instance.AddGeo(300);
+                }
             }
         }
     }
