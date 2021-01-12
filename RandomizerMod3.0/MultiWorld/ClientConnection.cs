@@ -25,9 +25,18 @@ namespace RandomizerMod.MultiWorld
         private List<MWItemSendMessage> ItemSendQueue = new List<MWItemSendMessage>();
         private Thread ReadThread;
 
+        // TODO use these to make this class nicer
         public delegate void NumReadyEvent(int num);
+        public delegate void DisconnectEvent();
+        public delegate void ConnectEvent(ulong uid);
+        public delegate void JoinEvent();
+        public delegate void LeaveEvent();
 
         public event NumReadyEvent NumReadyReceived;
+        public event DisconnectEvent OnDisconnect;
+        public event ConnectEvent OnConnect;
+        public event JoinEvent OnJoin;
+        public event LeaveEvent OnLeave;
 
         public RandoResult LastResult = null;
 
@@ -81,7 +90,6 @@ namespace RandomizerMod.MultiWorld
             ReadThread.Start();
 
             SendMessage(new MWConnectMessage());
-            Log("Connected to server!");
         }
 
         public void JoinRando(int randoId, int playerId)
@@ -90,6 +98,10 @@ namespace RandomizerMod.MultiWorld
             Log(RandomizerMod.Instance.MWSettings.UserName);
             Log(randoId);
             Log(playerId);
+            
+            State.SessionId = randoId;
+            State.PlayerId = playerId;
+
             SendMessage(new MWJoinMessage
             {
                 DisplayName = RandomizerMod.Instance.MWSettings.UserName,
@@ -98,10 +110,20 @@ namespace RandomizerMod.MultiWorld
             });
         }
 
+        public void Rejoin()
+        {
+            if (State.SessionId == -1 || State.PlayerId == -1) return;
+            JoinRando(State.SessionId, State.PlayerId);
+        }
+
         public void Leave()
         {
+            State.SessionId = -1;
+            State.PlayerId = -1;
+
             State.Joined = false;
             SendMessage(new MWLeaveMessage());
+            OnLeave?.Invoke();
         }
         public void Disconnect()
         {
@@ -110,12 +132,12 @@ namespace RandomizerMod.MultiWorld
 
             try
             {
-                ReadThread.Abort();
+                ReadThread?.Abort();
                 ReadThread = null;
                 Log($"Disconnecting (UID = {State.Uid})");
                 byte[] buf = Packer.Pack(new MWDisconnectMessage {SenderUid = State.Uid}).Buffer;
-                _client.GetStream().Write(buf, 0, buf.Length);
-                _client.Close();
+                _client?.GetStream().Write(buf, 0, buf.Length);
+                _client?.Close();
             }
             catch (Exception e)
             {
@@ -127,6 +149,8 @@ namespace RandomizerMod.MultiWorld
                 State.Joined = false;
                 _client = null;
                 messageEventQueue.Clear();
+
+                OnDisconnect?.Invoke();
             }
         }
 
@@ -172,6 +196,7 @@ namespace RandomizerMod.MultiWorld
                 }
 
                 Reconnect();
+                Rejoin();
             }
 
             if (State.Connected)
@@ -182,6 +207,7 @@ namespace RandomizerMod.MultiWorld
 
                     Disconnect();
                     Reconnect();
+                    Rejoin();
                 }
                 else
                 {
@@ -312,16 +338,26 @@ namespace RandomizerMod.MultiWorld
             State.Uid = message.SenderUid;
             State.Connected = true;
             Log($"Connected! (UID = {State.Uid})");
+            OnConnect?.Invoke(State.Uid);
         }
 
         private void HandleJoinConfirm(MWJoinConfirmMessage message)
         {
             State.Joined = true;
+            OnJoin?.Invoke();
+
+            foreach (string item in RandomizerMod.Instance.Settings.UnconfirmedItems)
+            {
+                (int playerId, string itemName) = LogicManager.ExtractPlayerID(item);
+                if (playerId < 0) continue;
+                SendItem(RandomizerMod.Instance.Settings.GetItemLocation(item), itemName, playerId);
+            }
         }
 
         private void HandleLeaveMessage(MWLeaveMessage message)
         {
             State.Joined = false;
+            OnLeave?.Invoke();
         }
 
         private void HandleDisconnectMessage(MWDisconnectMessage message)
@@ -351,9 +387,8 @@ namespace RandomizerMod.MultiWorld
 
         private void HandleItemSendConfirm(MWItemSendConfirmMessage message)
         {
-            // Mark the item found here, just to make sure it makes it to the server before we mark it found
-            RandomizerMod.Instance.Settings.MarkItemFound(new MWItem(message.To, message.Item).ToString());
-            RandomizerMod.Instance.Settings.MarkLocationFound(message.Location);
+            // Mark the item confirmed here, so if we send an item but disconnect we can be sure it will be resent when we open again
+            RandomizerMod.Instance.Settings.MarkItemConfirmed(new MWItem(message.To, message.Item).ToString());
             ClearFromSendQueue(message.To, message.Item);
         }
 
@@ -384,6 +419,11 @@ namespace RandomizerMod.MultiWorld
             MWItemSendMessage msg = new MWItemSendMessage { Location = loc, Item = item, To = playerId };
             ItemSendQueue.Add(msg);
             SendMessage(msg);
+        }
+
+        public bool IsConnected()
+        {
+            return State.Connected;
         }
 
         public ConnectionStatus GetStatus()

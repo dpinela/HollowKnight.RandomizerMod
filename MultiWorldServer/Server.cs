@@ -270,9 +270,10 @@ namespace MultiWorldServer
                 Thread.Sleep(10);
                 client.TcpClient.Close();
             }
-            catch(Exception)
+            catch(Exception e)
             {
                 //Do nothing, we're already disconnecting
+                Log("Exception disconnecting client: " + e);
             }
         }
 
@@ -443,7 +444,7 @@ namespace MultiWorldServer
 
             lock (ready)
             {
-                if (!ready.ContainsKey(c.Room) || !ready[c.Room].ContainsKey(uid)) return;
+                if (c.Room == null || !ready.ContainsKey(c.Room) || !ready[c.Room].ContainsKey(uid)) return;
                 string roomText = string.IsNullOrEmpty(c.Room) ? "default room" : $"room \"{c.Room}\"";
                 Log($"{c.Nickname} (UID {c.UID}) unreadied from {roomText} ({ready[c.Room].Count - 1} readied)");
 

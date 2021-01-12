@@ -839,8 +839,8 @@ namespace RandomizerMod
                     {
                         RandomizerMod.Instance.MWSettings.IP = ipInput.text;
                         Log($"Trying to connect to {ipInput.text}");
-                        RandomizerMod.Instance.mwConnection.Disconnect();
-                        RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();
+                        /*RandomizerMod.Instance.mwConnection.Disconnect();
+                        RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();*/
                         RandomizerMod.Instance.mwConnection.Connect();
                         RandomizerMod.Instance.mwConnection.NumReadyReceived += UpdateReady;
                         item.SetSelection("Yes");
@@ -884,10 +884,11 @@ namespace RandomizerMod
                     
                     multiworldReadyBtn.SetSelection(false);
                     multiworldReadyBtn.Button.gameObject.SetActive(false);
-                    
-                    RandomizerMod.Instance.mwConnection.Disconnect();
+
                     startRandoBtn.gameObject.SetActive(true);
                     UnlockAll();
+
+                    RandomizerMod.Instance.mwConnection.Disconnect();
                 }
             }
 

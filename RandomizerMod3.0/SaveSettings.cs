@@ -31,6 +31,8 @@ namespace RandomizerMod
         private SerializableBoolDictionary _obtainedLocations = new SerializableBoolDictionary();
         private SerializableBoolDictionary _obtainedTransitions = new SerializableBoolDictionary();
 
+        private SerializableBoolDictionary _sentItems = new SerializableBoolDictionary();
+
         private RandoSettings _randoSettings = new RandoSettings();
 
         /// <remarks>item, location</remarks>
@@ -38,12 +40,16 @@ namespace RandomizerMod
 
         public int MaxOrder => _orderedLocations.Count;
 
+        public int NumItemsFound => _obtainedItems.Keys.Intersect(_itemPlacements.Keys).Count();
+
         public (string, int)[] VariableCosts => _variableCosts.Select(pair => (pair.Key, pair.Value)).ToArray();
         public (string, int)[] ShopCosts => _shopCosts.Select(pair => (pair.Key, pair.Value)).ToArray();
 
         public bool RandomizeTransitions => RandomizeAreas || RandomizeRooms;
 
         public bool IsMW => MWNumPlayers > 1;
+
+        public string[] UnconfirmedItems => _sentItems.Where(kvp => kvp.Value).Select(kvp => kvp.Key).ToArray();
 
         public bool FreeLantern => !(DarkRooms || RandomizeKeys);
         public SaveSettings()
@@ -56,15 +62,11 @@ namespace RandomizerMod
                 {
                     try
                     {
-                        RandomizerMod.Instance.mwConnection.Disconnect();
-                        RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();
+                        /*RandomizerMod.Instance.mwConnection.Disconnect();
+                        RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();*/
                         RandomizerMod.Instance.mwConnection.Connect();
                         RandomizerMod.Instance.mwConnection.JoinRando(MWRandoId, MWPlayerId);
-                    }
-                    catch (Exception)
-                    {
-
-                    }
+                    } catch (Exception) {}
                 }
             };
         }
@@ -500,6 +502,11 @@ namespace RandomizerMod
             return new HashSet<string>(ItemPlacements.Select(pair => pair.Item1));
         }
 
+        public string GetItemLocation(string item)
+        {
+            return _itemPlacements[item];
+        }
+
         public void MarkLocationFound(string location)
         {
             _obtainedLocations[location] = true;
@@ -561,6 +568,16 @@ namespace RandomizerMod
             {
                 _mwPlayerNames[i] = nicknames[i];
             }
+        }
+
+        public void AddSentItem(string item)
+        {
+            _sentItems[item] = false;
+        }
+
+        public void MarkItemConfirmed(string item)
+        {
+            _sentItems[item] = true;
         }
 
         public string GetMWPlayerName(int playerId)

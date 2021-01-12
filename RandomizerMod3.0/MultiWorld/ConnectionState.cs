@@ -8,8 +8,12 @@ namespace RandomizerMod.MultiWorld
     public class ConnectionState
     {
         public ulong Uid;
-        public bool Connected;
-        public bool Joined;
+        public bool Connected = false;
+        public bool Joined = false;
+
+        public int SessionId = -1;
+        public int PlayerId = -1;
+
         public DateTime LastPing = DateTime.Now;
     }
 }

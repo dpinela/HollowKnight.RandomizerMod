@@ -82,6 +82,9 @@ namespace RandomizerMod
             if (!remote && RandomizerMod.Instance.Settings.IsMW && player >= 0 && player != RandomizerMod.Instance.Settings.MWPlayerId)
             {
                 // Not our item, send it to MW instead
+                RandomizerMod.Instance.Settings.MarkItemFound(rawItem);
+                RandomizerMod.Instance.Settings.MarkLocationFound(location);
+                RandomizerMod.Instance.Settings.AddSentItem(rawItem);
                 RandomizerMod.Instance.mwConnection.SendItem(location, item, player);
                 return;
             }
