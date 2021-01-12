@@ -14,8 +14,8 @@ This mod is an extension of the existing Randomizer3.0 and MultiWorld mods to al
 - Concurrent sessions - Once a randomization is generated, a random identifier is included with it which is used to spin up a new session when connecting to the server. This way, multiple concurrent rando sessions can run simultaneously on the same server
 
 ## Getting Started
-1. Download `RandomizerModMW.zip` from the releases page on github: https://github.com/CallumMoseley/HollowKnight.RandomizerMod/releases
-2. Install SeanprCore.dll and modding API if you haven't already (this can be done through the mod installer: https://www.nexusmods.com/hollowknight/mods/9)
+1. Install SeanprCore and modding API if you haven't already (this can be done through the mod installer: https://www.nexusmods.com/hollowknight/mods/9)
+2. Download `RandomizerModMW.zip` from the releases page on github: https://github.com/CallumMoseley/HollowKnight.RandomizerMod/releases
 3. Copy `MultiWorldProtocol.dll`, `RandomizerLib3.0.dll`, and `RandomizerMod3.0.dll` into `Hollow Knight/hollow_knight_Data/Managed/Mods` (this will replace the existing RandomizerMod3.0 if you have it installed)
 
 This is all that is needed in terms of setup. To play multiworld:
