@@ -187,7 +187,7 @@ namespace RandomizerMod
 
                     if (result == null)
                     {
-                        MWRandomizer rando = new MWRandomizer(Settings.RandomizerSettings, 4);
+                        MWRandomizer rando = new MWRandomizer(Settings.RandomizerSettings);
                         result = rando.RandomizeMW()[0];
                     }
 
