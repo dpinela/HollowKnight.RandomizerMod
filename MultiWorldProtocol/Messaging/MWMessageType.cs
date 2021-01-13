@@ -19,6 +19,7 @@
         PingMessage,
         ReadyMessage,
         ResultMessage,
+        SaveMessage,
         SetupMessage,
         StartMessage,
         UnreadyMessage

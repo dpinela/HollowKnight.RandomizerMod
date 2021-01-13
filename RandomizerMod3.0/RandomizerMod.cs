@@ -96,6 +96,7 @@ namespace RandomizerMod
             ModHooks.Instance.GetPlayerIntHook += IntOverride;
             ModHooks.Instance.GetPlayerBoolHook += BoolGetOverride;
             ModHooks.Instance.SetPlayerBoolHook += BoolSetOverride;
+            ModHooks.Instance.BeforeSavegameSaveHook += OnSave;
             ModHooks.Instance.ApplicationQuitHook += OnQuit;
             On.PlayMakerFSM.OnEnable += FixVoidHeart;
             On.GameManager.BeginSceneTransition += EditTransition;
@@ -186,7 +187,7 @@ namespace RandomizerMod
 
                     if (result == null)
                     {
-                        MWRandomizer rando = new MWRandomizer(Settings.RandomizerSettings);
+                        MWRandomizer rando = new MWRandomizer(Settings.RandomizerSettings, 4);
                         result = rando.RandomizeMW()[0];
                     }
 
@@ -671,6 +672,15 @@ namespace RandomizerMod
             }
         }
 
+        private void OnSave(SaveGameData data)
+        {
+            if (Settings.IsMW)
+            {
+                mwConnection.NotifySave();
+            }
+        }
+
+        // TODO: these print exceptions in modlog that look like a problem but are not
         private void OnQuit()
         {
             try

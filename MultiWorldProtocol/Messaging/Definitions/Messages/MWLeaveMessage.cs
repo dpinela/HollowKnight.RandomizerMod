@@ -7,8 +7,6 @@ namespace MultiWorldProtocol.Messaging.Definitions.Messages
     [MWMessageType(MWMessageType.LeaveMessage)]
     public class MWLeaveMessage : MWMessage
     {
-        public string Token { get; set; }
-
         public MWLeaveMessage()
         {
             MessageType = MWMessageType.LeaveMessage;
@@ -19,7 +17,6 @@ namespace MultiWorldProtocol.Messaging.Definitions.Messages
     {
         public MWLeaveMessageDefinition() : base(MWMessageType.LeaveMessage)
         {
-            Properties.Add(new MWMessageProperty<string, MWLeaveMessage>(nameof(MWLeaveMessage.Token)));
         }
     }
 }

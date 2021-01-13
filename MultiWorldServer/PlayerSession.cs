@@ -26,7 +26,7 @@ namespace MultiWorldServer
         {
             if (message.MessageType != MWMessageType.ItemReceiveMessage)
             {
-                throw new InvalidOperationException("Server should only queue ItemConfiguration and ItemReceive messages for confirmation");
+                throw new InvalidOperationException("Server should only queue ItemReceive messages for confirmation");
             }
             lock (MessagesToConfirm)
             {
@@ -34,20 +34,22 @@ namespace MultiWorldServer
             }
         }
 
-        public void ConfirmMessage(MWMessage message)
+        public List<MWMessage> ConfirmMessage(MWMessage message)
         {
             if (message.MessageType == MWMessageType.ItemReceiveConfirmMessage)
             {
-                ConfirmItemReceive((MWItemReceiveConfirmMessage)message);
+                return ConfirmItemReceive((MWItemReceiveConfirmMessage)message);
             }
             else
             {
-                throw new InvalidOperationException("Must only confirm ItemConfiguration and ItemReceive messages.");
+                throw new InvalidOperationException("Must only confirm ItemReceive messages.");
             }
         }
 
-        private void ConfirmItemReceive(MWItemReceiveConfirmMessage message)
+        private List<MWMessage> ConfirmItemReceive(MWItemReceiveConfirmMessage message)
         {
+            List<MWMessage> confirmedMessages = new List<MWMessage>();
+
             lock (MessagesToConfirm)
             {
                 for (int i = MessagesToConfirm.Count - 1; i >= 0; i--)
@@ -55,10 +57,13 @@ namespace MultiWorldServer
                     MWItemReceiveMessage icm = MessagesToConfirm[i].Message as MWItemReceiveMessage;
                     if (icm.Item == message.Item && icm.From == message.From)
                     {
+                        confirmedMessages.Add(icm);
                         MessagesToConfirm.RemoveAt(i);
                     }
                 }
             }
+
+            return confirmedMessages;
         }
     }
 }

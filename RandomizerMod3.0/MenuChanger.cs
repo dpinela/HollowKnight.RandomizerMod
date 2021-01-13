@@ -112,13 +112,16 @@ namespace RandomizerMod
             RandoMenuItem<string> cursedBtn = new RandoMenuItem<string>(back, new Vector2(0, 960), "Cursed", "no", "noo", "noooo", "noooooooo", "noooooooooooooooo", "Oh yeah");
             RandoMenuItem<string> multiworldBtn = new RandoMenuItem<string>(back, new Vector2(0, 800), "Multiworld", "No", "Yes");
             RandoMenuItem<bool> multiworldReadyBtn = new RandoMenuItem<bool>(back, new Vector2(0, 600), "Ready", false, true);
+            GameObject readyPlayers = CreateLabel(back, new Vector2(-0, 540), "");
+            readyPlayers.transform.localScale = new Vector3(0.5f, 0.5f);
             multiworldReadyBtn.Button.gameObject.SetActive(false);
             RandoMenuItem<bool> RandoSpoilerBtn = new RandoMenuItem<bool>(back, new Vector2(0, 0), "Create Spoiler Log", true, false);
 
             // Used to show how many players readied up "Ready (1)"
-            void UpdateReady(int num)
+            void UpdateReady(int num, string players)
             {
                 multiworldReadyBtn.SetName($"Ready ({num})");
+                readyPlayers.transform.Find("Text").GetComponent<Text>().text = players;
             }
 
             // NGL i don't know what this does i just copied it and put it in a function
@@ -852,7 +855,7 @@ namespace RandomizerMod
                         return;
                     }
 
-                    startRandoBtn.transform.localPosition = startRandoBtn.transform.localPosition - new Vector3(0, 150);
+                    startRandoBtn.transform.localPosition = startRandoBtn.transform.localPosition - new Vector3(0, 210);
 
                     ipLabel.SetActive(false);
                     ipInput.gameObject.SetActive(false);
@@ -867,11 +870,13 @@ namespace RandomizerMod
                     multiworldReadyBtn.SetSelection(false);
                     multiworldReadyBtn.SetName("Ready");
 
+                    readyPlayers.transform.Find("Text").GetComponent<Text>().text = "";
+
                     startRandoBtn.gameObject.SetActive(false);
                 }
                 else
                 {
-                    startRandoBtn.transform.localPosition = startRandoBtn.transform.localPosition + new Vector3(0, 150);
+                    startRandoBtn.transform.localPosition = startRandoBtn.transform.localPosition + new Vector3(0, 210);
 
                     ipLabel.SetActive(true);
                     ipInput.gameObject.SetActive(true);
@@ -907,6 +912,7 @@ namespace RandomizerMod
                     RandomizerMod.Instance.mwConnection.Unready();
                     startRandoBtn.gameObject.SetActive(false);
                     multiworldReadyBtn.SetName("Ready");
+                    readyPlayers.transform.Find("Text").GetComponent<Text>().text = "";
                 }
             }
 

@@ -10,13 +10,32 @@ namespace MultiWorldServer
     {
         private int randoId;
         private Dictionary<int, PlayerSession> players;
-        private Dictionary<int, List<MWItemReceiveMessage>> unsentItems;
+
+        // These are to try to prevent items being lost. When items are sent, they go to unconfirmed. Once the confirmation message is received,
+        // they are moved to unsaved items. When we receive a message letting us know that 
+        private Dictionary<int, List<MWItemReceiveMessage>> unconfirmedItems;
+        private Dictionary<int, List<MWItemReceiveMessage>> unsavedItems;
 
         public GameSession(int id)
         {
             randoId = id;
             players = new Dictionary<int, PlayerSession>();
-            unsentItems = new Dictionary<int, List<MWItemReceiveMessage>>();
+            unconfirmedItems = new Dictionary<int, List<MWItemReceiveMessage>>();
+            unsavedItems = new Dictionary<int, List<MWItemReceiveMessage>>();
+        }
+
+        // We know that the client received the message, but until the game is saved we can't be sure it isn't lost in a crash
+        public void ConfirmItem(int playerId, MWItemReceiveMessage msg)
+        {
+            unconfirmedItems.GetOrCreateDefault(playerId).Remove(msg);
+            unsavedItems.GetOrCreateDefault(playerId).Add(msg);
+        }
+
+        // If items have been both confirmed and the player saves and we STILL lose the item, they didn't deserve it anyway
+        public void Save(int playerId)
+        {
+            if (!unsavedItems.ContainsKey(playerId)) return;
+            unsavedItems[playerId].Clear();
         }
 
         public void AddPlayer(Client c, MWJoinMessage join)
@@ -27,13 +46,13 @@ namespace MultiWorldServer
 
             Server.Log($"Player {join.PlayerId + 1} joined session {join.RandoId}");
 
-            if (unsentItems.ContainsKey(join.PlayerId))
+            if (unconfirmedItems.ContainsKey(join.PlayerId))
             {
-                foreach (var msg in unsentItems[join.PlayerId])
+                foreach (var msg in unconfirmedItems[join.PlayerId])
                 {
+                    Server.Log($"Resending {msg.Item} to {join.PlayerId} on join");
                     players[join.PlayerId].QueueConfirmableMessage(msg);
                 }
-                unsentItems.Remove(join.PlayerId);
             }
         }
 
@@ -42,17 +61,11 @@ namespace MultiWorldServer
             Server.Log($"Player {c.Session.playerId + 1} removed from session {c.Session.randoId}");
             players.Remove(c.Session.playerId);
 
-            // If someone has unconfirmed items, put them into unsent items to make sure they aren't lost
-            foreach (ResendEntry re in c.Session.MessagesToConfirm)
+            // If there are unsaved items when player is leaving, copy them to unconfirmed to be resent later
+            if (unsavedItems.ContainsKey(c.Session.playerId))
             {
-                if (re.Message.MessageType == MultiWorldProtocol.Messaging.MWMessageType.ItemReceiveMessage)
-                {
-                    if (!unsentItems.ContainsKey(c.Session.playerId))
-                    {
-                        unsentItems.Add(c.Session.playerId, new List<MWItemReceiveMessage>());
-                    }
-                    unsentItems[c.Session.playerId].Add((MWItemReceiveMessage) re.Message);
-                }
+                unconfirmedItems.GetOrCreateDefault(c.Session.playerId).AddRange(unsavedItems[c.Session.playerId]);
+                unsavedItems[c.Session.playerId].Clear();
             }
         }
 
@@ -70,15 +83,9 @@ namespace MultiWorldServer
 
                 players[player].QueueConfirmableMessage(msg);
             }
-            else    // Trying to send to an offline player
-            {
-                Server.Log($"Queuing item '{item}' for offline player '{player + 1}', from '{from}'");
-                if (!unsentItems.ContainsKey(player))
-                {
-                    unsentItems.Add(player, new List<MWItemReceiveMessage>());
-                }
-                unsentItems[player].Add(msg);
-            }
+
+            // Always add to unconfirmed, which doubles as holding items for offline players
+            unconfirmedItems.GetOrCreateDefault(player).Add(msg);
         }
 
         public string getPlayerString()

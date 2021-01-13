@@ -58,12 +58,6 @@ namespace RandomizerMod.Randomization
                 RandomizerMod.Instance.Settings.AddNewCost(kvp.Key.Item, kvp.Value);
             }
 
-            foreach (KeyValuePair<MWItem, int> kvp in result.shopCosts.Where(kvp => kvp.Key.PlayerId == result.playerId))
-            {
-                if (kvp.Key.PlayerId == result.playerId && VanillaManager.GetVanillaItems(result.settings).Contains(kvp.Key.Item)) continue;
-                RandomizerMod.Instance.Settings.AddShopCost(kvp.Key.ToString(), kvp.Value);
-            }
-
             foreach (var (item, shop) in VanillaManager.ItemPlacements.Where(p => LogicManager.ShopNames.Contains(p.Item2)))
             {
                 RandomizerMod.Instance.Settings.AddShopCost(item, LogicManager.GetItemDef(item).shopCost);

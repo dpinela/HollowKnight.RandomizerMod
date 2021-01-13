@@ -26,7 +26,7 @@ namespace RandomizerMod.MultiWorld
         private Thread ReadThread;
 
         // TODO use these to make this class nicer
-        public delegate void NumReadyEvent(int num);
+        public delegate void NumReadyEvent(int num, string players);
         public delegate void DisconnectEvent();
         public delegate void ConnectEvent(ulong uid);
         public delegate void JoinEvent();
@@ -304,7 +304,8 @@ namespace RandomizerMod.MultiWorld
                     State.LastPing = DateTime.Now;
                     break;
                 case MWMessageType.NumReadyMessage:
-                    NumReadyReceived?.Invoke(((MWNumReadyMessage)message).Ready);
+                    MWNumReadyMessage msg = message as MWNumReadyMessage;
+                    NumReadyReceived?.Invoke(msg.Ready, msg.Names);
                     break;
                 case MWMessageType.ResultMessage:
                     HandleResult((MWResultMessage)message);
@@ -388,6 +389,7 @@ namespace RandomizerMod.MultiWorld
         private void HandleItemSendConfirm(MWItemSendConfirmMessage message)
         {
             // Mark the item confirmed here, so if we send an item but disconnect we can be sure it will be resent when we open again
+            Log($"Confirming item: {message.Item} to {message.To}");
             RandomizerMod.Instance.Settings.MarkItemConfirmed(new MWItem(message.To, message.Item).ToString());
             ClearFromSendQueue(message.To, message.Item);
         }
@@ -419,6 +421,11 @@ namespace RandomizerMod.MultiWorld
             MWItemSendMessage msg = new MWItemSendMessage { Location = loc, Item = item, To = playerId };
             ItemSendQueue.Add(msg);
             SendMessage(msg);
+        }
+
+        public void NotifySave()
+        {
+            SendMessage(new MWSaveMessage());
         }
 
         public bool IsConnected()

@@ -565,8 +565,8 @@ namespace RandomizerMod
             string log = string.Empty;
             void AddToLog(string message) => log += message + Environment.NewLine;
 
-            // If this is a single player world, leave out MW tags
-            string MWItemToString(MWItem item) => result.players > 1 ? item.ToString() : item.Item;
+            // If this is a single player world, leave out names
+            string MWItemToString(MWItem item) => result.players > 1 ? $"{result.nicknames[item.PlayerId]}-{item.Item}" : item.Item;
 
             (int, MWItem, MWItem)[] orderedILPairs = new (int, MWItem, MWItem)[result.itemPlacements.Count];
 
@@ -624,9 +624,9 @@ namespace RandomizerMod
                     if (kvp.Value.Count > 0)
                     {
                         string title = kvp.Key.Item;
-                        if (LogicManager.ShopNames.Contains(title)) title = $"({orderedILPairs.First(triplet => triplet.Item3 == kvp.Key).Item1}) {title}";
                         title = CleanAreaName(title);
-                        if (result.players > 1) title = $"MW({kvp.Key.PlayerId + 1}) {title}";
+                        if (result.players > 1) title = $"{result.nicknames[kvp.Key.PlayerId]} {title}";
+                        if (LogicManager.ShopNames.Contains(kvp.Key.Item)) title = $"({orderedILPairs.First(triplet => triplet.Item3 == kvp.Key).Item1}) {title}";
                         AddToLog(Environment.NewLine + title + ":");
                         foreach (string item in kvp.Value) AddToLog(item.Replace('_', ' '));
                     }

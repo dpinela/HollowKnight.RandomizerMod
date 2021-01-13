@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
+    <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="GameSession.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Program.cs" />

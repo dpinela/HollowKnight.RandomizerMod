@@ -47,9 +47,9 @@ namespace RandomizerMod
 
         public bool RandomizeTransitions => RandomizeAreas || RandomizeRooms;
 
-        public bool IsMW => MWNumPlayers > 1;
+        public bool IsMW => MWNumPlayers >= 1;
 
-        public string[] UnconfirmedItems => _sentItems.Where(kvp => kvp.Value).Select(kvp => kvp.Key).ToArray();
+        public string[] UnconfirmedItems => _sentItems.Where(kvp => !kvp.Value).Select(kvp => kvp.Key).ToArray();
 
         public bool FreeLantern => !(DarkRooms || RandomizeKeys);
         public SaveSettings()

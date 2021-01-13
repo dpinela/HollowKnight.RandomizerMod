@@ -282,11 +282,15 @@ namespace MultiWorldServer
             if (client.Session != null)
             {
                 GameSessions[client.Session.randoId].RemovePlayer(client);
-                if (GameSessions[client.Session.randoId].isEmpty())
+
+                // TODO: Leaving this out for now, meaning fully async multiworlds should be possible
+                // Maybe put a timeout on sessions so they don't last forever, but for now this is ok
+
+                /*if (GameSessions[client.Session.randoId].isEmpty())
                 {
                     Log($"Removing session for rando id: {client.Session.randoId}");
                     GameSessions.Remove(client.Session.randoId);
-                }
+                }*/
                 client.Session = null;
             }
         }
@@ -348,6 +352,9 @@ namespace MultiWorldServer
                     break;
                 case MWMessageType.StartMessage:
                     HandleStartMessage(sender, (MWStartMessage)message);
+                    break;
+                case MWMessageType.SaveMessage:
+                    HandleSaveMessage(sender, (MWSaveMessage)message);
                     break;
                 case MWMessageType.InvalidMessage:
                 default:
@@ -431,16 +438,28 @@ namespace MultiWorldServer
                 string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
                 Log($"{sender.Nickname} (UID {sender.UID}) readied up in {roomText} ({ready[sender.Room].Count} readied)");
 
+                string names = "";
                 foreach (ulong uid in ready[sender.Room].Keys)
                 {
-                    SendMessage(new MWNumReadyMessage { Ready = ready[sender.Room].Count }, Clients[uid]);
+                    names += Clients[uid].Nickname;
+                    names += ", ";
+                }
+
+                if (names.Length >= 2)
+                {
+                    names = names.Substring(0, names.Length - 2);
+                }
+
+                foreach (ulong uid in ready[sender.Room].Keys)
+                {
+                    SendMessage(new MWNumReadyMessage { Ready = ready[sender.Room].Count, Names = names }, Clients[uid]);
                 }
             }
         }
 
         private void Unready(ulong uid)
         {
-            Client c = Clients[uid];
+            if (!Clients.TryGetValue(uid, out Client c)) return;
 
             lock (ready)
             {
@@ -448,11 +467,16 @@ namespace MultiWorldServer
                 string roomText = string.IsNullOrEmpty(c.Room) ? "default room" : $"room \"{c.Room}\"";
                 Log($"{c.Nickname} (UID {c.UID}) unreadied from {roomText} ({ready[c.Room].Count - 1} readied)");
 
-                if (c.Room != null) ready[c.Room].Remove(c.UID);
-                if (ready[c.Room].Count == 0) { ready.Remove(c.Room); return; }
+                ready[c.Room].Remove(c.UID);
+                if (ready[c.Room].Count == 0)
+                {
+                    ready.Remove(c.Room);
+                    return;
+                }
 
                 foreach (ulong uid2 in ready[c.Room].Keys)
                 {
+                    if (!Clients.ContainsKey(uid2)) continue;
                     SendMessage(new MWNumReadyMessage { Ready = ready[c.Room].Count }, Clients[uid2]);
                 }
             }
@@ -461,6 +485,13 @@ namespace MultiWorldServer
         private void HandleUnreadyMessage(Client sender, MWUnreadyMessage message)
         {
             Unready(sender.UID);
+        }
+
+        private void HandleSaveMessage(Client sender, MWSaveMessage message)
+        {
+            if (sender.Session == null) return;
+
+            GameSessions[sender.Session.randoId].Save(sender.Session.playerId);
         }
 
         private void HandleStartMessage(Client sender, MWStartMessage message)
@@ -527,7 +558,20 @@ namespace MultiWorldServer
 
         private void HandleItemReceiveConfirm(Client sender, MWItemReceiveConfirmMessage message)
         {
-            sender.Session.ConfirmMessage(message);
+            List<MWMessage> confirmed = sender.Session.ConfirmMessage(message);
+
+            foreach (MWMessage msg in confirmed)
+            {
+                switch (msg.MessageType)
+                {
+                    case MWMessageType.ItemReceiveMessage:
+                        MWItemReceiveMessage itemMsg = msg as MWItemReceiveMessage;
+                        GameSessions[sender.Session.randoId].ConfirmItem(sender.Session.playerId, itemMsg);
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         private void HandleItemSend(Client sender, MWItemSendMessage message)

@@ -8,6 +8,7 @@ namespace MultiWorldProtocol.Messaging.Definitions.Messages
     public class MWNumReadyMessage : MWMessage
     {
         public int Ready { get; set; }
+        public string Names { get; set; }
 
         public MWNumReadyMessage()
         {
@@ -20,6 +21,7 @@ namespace MultiWorldProtocol.Messaging.Definitions.Messages
         public MWNumReadyMessageDefinition() : base(MWMessageType.NumReadyMessage)
         {
             Properties.Add(new MWMessageProperty<int, MWNumReadyMessage>(nameof(MWNumReadyMessage.Ready)));
+            Properties.Add(new MWMessageProperty<string, MWNumReadyMessage>(nameof(MWNumReadyMessage.Names)));
         }
     }
 }
