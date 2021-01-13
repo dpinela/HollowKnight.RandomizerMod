@@ -1,6 +1,6 @@
 - helper log grubs/essence
-- dupe geo getting... duped
-- dupe geo exception (in GeoCounter.AddGeo)
+- dupe geo exception (in GeoCounter.AddGeo, can't reproduce?)
+- condensed spoiler logs
 
 Done:
 - server stability
@@ -9,3 +9,4 @@ Done:
 - fix percent???
 - show names of readied players on file create
 - show names of players in spoiler log
+- fixed 600 geo for dupes

@@ -254,7 +254,7 @@ namespace MultiWorldServer
 
         private void DisconnectClient(Client client)
         {
-            Log(string.Format("Disconnecting {0}", client.UID));
+            Log(string.Format("Disconnecting UID {0}", client.UID));
             try
             {
                 //Remove first from lists so if we get a network exception at least on the server side stuff should be clean
@@ -474,10 +474,22 @@ namespace MultiWorldServer
                     return;
                 }
 
+                string names = "";
+                foreach (ulong uid2 in ready[c.Room].Keys)
+                {
+                    names += Clients[uid2].Nickname;
+                    names += ", ";
+                }
+
+                if (names.Length >= 2)
+                {
+                    names = names.Substring(0, names.Length - 2);
+                }
+
                 foreach (ulong uid2 in ready[c.Room].Keys)
                 {
                     if (!Clients.ContainsKey(uid2)) continue;
-                    SendMessage(new MWNumReadyMessage { Ready = ready[c.Room].Count }, Clients[uid2]);
+                    SendMessage(new MWNumReadyMessage { Ready = ready[c.Room].Count, Names = names }, Clients[uid2]);
                 }
             }
         }

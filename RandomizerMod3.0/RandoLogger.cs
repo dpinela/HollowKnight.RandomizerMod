@@ -619,16 +619,17 @@ namespace RandomizerMod
                 foreach (string item in progression) AddToLog(item.Replace('_', ' '));
 
                 AddToLog(Environment.NewLine + "ALL ITEMS");
-                foreach (KeyValuePair<MWItem, List<string>> kvp in areaItemLocations)
+                foreach (MWItem key in areaItemLocations.Keys.OrderBy(mwItem => mwItem.PlayerId))
                 {
-                    if (kvp.Value.Count > 0)
+                    List<string> val = areaItemLocations[key];
+                    if (val.Count > 0)
                     {
-                        string title = kvp.Key.Item;
+                        string title = key.Item;
                         title = CleanAreaName(title);
-                        if (result.players > 1) title = $"{result.nicknames[kvp.Key.PlayerId]} {title}";
-                        if (LogicManager.ShopNames.Contains(kvp.Key.Item)) title = $"({orderedILPairs.First(triplet => triplet.Item3 == kvp.Key).Item1}) {title}";
+                        if (result.players > 1) title = $"{result.nicknames[key.PlayerId]} {title}";
+                        if (LogicManager.ShopNames.Contains(key.Item)) title = $"({orderedILPairs.First(triplet => triplet.Item3 == key).Item1}) {title}";
                         AddToLog(Environment.NewLine + title + ":");
-                        foreach (string item in kvp.Value) AddToLog(item.Replace('_', ' '));
+                        foreach (string item in val) AddToLog(item.Replace('_', ' '));
                     }
                 }
             }
