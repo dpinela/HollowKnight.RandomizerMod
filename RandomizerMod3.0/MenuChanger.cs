@@ -120,8 +120,11 @@ namespace RandomizerMod
             // Used to show how many players readied up "Ready (1)"
             void UpdateReady(int num, string players)
             {
-                multiworldReadyBtn.SetName($"Ready ({num})");
-                readyPlayers.transform.Find("Text").GetComponent<Text>().text = players;
+                if (multiworldReadyBtn.CurrentSelection)
+                {
+                    multiworldReadyBtn.SetName($"Ready ({num})");
+                    readyPlayers.transform.Find("Text").GetComponent<Text>().text = players;
+                }
             }
 
             // NGL i don't know what this does i just copied it and put it in a function
@@ -889,6 +892,9 @@ namespace RandomizerMod
                     
                     multiworldReadyBtn.SetSelection(false);
                     multiworldReadyBtn.Button.gameObject.SetActive(false);
+                    multiworldReadyBtn.SetName("Ready");
+
+                    readyPlayers.transform.Find("Text").GetComponent<Text>().text = "";
 
                     startRandoBtn.gameObject.SetActive(true);
                     UnlockAll();

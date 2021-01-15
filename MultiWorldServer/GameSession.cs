@@ -79,7 +79,7 @@ namespace MultiWorldServer
             MWItemReceiveMessage msg = new MWItemReceiveMessage { Location = location, From = from, Item = item };
             if (players.ContainsKey(player))
             {
-                Server.Log($"Sending item '{item}' to '{players[player].Name}', from '{from}'");
+                Server.Log($"Sending item '{item}' from {from} to '{players[player].Name}'");
 
                 players[player].QueueConfirmableMessage(msg);
             }

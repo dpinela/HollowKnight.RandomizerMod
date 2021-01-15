@@ -12,6 +12,7 @@ using MultiWorldProtocol.Messaging.Definitions.Messages;
 using RandomizerLib;
 using Newtonsoft.Json;
 using RandomizerLib.MultiWorld;
+using System.IO;
 
 namespace MultiWorldServer
 {
@@ -32,6 +33,8 @@ namespace MultiWorldServer
         private TcpListener _server;
         private readonly Timer ResendTimer;
 
+        private static StreamWriter LogWriter;
+
         public bool Running { get; private set; }
 
         public Server(int port)
@@ -49,29 +52,44 @@ namespace MultiWorldServer
             Log($"Server started on port {port}!");
         }
 
+        internal static void OpenLogger(string filename)
+        {
+            if (!Directory.Exists("Logs"))
+            {
+                Directory.CreateDirectory("Logs");
+            }
+            filename = "Logs/" + filename + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".txt";
+            FileStream fileStream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+            LogWriter = new StreamWriter(fileStream, Encoding.UTF8) { AutoFlush = true };
+        }
+
         internal static void Log(string message)
         {
-            Console.SetCursorPosition(0, Console.CursorTop);
-            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] {message}");
-            Console.Write("> ");
+            LogWriter.WriteLine($"[{DateTime.Now.ToLongTimeString()}] {message}");
+        }
+
+        internal static void LogToConsole(string message)
+        {
+            Console.WriteLine(message);
+            Log(message);
         }
 
         public void GiveItem(string item, int session, int player)
         {
-            Log($"Giving item {item} to player {player + 1} in session {session}");
+            LogToConsole($"Giving item {item} to player {player + 1} in session {session}");
             string suffix;
             (item, suffix) = LogicManager.ExtractSuffix(item);
             item = LogicManager.GetItemFromLower(item);
 
             if (item == null)
             {
-                Log($"Invalid item: {item}");
+                LogToConsole($"Invalid item: {item}");
                 return;
             }
 
             if (!GameSessions.ContainsKey(session))
             {
-                Log($"Session {session} does not exist");
+                LogToConsole($"Session {session} does not exist");
                 return;
             }
 
@@ -80,16 +98,16 @@ namespace MultiWorldServer
 
         public void ListSessions()
         {
-            Log($"{GameSessions.Count} current sessions");
+            LogToConsole($"{GameSessions.Count} current sessions");
             foreach (var kvp in GameSessions)
             {
-                Log($"ID: {kvp.Key} players: {kvp.Value.getPlayerString()}");
+                LogToConsole($"ID: {kvp.Key} players: {kvp.Value.getPlayerString()}");
             }
         }
 
         public void ListReady()
         {
-            Log($"{ready.Count} current lobbies");
+            LogToConsole($"{ready.Count} current lobbies");
             foreach (var kvp in ready)
             {
                 string playerString = "";
@@ -98,7 +116,7 @@ namespace MultiWorldServer
                     playerString += $"{Clients[kvp2.Key].Nickname}, ";
                 }
                 if (playerString != "") playerString = playerString.Substring(0, playerString.Length - 2);
-                Log($"Room: {kvp.Key} players: {playerString}");
+                LogToConsole($"Room: {kvp.Key} players: {playerString}");
             }
         }
 

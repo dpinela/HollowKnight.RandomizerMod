@@ -13,13 +13,22 @@ namespace MultiWorldServer
 
         private static void Main()
         {
+            Server.OpenLogger("ServerLog");
+
             LogHelper.LogTarget = new Logger();
             LogicManager.ParseXML();
 
             Serv = new Server(38281);
+
+            Console.SetCursorPosition(0, Console.CursorTop);
+            Console.Write("> ");
+
             while (Serv.Running)
             {
+
                 string input = Console.ReadLine();
+
+                Server.Log($"> " + input);
 
                 try
                 {
