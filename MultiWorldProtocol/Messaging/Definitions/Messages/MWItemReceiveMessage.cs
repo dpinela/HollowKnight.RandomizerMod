@@ -15,6 +15,23 @@ namespace MultiWorldProtocol.Messaging.Definitions.Messages
         {
             MessageType = MWMessageType.ItemReceiveMessage;
         }
+
+        // I kinda don't like doing this here and not anywhere else, but it lets us use these for Server's unconfirmedItems set
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            MWItemReceiveMessage other = obj as MWItemReceiveMessage;
+            return Item == other.Item && Location == other.Location && From == other.From;
+        }
+
+        public override int GetHashCode()
+        {
+            return (Item, Location, From).GetHashCode();
+        }
     }
 
     public class MWItemReceiveDefinition : MWMessageDefinition<MWItemReceiveMessage>

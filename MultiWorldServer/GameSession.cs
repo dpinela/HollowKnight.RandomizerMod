@@ -13,15 +13,15 @@ namespace MultiWorldServer
 
         // These are to try to prevent items being lost. When items are sent, they go to unconfirmed. Once the confirmation message is received,
         // they are moved to unsaved items. When we receive a message letting us know that 
-        private Dictionary<int, List<MWItemReceiveMessage>> unconfirmedItems;
-        private Dictionary<int, List<MWItemReceiveMessage>> unsavedItems;
+        private Dictionary<int, HashSet<MWItemReceiveMessage>> unconfirmedItems;
+        private Dictionary<int, HashSet<MWItemReceiveMessage>> unsavedItems;
 
         public GameSession(int id)
         {
             randoId = id;
             players = new Dictionary<int, PlayerSession>();
-            unconfirmedItems = new Dictionary<int, List<MWItemReceiveMessage>>();
-            unsavedItems = new Dictionary<int, List<MWItemReceiveMessage>>();
+            unconfirmedItems = new Dictionary<int, HashSet<MWItemReceiveMessage>>();
+            unsavedItems = new Dictionary<int, HashSet<MWItemReceiveMessage>>();
         }
 
         // We know that the client received the message, but until the game is saved we can't be sure it isn't lost in a crash
@@ -29,12 +29,14 @@ namespace MultiWorldServer
         {
             unconfirmedItems.GetOrCreateDefault(playerId).Remove(msg);
             unsavedItems.GetOrCreateDefault(playerId).Add(msg);
+            Server.Log($"Confirmed {msg.Item} to {playerId + 1}. Unconfirmed: {unconfirmedItems[playerId].Count} Unsaved: {unsavedItems[playerId].Count}");
         }
 
         // If items have been both confirmed and the player saves and we STILL lose the item, they didn't deserve it anyway
         public void Save(int playerId)
         {
             if (!unsavedItems.ContainsKey(playerId)) return;
+            Server.Log($"Player {playerId + 1} saved. Clearing {unsavedItems[playerId].Count} items");
             unsavedItems[playerId].Clear();
         }
 
@@ -50,7 +52,7 @@ namespace MultiWorldServer
             {
                 foreach (var msg in unconfirmedItems[join.PlayerId])
                 {
-                    Server.Log($"Resending {msg.Item} to {join.PlayerId} on join");
+                    Server.Log($"Resending {msg.Item} to {join.PlayerId + 1} on join");
                     players[join.PlayerId].QueueConfirmableMessage(msg);
                 }
             }
@@ -64,7 +66,7 @@ namespace MultiWorldServer
             // If there are unsaved items when player is leaving, copy them to unconfirmed to be resent later
             if (unsavedItems.ContainsKey(c.Session.playerId))
             {
-                unconfirmedItems.GetOrCreateDefault(c.Session.playerId).AddRange(unsavedItems[c.Session.playerId]);
+                unconfirmedItems.GetOrCreateDefault(c.Session.playerId).UnionWith(unsavedItems[c.Session.playerId]);
                 unsavedItems[c.Session.playerId].Clear();
             }
         }
