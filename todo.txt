@@ -3,10 +3,5 @@
 - condensed spoiler logs
 
 Done:
-- server stability
-- no longer spams items when connecting and instead correctly sends unconfirmed items
-- server will now not consider items received until both a confirmation message is sent and the player's game is saved, to prevent items lost when crashing/alt+f4ing
-- fix percent???
-- show names of readied players on file create
-- show names of players in spoiler log
-- fixed 600 geo for dupes
+- Fixed some bugs with ready list
+- Popup now correctly displays which item you have for additive sets when receiving from other players

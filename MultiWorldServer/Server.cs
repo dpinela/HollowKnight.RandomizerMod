@@ -200,28 +200,34 @@ namespace MultiWorldServer
 
         private void AcceptClient(IAsyncResult res)
         {
-            Client client = new Client
+            try
             {
-                TcpClient = _server.EndAcceptTcpClient(res)
-            };
+                Client client = new Client
+                {
+                    TcpClient = _server.EndAcceptTcpClient(res)
+                };
 
-            _server.BeginAcceptTcpClient(AcceptClient, _server);
+                _server.BeginAcceptTcpClient(AcceptClient, _server);
 
-            if (!client.TcpClient.Connected)
+                if (!client.TcpClient.Connected)
+                {
+                    return;
+                }
+
+                client.TcpClient.ReceiveTimeout = 2000;
+                client.TcpClient.SendTimeout = 2000;
+                client.lastPing = DateTime.Now;
+
+                lock (_clientLock)
+                {
+                    Unidentified.Add(client);
+                }
+
+                StartReadThread(client);
+            } catch (Exception e) // Not sure what could throw here, but have been seeing random rare exceptions in the servers
             {
-                return;
+                Log("Error when accepting client: " + e.Message);
             }
-
-            client.TcpClient.ReceiveTimeout = 2000;
-            client.TcpClient.SendTimeout = 2000;
-            client.lastPing = DateTime.Now;
-
-            lock (_clientLock)
-            {
-                Unidentified.Add(client);
-            }
-
-            StartReadThread(client);
         }
 
         private bool SendMessage(MWMessage message, Client client)

@@ -93,7 +93,7 @@ namespace RandomizerMod
             item = LogicManager.RemovePrefixSuffix(item);
 
             // If we received this from MW, display a relic message so the player knows they got an item
-            if (remote) RelicMsg.ShowRelicItem(item, from);
+            if (remote) ShowRelic(item, from);
 
             GiveItem(convertGiveAction(action), item, location, geo);
 
@@ -112,6 +112,20 @@ namespace RandomizerMod
             if (def.action == RandomizerLib.GiveAction.SpawnGeo)
                 def.action = RandomizerLib.GiveAction.AddGeo;
             GiveItemWrapper(def.action, item, location, from, remote: true);
+        }
+
+        public static void ShowRelic(string item, string from)
+        {
+            string[] itemSet = LogicManager.AdditiveItemSets.FirstOrDefault(set => set.Contains(item));
+
+            if (itemSet != null)
+            {
+                int current = RandomizerMod.Instance.Settings.GetAdditiveCount(item);
+                int max = LogicManager.GetMaxAdditiveLevel(item);
+                int next = Math.Min(current + 1, max);
+                item = itemSet[next - 1];
+            }
+            RelicMsg.ShowRelicItem(item, from);
         }
 
         // TODO: clean up the above? the reason it's all messed up is since I thought GiveAction would make more sense as part of RandomizerLib (LogicManager specifically)
