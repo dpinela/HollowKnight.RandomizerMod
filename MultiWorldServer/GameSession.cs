@@ -29,30 +29,41 @@ namespace MultiWorldServer
         {
             unconfirmedItems.GetOrCreateDefault(playerId).Remove(msg);
             unsavedItems.GetOrCreateDefault(playerId).Add(msg);
-            Server.Log($"Confirmed {msg.Item} to {playerId + 1}. Unconfirmed: {unconfirmedItems[playerId].Count} Unsaved: {unsavedItems[playerId].Count}");
+            Server.Log($"Confirmed {msg.Item} to {playerId + 1}. Unconfirmed: {unconfirmedItems[playerId].Count} Unsaved: {unsavedItems[playerId].Count}", randoId);
         }
 
         // If items have been both confirmed and the player saves and we STILL lose the item, they didn't deserve it anyway
         public void Save(int playerId)
         {
             if (!unsavedItems.ContainsKey(playerId)) return;
-            Server.Log($"Player {playerId + 1} saved. Clearing {unsavedItems[playerId].Count} items");
+            Server.Log($"Player {playerId + 1} saved. Clearing {unsavedItems[playerId].Count} items", randoId);
             unsavedItems[playerId].Clear();
         }
 
         public void AddPlayer(Client c, MWJoinMessage join)
         {
-            PlayerSession session = new PlayerSession(join.DisplayName, join.RandoId, join.PlayerId);
+            // If a player disconnects and rejoins before they can be removed from game session, you can have a weird order of events
+            if (players.ContainsKey(join.PlayerId))
+            {
+                // In this case, make sure that their unsaved items from before are protected
+                if (unsavedItems.ContainsKey(join.PlayerId))
+                {
+                    unconfirmedItems.GetOrCreateDefault(join.PlayerId).UnionWith(unsavedItems[join.PlayerId]);
+                    unsavedItems[join.PlayerId].Clear();
+                }
+            }
+
+            PlayerSession session = new PlayerSession(join.DisplayName, join.RandoId, join.PlayerId, c.UID);
             players[join.PlayerId] = session;
             c.Session = session;
 
-            Server.Log($"Player {join.PlayerId + 1} joined session {join.RandoId}");
+            Server.Log($"Player {join.PlayerId + 1} joined session {join.RandoId}", randoId);
 
             if (unconfirmedItems.ContainsKey(join.PlayerId))
             {
                 foreach (var msg in unconfirmedItems[join.PlayerId])
                 {
-                    Server.Log($"Resending {msg.Item} to {join.PlayerId + 1} on join");
+                    Server.Log($"Resending {msg.Item} to {join.PlayerId + 1} on join", randoId);
                     players[join.PlayerId].QueueConfirmableMessage(msg);
                 }
             }
@@ -60,7 +71,17 @@ namespace MultiWorldServer
 
         public void RemovePlayer(Client c)
         {
-            Server.Log($"Player {c.Session.playerId + 1} removed from session {c.Session.randoId}");
+            if (!players.ContainsKey(c.Session.playerId)) return;
+
+            // See above in add player, if someone disconnects and rejoins before RemovePlayer is called, then their new session will get removed and they
+            // will be in a weird limbo state. So, if the connection associated with this session doesn't match, then don't remove the player, since it
+            // was on a new connection
+            if (c.UID != players[c.Session.playerId].uid)
+            {
+                Server.Log($"Trying to remove player {c.Session.playerId + 1} but UIDs mismatch ({c.UID} != {players[c.Session.playerId].uid}). Stale connection?", randoId);
+                return;
+            }
+            Server.Log($"Player {c.Session.playerId + 1} removed from session {c.Session.randoId}", randoId);
             players.Remove(c.Session.playerId);
 
             // If there are unsaved items when player is leaving, copy them to unconfirmed to be resent later
@@ -81,7 +102,7 @@ namespace MultiWorldServer
             MWItemReceiveMessage msg = new MWItemReceiveMessage { Location = location, From = from, Item = item };
             if (players.ContainsKey(player))
             {
-                Server.Log($"Sending item '{item}' from {from} to '{players[player].Name}'");
+                Server.Log($"Sending item '{item}' from {from} to '{players[player].Name}'", randoId);
 
                 players[player].QueueConfirmableMessage(msg);
             }

@@ -12,14 +12,16 @@ namespace MultiWorldServer
         public string Name;
         public int randoId;
         public int playerId;
+        public ulong uid;
 
         public readonly List<ResendEntry> MessagesToConfirm = new List<ResendEntry>();
 
-        public PlayerSession(string Name, int randoId, int playerId)
+        public PlayerSession(string Name, int randoId, int playerId, ulong uid)
         {
             this.Name = Name;
             this.randoId = randoId;
             this.playerId = playerId;
+            this.uid = uid;
         }
 
         public void QueueConfirmableMessage(MWMessage message)

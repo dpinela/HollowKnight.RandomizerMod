@@ -63,9 +63,16 @@ namespace MultiWorldServer
             LogWriter = new StreamWriter(fileStream, Encoding.UTF8) { AutoFlush = true };
         }
 
-        internal static void Log(string message)
+        internal static void Log(string message, int? session = null)
         {
-            LogWriter.WriteLine($"[{DateTime.Now.ToLongTimeString()}] {message}");
+            if (session == null)
+            {
+                LogWriter.WriteLine($"[{DateTime.Now.ToLongTimeString()}] {message}");
+            }
+            else
+            {
+                LogWriter.WriteLine($"[{DateTime.Now.ToLongTimeString()}] [{session}] {message}");
+            }
         }
 
         internal static void LogToConsole(string message)
