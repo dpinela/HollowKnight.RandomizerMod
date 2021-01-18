@@ -150,30 +150,38 @@ namespace MultiWorldServer
 
         private void DoResends(object clients)
         {
-            lock (_clientLock)
+            try
             {
-                var ClientList = Clients.Values.ToList();
-                for (int i = ClientList.Count - 1; i>= 0; i--)
+                lock (_clientLock)
                 {
-                    var client = ClientList[i];
-                    if(client.Session!= null)
+                    var ClientList = Clients.Values.ToList();
+                    for (int i = ClientList.Count - 1; i >= 0; i--)
                     {
-                        lock (client.Session.MessagesToConfirm)
+                        var client = ClientList[i];
+                        if (client.Session != null)
                         {
-                            var now = DateTime.Now;
-                            for (int j = client.Session.MessagesToConfirm.Count - 1; j >= 0; j--)
+                            lock (client.Session.MessagesToConfirm)
                             {
-                                var entry = client.Session.MessagesToConfirm[j];
-                                if (now - entry.LastSent > TimeSpan.FromSeconds(5))
+                                var now = DateTime.Now;
+                                for (int j = client.Session.MessagesToConfirm.Count - 1; j >= 0; j--)
                                 {
-                                    var msg = entry.Message;
-                                    SendMessage(msg, client);
-                                    entry.LastSent = now;
+                                    var entry = client.Session.MessagesToConfirm[j];
+                                    if (now - entry.LastSent > TimeSpan.FromSeconds(5))
+                                    {
+                                        var msg = entry.Message;
+                                        SendMessage(msg, client);
+                                        entry.LastSent = now;
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                // I don't really like doing this but I was occasionally getting NullRefeneceExceptions here
+                Log($"Error resending items: {e.Message}");
             }
         }
 
@@ -310,19 +318,22 @@ namespace MultiWorldServer
 
         private void RemovePlayerFromSession(Client client)
         {
-            if (client.Session != null)
+            lock (_clientLock)
             {
-                GameSessions[client.Session.randoId].RemovePlayer(client);
-
-                // TODO: Leaving this out for now, meaning fully async multiworlds should be possible
-                // Maybe put a timeout on sessions so they don't last forever, but for now this is ok
-
-                /*if (GameSessions[client.Session.randoId].isEmpty())
+                if (client.Session != null)
                 {
-                    Log($"Removing session for rando id: {client.Session.randoId}");
-                    GameSessions.Remove(client.Session.randoId);
-                }*/
-                client.Session = null;
+                    GameSessions[client.Session.randoId].RemovePlayer(client);
+
+                    // TODO: Leaving this out for now, meaning fully async multiworlds should be possible
+                    // Maybe put a timeout on sessions so they don't last forever, but for now this is ok
+
+                    /*if (GameSessions[client.Session.randoId].isEmpty())
+                    {
+                        Log($"Removing session for rando id: {client.Session.randoId}");
+                        GameSessions.Remove(client.Session.randoId);
+                    }*/
+                    client.Session = null;
+                }
             }
         }
 
@@ -457,7 +468,7 @@ namespace MultiWorldServer
         {
             sender.Nickname = message.Nickname;
             sender.Room = message.Room;
-            lock (ready)
+            lock (_clientLock)
             {
                 if (!ready.ContainsKey(sender.Room))
                 {
@@ -492,7 +503,7 @@ namespace MultiWorldServer
         {
             if (!Clients.TryGetValue(uid, out Client c)) return;
 
-            lock (ready)
+            lock (_clientLock)
             {
                 if (c.Room == null || !ready.ContainsKey(c.Room) || !ready[c.Room].ContainsKey(uid)) return;
                 string roomText = string.IsNullOrEmpty(c.Room) ? "default room" : $"room \"{c.Room}\"";
@@ -552,7 +563,7 @@ namespace MultiWorldServer
             string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
             Log($"Starting MW for {roomText} at request of {sender.Nickname}");
 
-            lock (ready)
+            lock (_clientLock)
             {
                 if (!ready[room].ContainsKey(sender.UID)) return;
 
@@ -571,7 +582,7 @@ namespace MultiWorldServer
                 }
 
                 ready.Remove(room);
-            }
+                }
 
             Log("Starting rando with players:");
             foreach (string nickname in nicknames)

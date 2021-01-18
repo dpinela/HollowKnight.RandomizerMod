@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiWorldServer", "MultiWo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomizerLib3.0", "RandomizerLib3.0\RandomizerLib3.0.csproj", "{9A6E25CA-F58E-4F1B-9187-7142844A7D0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MWRandomizerTest", "MWRandomizerTest\MWRandomizerTest.csproj", "{532E9758-15E7-4D47-851D-A07407ED1F1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeClient", "MWRandomizerTest\FakeClient.csproj", "{532E9758-15E7-4D47-851D-A07407ED1F1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

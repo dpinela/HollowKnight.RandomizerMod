@@ -1,7 +1,15 @@
 - helper log grubs/essence
 - dupe geo exception (in GeoCounter.AddGeo, can't reproduce?)
 - condensed spoiler logs
+- Fix ready list not showing up
+- fix essentially every part of the server because oh god it is so broken
 
-Done:
-- Fixed some bugs with ready list
-- Popup now correctly displays which item you have for additive sets when receiving from other players
+Unhandled Exception: System.NullReferenceException: Object reference not set to an instance of an object.
+   at MultiWorldServer.Server.DoResends(Object clients)
+   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading._TimerCallback.PerformTimerCallback(Object state)
+
+- go through modlogs and investigate local crashes related to server
+- go through server logs
+- show list of n recently received items
+- have an eject button that just releases all your items to other players

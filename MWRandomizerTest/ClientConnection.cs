@@ -6,13 +6,12 @@ using MultiWorldProtocol.Messaging.Definitions.Messages;
 using System.Net.Sockets;
 using System.Threading;
 using Modding;
-using static RandomizerMod.LogHelper;
 using Newtonsoft.Json;
 
 using RandomizerLib;
 using RandomizerLib.MultiWorld;
 
-namespace RandomizerMod.MultiWorld
+namespace FakeClient
 {
     public class ClientConnection
     {
@@ -66,7 +65,7 @@ namespace RandomizerMod.MultiWorld
                 return;
             }
 
-            Log("Attempting to connect to server");
+            Console.WriteLine("Attempting to connect to server");
 
             State.Uid = 0;
             State.LastPing = DateTime.Now;
@@ -77,15 +76,13 @@ namespace RandomizerMod.MultiWorld
                 SendTimeout = 2000
             };
 
-            _client.Connect(RandomizerMod.Instance.MWSettings.IP, RandomizerMod.Instance.MWSettings.Port);
+            _client.Connect("127.0.0.1", 38281);
 
             if (ReadThread != null && ReadThread.IsAlive)
             {
                 ReadThread.Abort();
             }
 
-            // Make sure we never have more than one ping timer
-            PingTimer?.Dispose();
             PingTimer = new Timer(DoPing, State, 1000, PING_INTERVAL);
 
             ReadThread = new Thread(ReadWorker);
@@ -96,10 +93,10 @@ namespace RandomizerMod.MultiWorld
 
         public void JoinRando(int randoId, int playerId)
         {
-            Log("Joining rando session");
-            Log(RandomizerMod.Instance.MWSettings.UserName);
-            Log(randoId);
-            Log(playerId);
+            Console.WriteLine("Joining rando session");
+            Console.WriteLine(RandomizerMod.Instance.MWSettings.UserName);
+            Console.WriteLine(randoId);
+            Console.WriteLine(playerId);
             
             State.SessionId = randoId;
             State.PlayerId = playerId;
@@ -129,22 +126,21 @@ namespace RandomizerMod.MultiWorld
         }
         public void Disconnect()
         {
-            Log("Disconnecting from server");
+            Console.WriteLine("Disconnecting from server");
             PingTimer?.Dispose();
-            PingTimer = null;
 
             try
             {
                 ReadThread?.Abort();
                 ReadThread = null;
-                Log($"Disconnecting (UID = {State.Uid})");
+                Console.WriteLine($"Disconnecting (UID = {State.Uid})");
                 byte[] buf = Packer.Pack(new MWDisconnectMessage {SenderUid = State.Uid}).Buffer;
                 _client?.GetStream().Write(buf, 0, buf.Length);
                 _client?.Close();
             }
             catch (Exception e)
             {
-                Log("Error disconnection:\n" + e);
+                Console.WriteLine("Error disconnection:\n" + e);
             }
             finally
             {
@@ -181,7 +177,7 @@ namespace RandomizerMod.MultiWorld
                     GiveItemActions.GiveItemMW(item.Item, item.Location, item.From);
                     break;
                 default:
-                    Log("Unknown type in message queue: " + message.MessageType);
+                    Console.WriteLine("Unknown type in message queue: " + message.MessageType);
                     break;
             }
         }
@@ -195,7 +191,7 @@ namespace RandomizerMod.MultiWorld
                     State.Connected = false;
                     State.Joined = false;
 
-                    Log("Disconnected from server");
+                    Console.WriteLine("Disconnected from server");
                 }
 
                 Disconnect();
@@ -207,7 +203,7 @@ namespace RandomizerMod.MultiWorld
             {
                 if (DateTime.Now - State.LastPing > TimeSpan.FromMilliseconds(PING_INTERVAL * 3.5))
                 {
-                    Log("Connection timed out");
+                    Console.WriteLine("Connection timed out");
 
                     Disconnect();
                     Reconnect();
@@ -238,7 +234,7 @@ namespace RandomizerMod.MultiWorld
             }
             catch (Exception e)
             {
-                Log($"Failed to send message '{msg}' to server:\n{e}");
+                Console.WriteLine($"Failed to send message '{msg}' to server:\n{e}");
             }
         }
 
@@ -267,7 +263,7 @@ namespace RandomizerMod.MultiWorld
             }
             catch (Exception e)
             {
-                Log(e);
+                Console.WriteLine(e);
                 return;
             }
 
@@ -342,7 +338,7 @@ namespace RandomizerMod.MultiWorld
         {
             State.Uid = message.SenderUid;
             State.Connected = true;
-            Log($"Connected! (UID = {State.Uid})");
+            Console.WriteLine($"Connected! (UID = {State.Uid})");
             OnConnect?.Invoke(State.Uid);
         }
 
@@ -351,12 +347,12 @@ namespace RandomizerMod.MultiWorld
             State.Joined = true;
             OnJoin?.Invoke();
 
-            foreach (string item in RandomizerMod.Instance.Settings.UnconfirmedItems)
+            /*foreach (string item in RandomizerMod.Instance.Settings.UnconfirmedItems)
             {
                 (int playerId, string itemName) = LogicManager.ExtractPlayerID(item);
                 if (playerId < 0) continue;
                 SendItem(RandomizerMod.Instance.Settings.GetItemLocation(item), itemName, playerId);
-            }
+            }*/
         }
 
         private void HandleLeaveMessage(MWLeaveMessage message)
@@ -393,8 +389,8 @@ namespace RandomizerMod.MultiWorld
         private void HandleItemSendConfirm(MWItemSendConfirmMessage message)
         {
             // Mark the item confirmed here, so if we send an item but disconnect we can be sure it will be resent when we open again
-            Log($"Confirming item: {message.Item} to {message.To}");
-            RandomizerMod.Instance.Settings.MarkItemConfirmed(new MWItem(message.To, message.Item).ToString());
+            Console.WriteLine($"Confirming item: {message.Item} to {message.To}");
+            //RandomizerMod.Instance.Settings.MarkItemConfirmed(new MWItem(message.To, message.Item).ToString());
             ClearFromSendQueue(message.To, message.Item);
         }
 
@@ -421,7 +417,7 @@ namespace RandomizerMod.MultiWorld
 
         public void SendItem(string loc, string item, int playerId)
         {
-            Log($"Sending item {item} to {playerId}");
+            Console.WriteLine($"Sending item {item} to {playerId}");
             MWItemSendMessage msg = new MWItemSendMessage { Location = loc, Item = item, To = playerId };
             ItemSendQueue.Add(msg);
             SendMessage(msg);

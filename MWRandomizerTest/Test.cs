@@ -8,65 +8,14 @@ using RandomizerLib;
 using RandomizerLib.MultiWorld;
 using Modding;
 
-namespace MWRandomizerTest
+namespace FakeClient
 {
-    class Test
+    class GameClient
     {
         static void Main(string[] args)
         {
-            LogicManager.ParseXML();
-
-            RandoSettings settings = new RandoSettings();
-            settings.Seed = 886399437;
-            settings.RandomizeRooms = true;
-            settings.Cursed = false;
-            settings.CreateSpoilerLog = true;
-            
-            settings.RandomizeStartLocation = true;
-            settings.RandomizeStartItems = false;
-
-            settings.MildSkips = false;
-            settings.ShadeSkips = false;
-            settings.FireballSkips = false;
-            settings.AcidSkips = false;
-            settings.SpikeTunnels = false;
-            settings.DarkRooms = false;
-            settings.SpicySkips = false;
-
-            settings.RandomizeDreamers = true;
-            settings.RandomizeSkills = true;
-            settings.RandomizeCharms = true;
-            settings.RandomizeKeys = true;
-            settings.RandomizeGeoChests = true;
-            settings.RandomizeMaskShards = true;
-            settings.RandomizeVesselFragments = true;
-            settings.RandomizePaleOre = true;
-            settings.RandomizeCharmNotches = true;
-            settings.RandomizeRancidEggs = true;
-            settings.RandomizeRelics = true;
-            settings.RandomizeStags = true;
-            settings.RandomizeMaps = true;
-            settings.RandomizeGrubs = true;
-            settings.RandomizeWhisperingRoots = true;
-            settings.RandomizeRocks = true;
-            settings.RandomizeSoulTotems = true;
-            settings.RandomizePalaceTotems = true;
-            settings.RandomizeLifebloodCocoons = true;
-            settings.DuplicateMajorItems = true;
-
-            settings.Grubfather = true;
-            settings.CharmNotch = true;
-            settings.EarlyGeo = true;
-            settings.ExtraPlatforms = true;
-            settings.LeverSkips = true;
-            settings.Jiji = false;
-
-            MWRandomizer rando = new MWRandomizer(settings, 2);
-
-            List<RandoResult> results = rando.RandomizeMW();
-            RandoResult res = JsonConvert.DeserializeObject<RandoResult>(JsonConvert.SerializeObject(results[0]));
-
-            Console.Read();
+            ClientConnection cc = new ClientConnection();
+            cc.Connect();
         }
     }
 }

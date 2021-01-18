@@ -44,10 +44,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientConnection.cs" />
+    <Compile Include="ConnectionState.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MultiWorldProtocol\MultiWorldProtocol.csproj">
+      <Project>{646d3716-fe32-4f72-839a-942be24e6978}</Project>
+      <Name>MultiWorldProtocol</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RandomizerLib3.0\RandomizerLib3.0.csproj">
       <Project>{9a6e25ca-f58e-4f1b-9187-7142844a7d0a}</Project>
       <Name>RandomizerLib3.0</Name>
