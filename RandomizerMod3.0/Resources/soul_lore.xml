@@ -169,7 +169,7 @@
     <objectName>Soul Totem 1</objectName>
     <replace>true</replace>
     <itemLogic>Distant_Village</itemLogic>
-    <areaLogic>Deepnest_10[door1] | (Deepnest_10[right2] + (DASH | CLAW | WINGS | AIRSTALL)) | (Distant_Village_Stag + Can_Stag)</areaLogic>
+    <areaLogic>Deepnest_10[door1] | (Deepnest_10[right2] + (DASH | CLAW | WINGS | AIRSTALL)) | (Distant_Vilage_Stag + Can_Stag)</areaLogic>
     <roomLogic>Deepnest_10[door1] | Deepnest_10[door2] | Deepnest_10[right1] | (Deepnest_10[right2] + (DASH | CLAW | WINGS | AIRSTALL))</roomLogic>
     <type>Soul</type>
     <action>AddSoul</action>

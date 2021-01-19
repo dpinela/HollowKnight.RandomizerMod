@@ -1,0 +1,43 @@
+﻿<randomizer>
+  <shop name="Sly">
+    <sceneName>Room_shop</sceneName>
+    <objectName>Shop Menu</objectName>
+    <itemLogic>Crossroads + Dirtmouth</itemLogic>
+    <areaLogic>Crossroads + Dirtmouth</areaLogic>
+    <roomLogic>Room_ruinhouse[left1] + Room_shop[left1]</roomLogic>
+    <requiredPlayerDataBool></requiredPlayerDataBool>
+  </shop>
+  <shop name="Sly_(Key)">
+    <sceneName>Room_shop</sceneName>
+    <objectName>Shop Menu</objectName>
+    <itemLogic>SHOPKEY + Crossroads + Dirtmouth</itemLogic>
+    <areaLogic>SHOPKEY + Crossroads + Dirtmouth</areaLogic>
+    <roomLogic>Room_ruinhouse[left1] + Room_shop[left1] + SHOPKEY</roomLogic>
+    <requiredPlayerDataBool>gaveSlykey</requiredPlayerDataBool>
+  </shop>
+  <shop name="Iselda">
+    <sceneName>Room_mapper</sceneName>
+    <objectName>Shop Menu</objectName>
+    <itemLogic>Dirtmouth</itemLogic>
+    <areaLogic>Dirtmouth</areaLogic>
+    <roomLogic>Room_mapper[left1]</roomLogic>
+    <requiredPlayerDataBool></requiredPlayerDataBool>
+  </shop>
+  <shop name="Salubra">
+    <sceneName>Room_Charm_Shop</sceneName>
+    <objectName>Shop Menu</objectName>
+    <itemLogic>Crossroads + (CLAW | DASH | WINGS | SUPERDASH | INFECTED | ((SCREAM | FIREBALL) + FIREBALLSKIPS) | SHADESKIPS)</itemLogic>
+    <areaLogic>Crossroads + (CLAW | DASH | WINGS | SUPERDASH | INFECTED | ((SCREAM | FIREBALL) + FIREBALLSKIPS) | SHADESKIPS)</areaLogic>
+    <roomLogic>Room_Charm_Shop[left1]</roomLogic>
+    <requiredPlayerDataBool></requiredPlayerDataBool>
+  </shop>
+  <shop name="Leg_Eater">
+    <sceneName>Fungus2_26</sceneName>
+    <objectName>Shop Menu</objectName>
+    <itemLogic>(Fungal_Wastes + (DASH | WINGS | ACID | AIRSTALL | CLAW | SUPERDASH)) | (Crossroads + (INFECTED | DASH | WINGS | (CLAW + AIRSTALL)))</itemLogic>
+    <areaLogic>Fungal_Wastes + (DASH | WINGS | ACID | AIRSTALL | CLAW | SUPERDASH | Fungus2_06[top1])</areaLogic>
+    <roomLogic>Fungus2_26[left1]</roomLogic>
+    <requiredPlayerDataBool></requiredPlayerDataBool>
+    <dungDiscount>true</dungDiscount>
+  </shop>
+</randomizer>
