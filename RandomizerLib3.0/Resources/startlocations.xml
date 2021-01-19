@@ -160,7 +160,7 @@
     <x>26.5</x>
     <y>4.4</y>
     <zone>OUTSKIRTS</zone>
-    <waypoint>Central_Kingdom's_Edge</waypoint>
+    <waypoint>Upper_Kingdom's_Edge</waypoint>
     <areaTransition>Deepnest_East_07[left2]</areaTransition>
     <roomTransition>Deepnest_East_15[left1]</roomTransition>
     <itemSafe>false</itemSafe>
@@ -209,10 +209,10 @@
     <y>63.4</y>
     <zone>ROYAL_GARDENS</zone>
     <waypoint>Top_Left_Queen's_Gardens</waypoint>
-    <areaTransition>Town[bot1]</areaTransition>
+    <areaTransition>Fungus3_34[right1]</areaTransition>
     <roomTransition>Fungus3_13[left1]</roomTransition>
     <itemSafe>false</itemSafe>
-    <areaSafe>true</areaSafe>
+    <areaSafe>false</areaSafe>
     <roomSafe>true</roomSafe>
   </start>
   <start name="Far Greenpath">
@@ -220,7 +220,7 @@
     <x>34.9</x>
     <y>23.4</y>
     <zone>GREEN_PATH</zone>
-    <waypoint>Greenpath</waypoint>
+    <waypoint>Greenpath-QG</waypoint>
     <areaTransition>Fungus1_13[left1]</areaTransition>
     <roomTransition>Fungus1_13[left1]</roomTransition>
     <itemSafe>false</itemSafe>
@@ -256,7 +256,7 @@
     <x>20.9</x>
     <y>136.3</y>
     <zone>CITY</zone>
-    <waypoint>Upper_King's_Station</waypoint>
+    <waypoint>Right_Elevator</waypoint>
     <areaTransition>Ruins2_10b[right1]</areaTransition>
     <roomTransition>Ruins2_10b[right1]</roomTransition>
     <itemSafe>true</itemSafe>

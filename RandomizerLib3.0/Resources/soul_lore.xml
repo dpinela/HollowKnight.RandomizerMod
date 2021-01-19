@@ -515,7 +515,7 @@
     <replace>true</replace>
     <itemLogic>Upper_Crystal_Peak + ((CLAW + (DASH | WINGS | AIRSTALL | (SUPERDASH + MILDSKIPS))) | (WINGS + SHADESKIPS))</itemLogic>
     <areaLogic>Upper_Crystal_Peak + ((CLAW + (DASH | WINGS | AIRSTALL | (SUPERDASH + MILDSKIPS))) | (WINGS + SHADESKIPS))</areaLogic>
-    <roomLogic>Mines_31[left1] + ((CLAW + (DASH | WINGS | AIRSTALL | (SUPERDASH + MILDSKIPS))) | (WINGS + SHADESKIPS))</roomLogic>
+    <roomLogic>Mines_31[left1] + (CLAW + (DASH | WINGS | AIRSTALL | (SUPERDASH + MILDSKIPS)))</roomLogic>
     <type>Soul</type>
     <action>AddSoul</action>
     <pool>Soul</pool>
@@ -530,7 +530,7 @@
     <replace>true</replace>
     <itemLogic>Upper_Crystal_Peak + ((CLAW + (DASH | WINGS | AIRSTALL)) | (WINGS + SHADESKIPS))</itemLogic>
     <areaLogic>Upper_Crystal_Peak + ((CLAW + (DASH | WINGS | AIRSTALL)) | (WINGS + SHADESKIPS))</areaLogic>
-    <roomLogic>Mines_31[left1] + ((CLAW + (DASH | WINGS | AIRSTALL)) | (WINGS + SHADESKIPS))</roomLogic>
+    <roomLogic>Mines_31[left1] + (CLAW + (DASH | WINGS | AIRSTALL))</roomLogic>
     <type>Soul</type>
     <action>AddSoul</action>
     <pool>Soul</pool>

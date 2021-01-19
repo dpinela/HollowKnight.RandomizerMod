@@ -24,7 +24,7 @@
   <macro name="SKIPACID">CLAW + DASH + SUPERDASH + ACIDSKIPS</macro>
   <macro name="MINIBOSS">FIREBALL | SCREAM | QUAKE | SPICYSKIPS</macro>
   <macro name="AERIALMINIBOSS">((FIREBALL | SCREAM) + (DASH | MILDSKIPS)) | SPICYSKIPS</macro>
-  <macro name="BOSS">(Vengeful_Spirit + Shade_Soul) | (Desolate_Dive + Descending_Dark) | (Howling_Wraiths + Abyss_Shriek) | (FIREBALL + QUAKE) | (SCREAM + QUAKE) | (FIREBALL + SCREAM)</macro>
+  <macro name="BOSS">((Vengeful_Spirit + Shade_Soul) | (Desolate_Dive + Descending_Dark) | (Howling_Wraiths + Abyss_Shriek) | (FIREBALL + QUAKE) | (SCREAM + QUAKE) | (FIREBALL + SCREAM)) + (DASH | MILDSKIPS)</macro>
   <macro name="ALLSTAGS">Crossroads_Stag + Greenpath_Stag + Queen's_Station_Stag + Queen's_Gardens_Stag + City_Storerooms_Stag + King's_Station_Stag + Resting_Grounds_Stag + Distant_Village_Stag + Hidden_Station_Stag</macro>
   <macro name="LIFEBLOOD">Lifeblood_Heart | Lifeblood_Core | Joni's_Blessing</macro>
 
