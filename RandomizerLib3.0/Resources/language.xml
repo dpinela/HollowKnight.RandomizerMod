@@ -73,6 +73,8 @@
     <entry sheet="UI" key="RANDOMIZER_NAME_LIFEBLOOD_COCOON_SMALL">6 lifeblood masks</entry>
     <entry sheet="UI" key="RANDOMIZER_NAME_LIFEBLOOD_COCOON_LARGE">9 lifeblood masks</entry>
     <entry sheet="UI" key="RANDOMIZER_DESC_LIFEBLOOD_COCOON">Limited edition Lifeblood masks - get them while they last!</entry>
+    <entry sheet="UI" key="RANDOMIZER_NAME_GRIMMKIN_FLAME">Grimmkin Flame</entry>
+    <entry sheet="UI" key="RANDOMIZER_DESC_GRIMMKIN_FLAME">Hot new addition to your randomizer!</entry>
   <entry sheet="UI" key="RANDOMIZER_NAME_1GEO">1 geo</entry>
   <entry sheet="UI" key="RANDOMIZER_NAME_15GEO">15 geo</entry>
   <entry sheet="UI" key="RANDOMIZER_NAME_17GEO">17 geo</entry>

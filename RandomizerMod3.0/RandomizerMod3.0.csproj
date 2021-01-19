@@ -283,11 +283,6 @@
     <EmbeddedResource Include="Resources\ShopIcons\GreatSlash.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\items.xml" />
-    <EmbeddedResource Include="Resources\rocks.xml" />
-    <EmbeddedResource Include="Resources\soul_lore.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\UI\logo2.png" />
   </ItemGroup>
   <ItemGroup>
@@ -350,15 +345,6 @@
     <EmbeddedResource Include="Resources\ShopIcons\WanderersJournal.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\additive.xml" />
-    <EmbeddedResource Include="Resources\macros.xml" />
-    <EmbeddedResource Include="Resources\areas.xml" />
-    <EmbeddedResource Include="Resources\shops.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\rooms.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\ShopIcons\Essence.png" />
   </ItemGroup>
   <ItemGroup>
@@ -371,10 +357,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\ShopIcons\Quill.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\waypoints.xml" />
-    <EmbeddedResource Include="Resources\startlocations.xml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Prompts\Dreamer.png" />

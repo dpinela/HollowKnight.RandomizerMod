@@ -3919,13 +3919,13 @@
     <sceneName>Ruins1_05</sceneName>
     <doorName>right1</doorName>
     <areaName>City_of_Tears</areaName>
-    <logic>Ruins1_05</logic>
+    <logic>Ruins1_05 + (CLAW | WINGS | Ruins1_05[top1])</logic>
   </transition>
   <transition name="Ruins1_05[right2]">
     <sceneName>Ruins1_05</sceneName>
     <doorName>right2</doorName>
     <areaName>City_of_Tears</areaName>
-    <logic>Ruins1_05 + (CLAW | WINGS | Ruins1_05[top1])</logic>
+    <logic>Ruins1_05</logic>
   </transition>
   <transition name="Ruins1_05[top1]">
     <sceneName>Ruins1_05</sceneName>
