@@ -2189,9 +2189,9 @@
     <objectName>Shiny Item</objectName>
     <fsmName>Shiny Control</fsmName>
     <replace>false</replace>
-    <itemLogic>Dirtmouth + Grimmchild + BOSS + 6FLAMES</itemLogic>
-    <areaLogic>Dirtmouth + Grimmchild + BOSS + 6FLAMES</areaLogic>
-    <roomLogic>Grimm_Main_Tent[left1] + Grimmchild + BOSS + 6FLAMES</roomLogic>
+    <itemLogic>Dirtmouth + Grimmchild + BOSS</itemLogic>
+    <areaLogic>Dirtmouth + Grimmchild + BOSS</areaLogic>
+    <roomLogic>Grimm_Main_Tent[left1] + Grimmchild + BOSS</roomLogic>
     <type>Trinket</type>
     <action>Int</action>
     <pool>Notch</pool>
@@ -5332,6 +5332,7 @@
     <areaName>Kingdoms_Edge</areaName>
   </item>
   <!--Grimmkin Flames-->
+    <!--
   <item name="Grimmkin_Flame-City_Storerooms">
     <intName>flamesCollected</intName>
     <sceneName>Ruins1_28</sceneName>
@@ -5502,6 +5503,7 @@
     <areaName>Distant_Village</areaName>
     <progression>true</progression>
   </item>
+  -->
   
 <!--REFERENCES-->
   <item name="Grubfather">
