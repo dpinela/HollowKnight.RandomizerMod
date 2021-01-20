@@ -21,7 +21,7 @@ namespace RandomizerMod
         // It's easier to just update this static variable after deserializing than passing settings around since LanguageStringManager
         // is mostly used while creating randomizer actions and the settings won't be copied into RandomizerMod yet
         private static Dictionary<int, string> MWNicknames = new Dictionary<int, string>();
-        private static string GetMWPlayerName(int playerId)
+        public static string GetMWPlayerName(int playerId)
         {
             string name = "Player " + (playerId + 1);
             if (MWNicknames != null && MWNicknames.ContainsKey(playerId))

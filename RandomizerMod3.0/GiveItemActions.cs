@@ -72,7 +72,12 @@ namespace RandomizerMod
             {
                 string loc = location;
                 if (remote) loc = $"{from}-{location}";
-                LogItemToTracker(rawItem, loc);
+                string it = item;
+                if (player != RandomizerMod.Instance.Settings.MWPlayerId)
+                {
+                    it = $"{LanguageStringManager.GetMWPlayerName(player)}-{item}";
+                }
+                LogItemToTracker(it, loc);
             }
             else
             {
