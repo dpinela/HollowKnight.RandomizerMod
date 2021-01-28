@@ -415,6 +415,71 @@ namespace RandomizerMod
             string message = $"Putting item \"{item.Replace('_', ' ')}\" at \"{location.Replace('_', ' ')}\"";
             LogSpoiler(message);
         }
+
+        public static string generateSpoilerLog(RandoResult result)
+        {
+            string log = string.Empty;
+            void AddToLog(string message) => log += message + Environment.NewLine;
+
+            AddToLog(GetItemSpoiler(result));
+            if (result.settings.RandomizeTransitions) AddToLog(GetTransitionSpoiler(result.settings, result.transitionPlacements.Select(kvp => (kvp.Key, kvp.Value)).ToArray()));
+
+            try
+            {
+                AddToLog(Environment.NewLine + "SETTINGS");
+                AddToLog($"Seed: {result.settings.Seed}");
+                AddToLog($"Mode: " + // :)
+                    $"{(result.settings.RandomizeRooms ? (result.settings.ConnectAreas ? "Connected-Area Room Randomizer" : "Room Randomizer") : (result.settings.RandomizeAreas ? "Area Randomizer" : "Item Randomizer"))}");
+                if (result.players > 1)
+                {
+                    AddToLog($"Multiworld players: {result.players}");
+                    AddToLog($"Multiworld player ID: {result.playerId + 1}");
+                }
+                AddToLog($"Cursed: {result.settings.Cursed}");
+                AddToLog($"Start location: {result.settings.StartName}");
+                AddToLog($"Random start items: {result.settings.RandomizeStartItems}");
+                AddToLog("REQUIRED SKIPS");
+                AddToLog($"Mild skips: {result.settings.MildSkips}");
+                AddToLog($"Shade skips: {result.settings.ShadeSkips}");
+                AddToLog($"Fireball skips: {result.settings.FireballSkips}");
+                AddToLog($"Acid skips: {result.settings.AcidSkips}");
+                AddToLog($"Spike tunnels: {result.settings.SpikeTunnels}");
+                AddToLog($"Dark Rooms: {result.settings.DarkRooms}");
+                AddToLog($"Spicy skips: {result.settings.SpicySkips}");
+                AddToLog("RANDOMIZED LOCATIONS");
+                AddToLog($"Dreamers: {result.settings.RandomizeDreamers}");
+                AddToLog($"Skills: {result.settings.RandomizeSkills}");
+                AddToLog($"Charms: {result.settings.RandomizeCharms}");
+                AddToLog($"Keys: {result.settings.RandomizeKeys}");
+                AddToLog($"Geo chests: {result.settings.RandomizeGeoChests}");
+                AddToLog($"Mask shards: {result.settings.RandomizeMaskShards}");
+                AddToLog($"Vessel fragments: {result.settings.RandomizeVesselFragments}");
+                AddToLog($"Pale ore: {result.settings.RandomizePaleOre}");
+                AddToLog($"Charm notches: {result.settings.RandomizeCharmNotches}");
+                AddToLog($"Rancid eggs: {result.settings.RandomizeRancidEggs}");
+                AddToLog($"Relics: {result.settings.RandomizeRelics}");
+                AddToLog($"Stags: {result.settings.RandomizeStags}");
+                AddToLog($"Maps: {result.settings.RandomizeMaps}");
+                AddToLog($"Grubs: {result.settings.RandomizeGrubs}");
+                AddToLog($"Whispering roots: {result.settings.RandomizeWhisperingRoots}");
+                AddToLog($"Lifeblood cocoons: {result.settings.RandomizeLifebloodCocoons}");
+                AddToLog($"Duplicate major items: {result.settings.DuplicateMajorItems}");
+                AddToLog("QUALITY OF LIFE");
+                AddToLog($"Grubfather: {result.settings.Grubfather}");
+                AddToLog($"Salubra: {result.settings.CharmNotch}");
+                AddToLog($"Early geo: {result.settings.EarlyGeo}");
+                AddToLog($"Extra platforms: {result.settings.ExtraPlatforms}");
+                AddToLog($"Levers: {result.settings.LeverSkips}");
+                AddToLog($"Jiji: {result.settings.Jiji}");
+            }
+            catch
+            {
+                AddToLog("Error logging randomizer settings!?!?");
+            }
+
+            return log;
+        }
+
         public static void LogAllToSpoiler(RandoResult result)
         {
             RandomizerMod.Instance.Log("Generating spoiler log...");
@@ -422,65 +487,7 @@ namespace RandomizerMod
             {
                 Stopwatch spoilerWatch = new Stopwatch();
                 spoilerWatch.Start();
-
-                string log = string.Empty;
-                void AddToLog(string message) => log += message + Environment.NewLine;
-
-                AddToLog(GetItemSpoiler(result));
-                if (result.settings.RandomizeTransitions) AddToLog(GetTransitionSpoiler(result.settings, result.transitionPlacements.Select(kvp => (kvp.Key, kvp.Value)).ToArray()));
-
-                try
-                {
-                    AddToLog(Environment.NewLine + "SETTINGS");
-                    AddToLog($"Seed: {result.settings.Seed}");
-                    AddToLog($"Mode: " + // :)
-                        $"{(result.settings.RandomizeRooms ? (result.settings.ConnectAreas ? "Connected-Area Room Randomizer" : "Room Randomizer") : (result.settings.RandomizeAreas ? "Area Randomizer" : "Item Randomizer"))}");
-                    if (result.players > 1)
-                    {
-                        AddToLog($"Multiworld players: {result.players}");
-                        AddToLog($"Multiworld player ID: {result.playerId + 1}");
-                    }
-                    AddToLog($"Cursed: {result.settings.Cursed}");
-                    AddToLog($"Start location: {result.settings.StartName}");
-                    AddToLog($"Random start items: {result.settings.RandomizeStartItems}");
-                    AddToLog("REQUIRED SKIPS");
-                    AddToLog($"Mild skips: {result.settings.MildSkips}");
-                    AddToLog($"Shade skips: {result.settings.ShadeSkips}");
-                    AddToLog($"Fireball skips: {result.settings.FireballSkips}");
-                    AddToLog($"Acid skips: {result.settings.AcidSkips}");
-                    AddToLog($"Spike tunnels: {result.settings.SpikeTunnels}");
-                    AddToLog($"Dark Rooms: {result.settings.DarkRooms}");
-                    AddToLog($"Spicy skips: {result.settings.SpicySkips}");
-                    AddToLog("RANDOMIZED LOCATIONS");
-                    AddToLog($"Dreamers: {result.settings.RandomizeDreamers}");
-                    AddToLog($"Skills: {result.settings.RandomizeSkills}");
-                    AddToLog($"Charms: {result.settings.RandomizeCharms}");
-                    AddToLog($"Keys: {result.settings.RandomizeKeys}");
-                    AddToLog($"Geo chests: {result.settings.RandomizeGeoChests}");
-                    AddToLog($"Mask shards: {result.settings.RandomizeMaskShards}");
-                    AddToLog($"Vessel fragments: {result.settings.RandomizeVesselFragments}");
-                    AddToLog($"Pale ore: {result.settings.RandomizePaleOre}");
-                    AddToLog($"Charm notches: {result.settings.RandomizeCharmNotches}");
-                    AddToLog($"Rancid eggs: {result.settings.RandomizeRancidEggs}");
-                    AddToLog($"Relics: {result.settings.RandomizeRelics}");
-                    AddToLog($"Stags: {result.settings.RandomizeStags}");
-                    AddToLog($"Maps: {result.settings.RandomizeMaps}");
-                    AddToLog($"Grubs: {result.settings.RandomizeGrubs}");
-                    AddToLog($"Whispering roots: {result.settings.RandomizeWhisperingRoots}");
-                    AddToLog($"Lifeblood cocoons: {result.settings.RandomizeLifebloodCocoons}");
-                    AddToLog($"Duplicate major items: {result.settings.DuplicateMajorItems}");
-                    AddToLog("QUALITY OF LIFE");
-                    AddToLog($"Grubfather: {result.settings.Grubfather}");
-                    AddToLog($"Salubra: {result.settings.CharmNotch}");
-                    AddToLog($"Early geo: {result.settings.EarlyGeo}");
-                    AddToLog($"Extra platforms: {result.settings.ExtraPlatforms}");
-                    AddToLog($"Levers: {result.settings.LeverSkips}");
-                    AddToLog($"Jiji: {result.settings.Jiji}");
-                }
-                catch
-                {
-                    AddToLog("Error logging randomizer settings!?!?");
-                }
+                string log = generateSpoilerLog(result);
 
                 spoilerWatch.Stop();
                 LogSpoiler(log);

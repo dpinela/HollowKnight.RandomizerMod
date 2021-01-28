@@ -63,6 +63,10 @@
       <Project>{9a6e25ca-f58e-4f1b-9187-7142844a7d0a}</Project>
       <Name>RandomizerLib3.0</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RandomizerMod3.0\RandomizerMod3.0.csproj">
+      <Project>{2A00B777-CBA2-409B-BB29-3339C92CCACC}</Project>
+      <Name>RandomizerMod3.0</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -24,7 +24,17 @@ namespace RandomizerMod.Randomization
             LanguageStringManager.SetMWNames(result.nicknames);
 
             SaveAllPlacements(result);
-            if (RandomizerMod.Instance.Settings.CreateSpoilerLog) RandoLogger.LogAllToSpoiler(result);
+            if (RandomizerMod.Instance.Settings.CreateSpoilerLog)
+            {
+                if (RandomizerMod.Instance.Settings.IsMW)
+                {
+                    RandoLogger.LogSpoiler(result.spoiler);
+                }
+                else
+                {
+                    RandoLogger.LogAllToSpoiler(result);
+                }
+            }
 
             RandomizerAction.CreateActions(RandomizerMod.Instance.Settings.ItemPlacements, RandomizerMod.Instance.Settings);
 

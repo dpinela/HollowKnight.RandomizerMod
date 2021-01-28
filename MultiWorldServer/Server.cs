@@ -13,6 +13,7 @@ using RandomizerLib;
 using Newtonsoft.Json;
 using RandomizerLib.MultiWorld;
 using System.IO;
+using RandomizerMod;
 
 namespace MultiWorldServer
 {
@@ -592,13 +593,19 @@ namespace MultiWorldServer
 
             Log("Randomizing world...");
             MWRandomizer randomizer = new MWRandomizer(settings);
-            List<RandoResult> results = randomizer.RandomizeMW();
+            List<RandoResult> results = randomizer.RandomizeMW(nicknames);
             Log("Done randomization");
+
+            string spoiler = RandoLogger.generateSpoilerLog(results[0]);
+            foreach(RandoResult result in results)
+            {
+                if (result.settings.CreateSpoilerLog) result.spoiler = spoiler;
+            }
+            Log("Done generating spoiler log");
 
             Log("Sending to players...");
             for (int i = 0; i < results.Count; i++)
             {
-                results[i].nicknames = nicknames;
                 Log($"Sending to player {i + 1}");
                 SendMessage(new MWResultMessage { Result = results[i] }, clients[i]);
             }
