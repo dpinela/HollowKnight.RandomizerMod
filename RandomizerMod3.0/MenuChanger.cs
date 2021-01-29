@@ -170,16 +170,16 @@ namespace RandomizerMod
             seedInput.caretWidth = 8;
             seedInput.characterLimit = 9;
 
-            InputField ipInput = createTextEntry();
-            ipInput.transform.localPosition = new Vector3(0, 860);
-            ipInput.text = RandomizerMod.Instance.MWSettings.IP;
-            ipInput.textComponent.fontSize = ipInput.textComponent.fontSize - 5;
+            InputField urlInput = createTextEntry();
+            urlInput.transform.localPosition = new Vector3(0, 860);
+            urlInput.text = RandomizerMod.Instance.MWSettings.URL;
+            urlInput.textComponent.fontSize = urlInput.textComponent.fontSize - 5;
 
-            ipInput.caretColor = Color.white;
-            ipInput.contentType = InputField.ContentType.Standard;
-            ipInput.navigation = Navigation.defaultNavigation;
-            ipInput.caretWidth = 8;
-            ipInput.characterLimit = 15;
+            urlInput.caretColor = Color.white;
+            urlInput.contentType = InputField.ContentType.Standard;
+            urlInput.navigation = Navigation.defaultNavigation;
+            urlInput.caretWidth = 8;
+            urlInput.characterLimit = 0;
 
             InputField nicknameInput = createTextEntry();
             nicknameInput.transform.localPosition = new Vector3(0, 720);
@@ -215,8 +215,8 @@ namespace RandomizerMod
             CreateLabel(back, new Vector2(900, 160), "Open Mode");
             CreateLabel(back, new Vector2(0, 200), "Use of Benchwarp mod may be required");
             CreateLabel(back, new Vector2(0, 1300), "Seed:");
-            GameObject ipLabel = CreateLabel(back, new Vector2(-150, 865), "IP:");
-            ipLabel.transform.localScale = new Vector3(0.8f, 0.8f);
+            GameObject urlLabel = CreateLabel(back, new Vector2(-200, 865), "URL:");
+            urlLabel.transform.localScale = new Vector3(0.8f, 0.8f);
             GameObject nicknameLabel = CreateLabel(back, new Vector2(-300, 725), "Nickname:");
             nicknameLabel.transform.localScale = new Vector3(0.8f, 0.8f);
             nicknameLabel.SetActive(false);
@@ -843,8 +843,8 @@ namespace RandomizerMod
                 {
                     try
                     {
-                        RandomizerMod.Instance.MWSettings.IP = ipInput.text;
-                        Log($"Trying to connect to {ipInput.text}");
+                        RandomizerMod.Instance.MWSettings.URL = urlInput.text;
+                        Log($"Trying to connect to {urlInput.text}");
                         /*RandomizerMod.Instance.mwConnection.Disconnect();
                         RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();*/
                         RandomizerMod.Instance.mwConnection.Connect();
@@ -860,8 +860,8 @@ namespace RandomizerMod
 
                     startRandoBtn.transform.localPosition = startRandoBtn.transform.localPosition - new Vector3(0, 210);
 
-                    ipLabel.SetActive(false);
-                    ipInput.gameObject.SetActive(false);
+                    urlLabel.SetActive(false);
+                    urlInput.gameObject.SetActive(false);
 
                     nicknameInput.gameObject.SetActive(true);
                     nicknameLabel.SetActive(true);
@@ -881,8 +881,8 @@ namespace RandomizerMod
                 {
                     startRandoBtn.transform.localPosition = startRandoBtn.transform.localPosition + new Vector3(0, 210);
 
-                    ipLabel.SetActive(true);
-                    ipInput.gameObject.SetActive(true);
+                    urlLabel.SetActive(true);
+                    urlInput.gameObject.SetActive(true);
 
                     nicknameInput.gameObject.SetActive(false);
                     nicknameLabel.SetActive(false);

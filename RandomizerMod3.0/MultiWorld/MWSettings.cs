@@ -4,7 +4,7 @@ namespace RandomizerMod.MultiWorld
 {
     public class MWSettings : BaseSettings
     {
-        public string IP
+        public string URL
         {
             get => GetString("127.0.0.1");
             set => SetString(value);

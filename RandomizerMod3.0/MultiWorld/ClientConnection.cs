@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 
 using RandomizerLib;
 using RandomizerLib.MultiWorld;
+using System.Net;
 
 namespace RandomizerMod.MultiWorld
 {
@@ -66,7 +67,7 @@ namespace RandomizerMod.MultiWorld
                 return;
             }
 
-            Log("Attempting to connect to server");
+            Log($"Attempting to connect to server");
 
             State.Uid = 0;
             State.LastPing = DateTime.Now;
@@ -77,7 +78,10 @@ namespace RandomizerMod.MultiWorld
                 SendTimeout = 2000
             };
 
-            _client.Connect(RandomizerMod.Instance.MWSettings.IP, RandomizerMod.Instance.MWSettings.Port);
+            if(!TryConnect())
+            {
+                throw new Exception($"Could not connect to {RandomizerMod.Instance.MWSettings.URL}");
+            }
 
             if (ReadThread != null && ReadThread.IsAlive)
             {
@@ -92,6 +96,40 @@ namespace RandomizerMod.MultiWorld
             ReadThread.Start();
 
             SendMessage(new MWConnectMessage());
+        }
+
+        private bool TryConnect()
+        {
+            List<string> ips = ResolveURL();
+            foreach (string ip in ips)
+            {
+                try
+                {
+                    Log($"attemping connection to {ip}");
+                    _client.Connect(ip, RandomizerMod.Instance.MWSettings.Port);
+                }
+                catch { } // Ignored exception as we may connect to another IP successfully
+            }
+            return _client.Connected;
+        }
+
+        private List<string> ResolveURL()
+        {
+            List<string> ips = new List<string>();
+            string url = RandomizerMod.Instance.MWSettings.URL;
+
+            IPAddress ip;
+            if (IPAddress.TryParse(url, out ip))
+            {
+                ips.Add(url);
+            } 
+            else
+            {
+                IPHostEntry hostEntry = Dns.GetHostEntry(url);
+                Array.ForEach<IPAddress>(hostEntry.AddressList, ipAddress => ips.Add(ipAddress.ToString()));
+            }
+
+            return ips;
         }
 
         public void JoinRando(int randoId, int playerId)
