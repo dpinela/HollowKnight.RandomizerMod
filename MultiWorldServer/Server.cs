@@ -15,6 +15,7 @@ using RandomizerLib.MultiWorld;
 using System.IO;
 using RandomizerMod;
 using RandomizerLib.Logging;
+using System.Diagnostics;
 
 namespace MultiWorldServer
 {
@@ -597,9 +598,14 @@ namespace MultiWorldServer
             List<RandoResult> results = randomizer.RandomizeMW(nicknames);
             Log("Done randomization");
 
+            Stopwatch spoilerWatch = new Stopwatch();
+            spoilerWatch.Start();
             string spoiler = SpoilerLogger.generateSpoilerLog(results[0]);
+            spoilerWatch.Stop();
+
             string spoilerLocalPath = $"Spoilers/{results[0].randoId}.txt";
-            saveSpoilerFile(spoiler, results[0], spoilerLocalPath);
+            saveSpoilerFile(spoiler, results[0], spoilerLocalPath, spoilerWatch.Elapsed.TotalSeconds);
+
             Log($"Done generating spoiler log");
 
             foreach (RandoResult result in results)
@@ -616,7 +622,7 @@ namespace MultiWorldServer
             Log($"Done sending to players!");
         }
 
-        private void saveSpoilerFile(string spoiler, RandoResult result, string path)
+        private void saveSpoilerFile(string spoiler, RandoResult result, string path, double totalSeconds)
         {
             if (!Directory.Exists("Spoilers"))
             {
@@ -625,6 +631,7 @@ namespace MultiWorldServer
             SpoilerLogger spoilerLogger = new SpoilerLogger(path);
             spoilerLogger.InitializeSpoiler(result);
             spoilerLogger.LogSpoiler(spoiler);
+            spoilerLogger.LogSpoiler($"Generated spoiler log in {totalSeconds} seconds.");
         }
 
         private void HandleNotify(Client sender, MWNotifyMessage message)

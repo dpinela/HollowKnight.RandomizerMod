@@ -19,12 +19,12 @@ namespace RandomizerLib.Logging
 
         public void LogSpoiler(string message)
         {
-            File.AppendAllText(Path.Combine(path, "RandomizerSpoilerLog.txt"), message + Environment.NewLine);
+            File.AppendAllText(path, message + Environment.NewLine);
         }
 
         public void InitializeSpoiler(RandoResult result)
         {
-            File.Create(Path.Combine(path, "RandomizerSpoilerLog.txt")).Dispose();
+            File.Create(path).Dispose();
             LogSpoiler("Randomization completed with seed: " + result.settings.Seed);
 
             if (result.players > 1)
