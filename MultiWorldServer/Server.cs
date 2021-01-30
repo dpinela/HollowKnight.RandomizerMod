@@ -598,19 +598,14 @@ namespace MultiWorldServer
             List<RandoResult> results = randomizer.RandomizeMW(nicknames);
             Log("Done randomization");
 
-            Stopwatch spoilerWatch = new Stopwatch();
-            spoilerWatch.Start();
-            string spoiler = SpoilerLogger.generateSpoilerLog(results[0]);
-            spoilerWatch.Stop();
-
             string spoilerLocalPath = $"Spoilers/{results[0].randoId}.txt";
-            saveSpoilerFile(spoiler, results[0], spoilerLocalPath, spoilerWatch.Elapsed.TotalSeconds);
-
+            saveSpoilerFile(results[0], spoilerLocalPath);
             Log($"Done generating spoiler log");
 
+            string spoilerFileContent = File.ReadAllText(spoilerLocalPath);
             foreach (RandoResult result in results)
             {
-                if (result.settings.CreateSpoilerLog) result.spoiler = spoiler;
+                if (result.settings.CreateSpoilerLog) result.spoiler = spoilerFileContent;
             }
 
             Log("Sending to players...");
@@ -622,7 +617,7 @@ namespace MultiWorldServer
             Log($"Done sending to players!");
         }
 
-        private void saveSpoilerFile(string spoiler, RandoResult result, string path, double totalSeconds)
+        private void saveSpoilerFile(RandoResult result, string path)
         {
             if (!Directory.Exists("Spoilers"))
             {
@@ -630,8 +625,14 @@ namespace MultiWorldServer
             }
             SpoilerLogger spoilerLogger = new SpoilerLogger(path);
             spoilerLogger.InitializeSpoiler(result);
+
+            Stopwatch spoilerWatch = new Stopwatch();
+            spoilerWatch.Start();
+            string spoiler = SpoilerLogger.generateSpoilerLog(result);
+            spoilerWatch.Stop();
+
             spoilerLogger.LogSpoiler(spoiler);
-            spoilerLogger.LogSpoiler($"Generated spoiler log in {totalSeconds} seconds.");
+            spoilerLogger.LogSpoiler($"Generated spoiler log in {spoilerWatch.Elapsed.TotalSeconds} seconds.");
         }
 
         private void HandleNotify(Client sender, MWNotifyMessage message)

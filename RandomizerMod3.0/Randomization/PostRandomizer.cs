@@ -34,6 +34,7 @@ namespace RandomizerMod.Randomization
                 }
                 else
                 {
+                    spoilerLogger.InitializeSpoiler(result);
                     spoilerLogger.LogAllToSpoiler(result);
                 }
             }

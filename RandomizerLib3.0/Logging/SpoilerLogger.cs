@@ -15,6 +15,10 @@ namespace RandomizerLib.Logging
         public SpoilerLogger(string path)
         {
             this.path = path;
+            if (File.Exists(this.path))
+            {
+                File.Create(path).Dispose();
+            }
         }
 
         public void LogSpoiler(string message)
@@ -24,7 +28,6 @@ namespace RandomizerLib.Logging
 
         public void InitializeSpoiler(RandoResult result)
         {
-            File.Create(path).Dispose();
             LogSpoiler("Randomization completed with seed: " + result.settings.Seed);
 
             if (result.players > 1)
