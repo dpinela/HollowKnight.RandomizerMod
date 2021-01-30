@@ -46,7 +46,7 @@ namespace RandomizerLib.Logging
             {
                 Stopwatch spoilerWatch = new Stopwatch();
                 spoilerWatch.Start();
-                string log = SpoilerLogger.generateSpoilerLog(result);
+                string log = SpoilerLogger.GenerateSpoilerLog(result);
 
                 spoilerWatch.Stop();
                 LogSpoiler(log);
@@ -54,12 +54,13 @@ namespace RandomizerLib.Logging
             }).Start();
         }
 
-        public static string generateSpoilerLog(RandoResult result)
+        public static string GenerateSpoilerLog(RandoResult result)
         {
             string log = string.Empty;
             void AddToLog(string message) => log += message + Environment.NewLine;
 
-            AddToLog(GetItemSpoiler(result));
+            
+            AddToLog(string.IsNullOrEmpty(result.itemsSpoiler) ? GetItemSpoiler(result) : result.itemsSpoiler);
             if (result.settings.RandomizeTransitions) AddToLog(GetTransitionSpoiler(result.settings, result.transitionPlacements.Select(kvp => (kvp.Key, kvp.Value)).ToArray()));
 
             try
@@ -118,7 +119,7 @@ namespace RandomizerLib.Logging
             return log;
         }
 
-        private static string GetItemSpoiler(RandoResult result)
+        public static string GetItemSpoiler(RandoResult result)
         {
             string log = string.Empty;
             void AddToLog(string message) => log += message + Environment.NewLine;

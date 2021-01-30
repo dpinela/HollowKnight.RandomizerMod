@@ -9,12 +9,14 @@ using RandomizerLib.MultiWorld;
 using Newtonsoft.Json;
 using RandomizerMod.Actions;
 using RandomizerLib.Logging;
+using System.IO;
+using UnityEngine;
 
 namespace RandomizerMod.Randomization
 {
     internal static class PostRandomizer
     {
-        public static void PostRandomizationTasks(RandoResult result, SpoilerLogger spoilerLogger)
+        public static void PostRandomizationTasks(RandoResult result)
         {
             VanillaManager.SetupVanilla(result.settings);
 
@@ -28,15 +30,9 @@ namespace RandomizerMod.Randomization
             if (RandomizerMod.Instance.Settings.CreateSpoilerLog)
             {
                 RandomizerMod.Instance.Log("Generating spoiler log...");
-                if (RandomizerMod.Instance.Settings.IsMW)
-                {
-                    spoilerLogger.LogSpoiler(result.spoiler);
-                }
-                else
-                {
-                    spoilerLogger.InitializeSpoiler(result);
-                    spoilerLogger.LogAllToSpoiler(result);
-                }
+                SpoilerLogger spoilerLogger = new SpoilerLogger(Path.Combine(Application.persistentDataPath, "RandomizerSpoilerLog.txt"));
+                spoilerLogger.InitializeSpoiler(result);
+                spoilerLogger.LogAllToSpoiler(result);
             }
 
             RandomizerAction.CreateActions(RandomizerMod.Instance.Settings.ItemPlacements, RandomizerMod.Instance.Settings);

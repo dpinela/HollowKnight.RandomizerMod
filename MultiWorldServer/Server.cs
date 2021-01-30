@@ -598,13 +598,14 @@ namespace MultiWorldServer
             Log("Done randomization");
 
             string spoilerLocalPath = $"Spoilers/{results[0].randoId}.txt";
-            saveSpoilerFile(results[0], spoilerLocalPath);
+            string itemsSpoiler = SpoilerLogger.GetItemSpoiler(results[0]);
+            SaveItemSpoilerFile(results[0], spoilerLocalPath, itemsSpoiler);
             Log($"Done generating spoiler log");
 
-            string spoilerFileContent = File.ReadAllText(spoilerLocalPath);
-            foreach (RandoResult result in results)
+            for (int i = 0; i < results.Count; i++)
             {
-                if (result.settings.CreateSpoilerLog) result.spoiler = spoilerFileContent;
+                if (results[i].settings.CreateSpoilerLog) results[i].itemsSpoiler = itemsSpoiler;
+                FilterRandoResult(results[i]);
             }
 
             Log("Sending to players...");
@@ -616,22 +617,61 @@ namespace MultiWorldServer
             Log($"Done sending to players!");
         }
 
-        private void saveSpoilerFile(RandoResult result, string path)
+        private void FilterRandoResult(RandoResult result)
+        {
+            result.locationOrder = null;
+            FilterResultItemPlacements(result);
+            FilterResultShopCosts(result);
+            FilterResultVariableCosts(result);
+        }
+
+        private void FilterResultShopCosts(RandoResult result)
+        {
+            Dictionary<MWItem, int> relevantShopCosts = new Dictionary<MWItem, int>();
+            foreach (var itemPlacement in result.shopCosts)
+            {
+                if (itemPlacement.Key.PlayerId == result.playerId)
+                {
+                    relevantShopCosts.Add(itemPlacement.Key, itemPlacement.Value);
+                }
+            }
+            result.shopCosts = relevantShopCosts;
+        }
+
+        private void FilterResultVariableCosts(RandoResult result) 
+        { 
+            Dictionary<MWItem, int> relevantVariableCosts = new Dictionary<MWItem, int>();
+            foreach (var itemPlacement in result.variableCosts)
+            {
+                if (itemPlacement.Key.PlayerId == result.playerId)
+                {
+                    relevantVariableCosts.Add(itemPlacement.Key, itemPlacement.Value);
+                }
+            }
+            result.variableCosts = relevantVariableCosts;
+        }
+
+        private void FilterResultItemPlacements(RandoResult result)
+        {
+            Dictionary<MWItem, MWItem> relevantItemPlacements = new Dictionary<MWItem, MWItem>();
+            foreach (var itemPlacement in result.itemPlacements)
+            {
+                if (itemPlacement.Key.PlayerId == result.playerId || itemPlacement.Value.PlayerId == result.playerId)
+                {
+                    relevantItemPlacements.Add(itemPlacement.Key, itemPlacement.Value);
+                }
+            }
+            result.itemPlacements = relevantItemPlacements;
+        }
+
+        private void SaveItemSpoilerFile(RandoResult result, string path, string itemsSpoiler)
         {
             if (!Directory.Exists("Spoilers"))
             {
                 Directory.CreateDirectory("Spoilers");
             }
             SpoilerLogger spoilerLogger = new SpoilerLogger(path);
-            spoilerLogger.InitializeSpoiler(result);
-
-            Stopwatch spoilerWatch = new Stopwatch();
-            spoilerWatch.Start();
-            string spoiler = SpoilerLogger.generateSpoilerLog(result);
-            spoilerWatch.Stop();
-
-            spoilerLogger.LogSpoiler(spoiler);
-            spoilerLogger.LogSpoiler($"Generated spoiler log in {spoilerWatch.Elapsed.TotalSeconds} seconds.");
+            spoilerLogger.LogSpoiler(itemsSpoiler);
         }
 
         private void HandleNotify(Client sender, MWNotifyMessage message)

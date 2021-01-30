@@ -165,9 +165,8 @@ namespace RandomizerMod
                 {
                     if (result == null) return;
                     RandoLogger.InitializeTracker(result);
-                    SpoilerLogger spoilerLogger = new SpoilerLogger(Path.Combine(Application.persistentDataPath, "RandomizerSpoilerLog.txt"));
 
-                    PostRandomizationTasks(result, spoilerLogger);
+                    PostRandomizationTasks(result);
 
                     RandoLogger.UpdateHelperLog();
                     Ref.UI.StartNewGame(bossRush: true);
@@ -192,9 +191,8 @@ namespace RandomizerMod
                     }
 
                     RandoLogger.InitializeTracker(result);
-                    SpoilerLogger spoilerLogger = new SpoilerLogger(Path.Combine(Application.persistentDataPath, "RandomizerSpoilerLog.txt"));
 
-                    PostRandomizationTasks(result, spoilerLogger);
+                    PostRandomizationTasks(result);
 
                     RandoLogger.UpdateHelperLog();
                     Ref.UI.StartNewGame(bossRush: true);
