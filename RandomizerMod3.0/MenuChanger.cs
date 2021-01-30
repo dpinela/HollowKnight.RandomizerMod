@@ -124,6 +124,11 @@ namespace RandomizerMod
                 {
                     multiworldReadyBtn.SetName($"Ready ({num})");
                     readyPlayers.transform.Find("Text").GetComponent<Text>().text = players;
+
+                    if (num == -1)
+                    {
+                        startRandoBtn.gameObject.SetActive(false);
+                    }
                 }
             }
 

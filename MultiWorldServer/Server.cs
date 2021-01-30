@@ -30,6 +30,7 @@ namespace MultiWorldServer
         private readonly Dictionary<ulong, Client> Clients = new Dictionary<ulong, Client>();
         private readonly Dictionary<int, GameSession> GameSessions = new Dictionary<int, GameSession>();
         private readonly Dictionary<string, Dictionary<ulong, RandoSettings>> ready = new Dictionary<string, Dictionary<ulong, RandoSettings>>();
+        private readonly Dictionary<string, Dictionary<string, RandoResult>> unsavedResults = new Dictionary<string, Dictionary<string, RandoResult>>();
         private TcpListener _server;
         private readonly Timer ResendTimer;
 
@@ -470,11 +471,18 @@ namespace MultiWorldServer
             sender.Room = message.Room;
             lock (_clientLock)
             {
+                if (unsavedResults.ContainsKey(sender.Room) && !unsavedResults[sender.Room].ContainsKey(sender.Nickname))
+                {
+                    // Room has started & still open to make sure nobody loses their save & sender wasn't in room originally
+                    SendMessage(new MWNumReadyMessage { Ready = -1, Names = "Could not ready, please change room name" }, sender);
+                    return;
+                }
+
                 if (!ready.ContainsKey(sender.Room))
                 {
                     ready[sender.Room] = new Dictionary<ulong, RandoSettings>();
-                }
-
+                } 
+                
                 ready[sender.Room][sender.UID] = message.Settings;
 
                 string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
@@ -543,6 +551,17 @@ namespace MultiWorldServer
 
         private void HandleSaveMessage(Client sender, MWSaveMessage message)
         {
+            if (unsavedResults.ContainsKey(sender.Room) && unsavedResults[sender.Room].ContainsKey(sender.Nickname))
+            {
+                unsavedResults[sender.Room].Remove(sender.Nickname);
+                if (unsavedResults[sender.Room].Count == 0)
+                {
+                    Log($"Everyone in {sender.Room} has saved, freeing room name");
+                    ready.Remove(sender.Room);
+                    unsavedResults.Remove(sender.Room);
+                }
+            }
+
             if (sender.Session == null) return;
 
             GameSessions[sender.Session.randoId].Save(sender.Session.playerId);
@@ -559,6 +578,14 @@ namespace MultiWorldServer
             string room = sender.Room;
 
             if (!ready.ContainsKey(room)) return;
+            if (unsavedResults.ContainsKey(sender.Room) && !unsavedResults[sender.Room].ContainsKey(sender.Nickname)) return;
+
+            if (unsavedResults.ContainsKey(room) && unsavedResults[room].ContainsKey(sender.Nickname))
+            {
+                Log($"Sending unsaved result to {sender.Nickname}");
+                SendMessage(new MWResultMessage { Result = unsavedResults[room][sender.Nickname] }, sender);
+                return;
+            }
 
             string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
             Log($"Starting MW for {roomText} at request of {sender.Nickname}");
@@ -580,9 +607,7 @@ namespace MultiWorldServer
                     settings.Add(kvp.Value);
                     nicknames.Add(Clients[kvp.Key].Nickname);
                 }
-
-                ready.Remove(room);
-                }
+            }
 
             Log("Starting rando with players:");
             foreach (string nickname in nicknames)
@@ -595,6 +620,13 @@ namespace MultiWorldServer
             List<RandoResult> results = randomizer.RandomizeMW();
             Log("Done randomization");
 
+            Dictionary<string, RandoResult> clientsResults = new Dictionary<string, RandoResult>();
+            for (int i=0; i < results.Count; i++)
+            {
+                clientsResults.Add(clients[i].Nickname, results[i]);
+            }
+            unsavedResults[room] = clientsResults;
+            
             Log("Sending to players...");
             for (int i = 0; i < results.Count; i++)
             {
