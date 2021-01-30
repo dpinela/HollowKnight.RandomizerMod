@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using RandomizerLib.MultiWorld;
 using System.IO;
 using RandomizerMod;
+using RandomizerLib.Logging;
 
 namespace MultiWorldServer
 {
@@ -596,12 +597,15 @@ namespace MultiWorldServer
             List<RandoResult> results = randomizer.RandomizeMW(nicknames);
             Log("Done randomization");
 
-            string spoiler = RandoLogger.generateSpoilerLog(results[0]);
-            foreach(RandoResult result in results)
+            string spoiler = SpoilerLogger.generateSpoilerLog(results[0]);
+            string spoilerLocalPath = $"Spoilers/{results[0].randoId}.txt";
+            saveSpoilerFile(spoiler, results[0], spoilerLocalPath);
+            Log($"Done generating spoiler log");
+
+            foreach (RandoResult result in results)
             {
                 if (result.settings.CreateSpoilerLog) result.spoiler = spoiler;
             }
-            Log("Done generating spoiler log");
 
             Log("Sending to players...");
             for (int i = 0; i < results.Count; i++)
@@ -610,6 +614,17 @@ namespace MultiWorldServer
                 SendMessage(new MWResultMessage { Result = results[i] }, clients[i]);
             }
             Log($"Done sending to players!");
+        }
+
+        private void saveSpoilerFile(string spoiler, RandoResult result, string path)
+        {
+            if (!Directory.Exists("Spoilers"))
+            {
+                Directory.CreateDirectory("Spoilers");
+            }
+            SpoilerLogger spoilerLogger = new SpoilerLogger(path);
+            spoilerLogger.InitializeSpoiler(result);
+            spoilerLogger.LogSpoiler(spoiler);
         }
 
         private void HandleNotify(Client sender, MWNotifyMessage message)

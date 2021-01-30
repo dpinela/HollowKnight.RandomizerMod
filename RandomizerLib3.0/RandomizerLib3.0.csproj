@@ -70,6 +70,7 @@
     <Compile Include="RandoResult.cs" />
     <Compile Include="RandoSettings.cs" />
     <Compile Include="SpanningTree.cs" />
+    <Compile Include="Logging\SpoilerLogger.cs" />
     <Compile Include="TransitionManager.cs" />
     <Compile Include="TransitionRandomizer.cs" />
     <Compile Include="VanillaManager.cs" />

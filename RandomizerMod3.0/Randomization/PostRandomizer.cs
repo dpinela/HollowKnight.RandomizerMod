@@ -8,12 +8,13 @@ using RandomizerLib;
 using RandomizerLib.MultiWorld;
 using Newtonsoft.Json;
 using RandomizerMod.Actions;
+using RandomizerLib.Logging;
 
 namespace RandomizerMod.Randomization
 {
     internal static class PostRandomizer
     {
-        public static void PostRandomizationTasks(RandoResult result)
+        public static void PostRandomizationTasks(RandoResult result, SpoilerLogger spoilerLogger)
         {
             VanillaManager.SetupVanilla(result.settings);
 
@@ -26,13 +27,14 @@ namespace RandomizerMod.Randomization
             SaveAllPlacements(result);
             if (RandomizerMod.Instance.Settings.CreateSpoilerLog)
             {
+                RandomizerMod.Instance.Log("Generating spoiler log...");
                 if (RandomizerMod.Instance.Settings.IsMW)
                 {
-                    RandoLogger.LogSpoiler(result.spoiler);
+                    spoilerLogger.LogSpoiler(result.spoiler);
                 }
                 else
                 {
-                    RandoLogger.LogAllToSpoiler(result);
+                    spoilerLogger.LogAllToSpoiler(result);
                 }
             }
 
