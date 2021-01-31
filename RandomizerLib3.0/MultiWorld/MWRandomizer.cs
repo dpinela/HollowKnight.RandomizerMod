@@ -49,7 +49,7 @@ namespace RandomizerLib.MultiWorld
             this.players = 1;
         }
 
-        public List<RandoResult> RandomizeMW()
+        public List<RandoResult> RandomizeMW(List<string> nicknames = null)
         {
             transitionPlacements = new List<Dictionary<string, string>>();
 
@@ -94,7 +94,7 @@ namespace RandomizerLib.MultiWorld
                 catch (RandomizationError) { }
             }
 
-            return PrepareResult();
+            return PrepareResult(nicknames);
         }
 
         private void MWRandomizeItems()
@@ -291,10 +291,10 @@ namespace RandomizerLib.MultiWorld
             }
         }
 
-        private List<RandoResult> PrepareResult()
+        private List<RandoResult> PrepareResult(List<string> nicknames)
         {
             List<RandoResult> results = new List<RandoResult>();
-            List<string> nicknames = new List<string>();
+            if (nicknames == null) nicknames = new List<string>();
 
             int randoId = (new Random()).Next();
 
@@ -313,8 +313,6 @@ namespace RandomizerLib.MultiWorld
 
             for (int i = 0; i < players; i++)
             {
-                nicknames.Add($"Player {i + 1}");
-
                 RandoResult result = new RandoResult();
                 result.playerId = i;
                 result.players = players;
@@ -328,6 +326,7 @@ namespace RandomizerLib.MultiWorld
                 result.itemPlacements = new Dictionary<MWItem, MWItem>();
                 result.locationOrder = im.locationOrder;
                 result.shopCosts = shopCosts;
+                result.nicknames = nicknames;
 
                 // Need to flip L -> I to I -> L since each item is unique but locations (shops in particular) are not
                 foreach (var kvp in im.nonShopItems)
@@ -345,11 +344,6 @@ namespace RandomizerLib.MultiWorld
                 }
 
                 results.Add(result);
-            }
-
-            foreach (RandoResult result in results)
-            {
-                result.nicknames = nicknames;
             }
 
             return results;
