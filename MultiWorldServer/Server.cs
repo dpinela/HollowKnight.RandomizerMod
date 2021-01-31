@@ -619,7 +619,7 @@ namespace MultiWorldServer
 
         private void FilterRandoResult(RandoResult result)
         {
-            result.locationOrder = null;
+            result.locationOrder = new Dictionary<MWItem, int>();
             FilterResultItemPlacements(result);
             FilterResultShopCosts(result);
             FilterResultVariableCosts(result);
