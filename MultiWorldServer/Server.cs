@@ -13,6 +13,8 @@ using RandomizerLib;
 using Newtonsoft.Json;
 using RandomizerLib.MultiWorld;
 using System.IO;
+using RandomizerLib.Logging;
+using System.Diagnostics;
 
 namespace MultiWorldServer
 {
@@ -617,8 +619,9 @@ namespace MultiWorldServer
 
             Log("Randomizing world...");
             MWRandomizer randomizer = new MWRandomizer(settings);
-            List<RandoResult> results = randomizer.RandomizeMW();
+            List<RandoResult> results = randomizer.RandomizeMW(nicknames);
             Log("Done randomization");
+
 
             Dictionary<string, RandoResult> clientsResults = new Dictionary<string, RandoResult>();
             for (int i=0; i < results.Count; i++)
@@ -627,14 +630,85 @@ namespace MultiWorldServer
             }
             unsavedResults[room] = clientsResults;
             
+
+            string spoilerLocalPath = $"Spoilers/{results[0].randoId}.txt";
+            string itemsSpoiler = SpoilerLogger.GetItemSpoiler(results[0]);
+            SaveItemSpoilerFile(results[0], spoilerLocalPath, itemsSpoiler);
+            Log($"Done generating spoiler log");
+
+            for (int i = 0; i < results.Count; i++)
+            {
+                if (results[i].settings.CreateSpoilerLog) results[i].itemsSpoiler = itemsSpoiler;
+                FilterRandoResult(results[i]);
+            }
+
+
             Log("Sending to players...");
             for (int i = 0; i < results.Count; i++)
             {
-                results[i].nicknames = nicknames;
                 Log($"Sending to player {i + 1}");
                 SendMessage(new MWResultMessage { Result = results[i] }, clients[i]);
             }
             Log($"Done sending to players!");
+        }
+
+        private void FilterRandoResult(RandoResult result)
+        {
+            FilterResultLocationOrder(result);
+            FilterResultItemPlacements(result);
+            FilterResultShopCosts(result);
+            FilterResultVariableCosts(result);
+        }
+
+        private void FilterResultLocationOrder(RandoResult result)
+        {
+            Dictionary<MWItem, int> relevantLocationOrder = new Dictionary<MWItem, int>();
+            foreach (var locationOrder in result.locationOrder.Where(kvp => kvp.Key.PlayerId == result.playerId))
+            {
+                relevantLocationOrder.Add(locationOrder.Key, locationOrder.Value);
+            }
+            result.locationOrder = relevantLocationOrder;
+        }
+
+        private void FilterResultShopCosts(RandoResult result)
+        {
+            Dictionary<MWItem, int> relevantShopCosts = new Dictionary<MWItem, int>();
+            foreach (var shopCost in result.shopCosts.Where(kvp => result.itemPlacements.ContainsKey(kvp.Key) && result.itemPlacements[kvp.Key].PlayerId == result.playerId))
+            {
+                relevantShopCosts.Add(shopCost.Key, shopCost.Value);
+            }
+
+            result.shopCosts = relevantShopCosts;
+        }
+
+        private void FilterResultVariableCosts(RandoResult result) 
+        { 
+            Dictionary<MWItem, int> relevantVariableCosts = new Dictionary<MWItem, int>();
+            foreach (var variableCost in result.variableCosts.Where(kvp => kvp.Value != 0 && kvp.Key.PlayerId == result.playerId))
+            {
+                relevantVariableCosts.Add(variableCost.Key, variableCost.Value);
+            }
+            result.variableCosts = relevantVariableCosts;
+        }
+
+        private void FilterResultItemPlacements(RandoResult result)
+        {
+            Dictionary<MWItem, MWItem> relevantItemPlacements = new Dictionary<MWItem, MWItem>();
+            foreach (var itemPlacement in result.itemPlacements.Where(kvp => kvp.Value.PlayerId == result.playerId))
+            {
+                relevantItemPlacements.Add(itemPlacement.Key, itemPlacement.Value);
+            }
+            result.itemPlacements = relevantItemPlacements;
+        }
+
+        private void SaveItemSpoilerFile(RandoResult result, string path, string itemsSpoiler)
+        {
+            if (!Directory.Exists("Spoilers"))
+            {
+                Directory.CreateDirectory("Spoilers");
+            }
+            SpoilerLogger spoilerLogger = new SpoilerLogger(path);
+            spoilerLogger.LogSpoiler(itemsSpoiler);
         }
 
         private void HandleNotify(Client sender, MWNotifyMessage message)
