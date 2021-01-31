@@ -23,6 +23,8 @@ using RandomizerLib.Logging;
 
 using Object = UnityEngine.Object;
 using Newtonsoft.Json;
+using RandomizerMod.Components;
+using GlobalEnums;
 
 namespace RandomizerMod
 {
@@ -98,6 +100,13 @@ namespace RandomizerMod
             ModHooks.Instance.SetPlayerBoolHook += BoolSetOverride;
             ModHooks.Instance.BeforeSavegameSaveHook += OnSave;
             ModHooks.Instance.ApplicationQuitHook += OnQuit;
+            ModHooks.Instance.AfterSavegameLoadHook += OnLoad;
+
+            On.InvAnimateUpAndDown.AnimateUp += OnInventory;
+            On.InvAnimateUpAndDown.AnimateDown += OnInventoryClose;
+
+            On.UIManager.GoToPauseMenu += OnPause;
+            On.UIManager.UIClosePauseMenu += OnUnpause;
             On.PlayMakerFSM.OnEnable += FixVoidHeart;
             On.GameManager.BeginSceneTransition += EditTransition;
             On.HeroController.CanFocus += DisableFocus;
@@ -698,6 +707,7 @@ namespace RandomizerMod
 
         private IEnumerator OnQuitToMenu(On.QuitToMenu.orig_Start orig, QuitToMenu self)
         {
+            RecentItems.Destroy();
             try
             {
                 mwConnection.Leave();
@@ -710,6 +720,37 @@ namespace RandomizerMod
             } catch (Exception) { }
 
             return orig(self);
+        }
+
+        private IEnumerator OnPause(On.UIManager.orig_GoToPauseMenu orig, UIManager uiManager)
+        {
+            yield return orig(uiManager);
+
+            if (Settings.IsMW) RecentItems.Hide();
+        }
+
+        private void OnUnpause(On.UIManager.orig_UIClosePauseMenu origUIClosePauseMenu, UIManager self)
+        {
+            origUIClosePauseMenu(self);
+
+            if (Settings.IsMW) RecentItems.Show();
+        }
+
+        private void OnLoad(SaveGameData data)
+        {
+            if (Settings.IsMW) RecentItems.Create();
+        }
+
+        private void OnInventory(On.InvAnimateUpAndDown.orig_AnimateUp orig, InvAnimateUpAndDown self)
+        {
+            orig(self);
+            if (Settings.IsMW) RecentItems.Hide();
+        }
+
+        private void OnInventoryClose(On.InvAnimateUpAndDown.orig_AnimateDown orig, InvAnimateUpAndDown self)
+        {
+            orig(self);
+            if (Settings.IsMW) RecentItems.Show();
         }
     }
 }

@@ -77,7 +77,7 @@ namespace RandomizerMod
             if (RandomizerMod.Instance.Settings.EarlyGeo)
             {
                 // added version checking to the early geo randomization
-                int geoSeed = RandomizerMod.Instance.Settings.Seed;
+                int geoSeed = RandomizerMod.Instance.Settings.GeoSeed;
                 unchecked
                 {
                     geoSeed = geoSeed * 17 + 31 * RandomizerMod.Instance.MakeAssemblyHash();

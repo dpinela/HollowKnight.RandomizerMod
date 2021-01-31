@@ -11,6 +11,7 @@ using MultiWorldProtocol.Messaging.Definitions.Messages;
 using RandomizerLib;
 using RandomizerMod.MultiWorld;
 using RandomizerLib.MultiWorld;
+using RandomizerMod.Components;
 
 namespace RandomizerMod
 {
@@ -131,6 +132,7 @@ namespace RandomizerMod
                 item = itemSet[next - 1];
             }
             RelicMsg.ShowRelicItem(item, from);
+            RecentItems.AddItem(item, from);
         }
 
         // TODO: clean up the above? the reason it's all messed up is since I thought GiveAction would make more sense as part of RandomizerLib (LogicManager specifically)

@@ -8,6 +8,7 @@ using static RandomizerMod.LogHelper;
 
 using RandomizerLib;
 using System;
+using RandomizerMod.Components;
 
 namespace RandomizerMod
 {
@@ -413,6 +414,11 @@ namespace RandomizerMod
         {
             get => _randoSettings.Seed;
             set => _randoSettings.Seed = value;
+        }
+        public int GeoSeed
+        {
+            get => _randoSettings.GeoSeed;
+            set => _randoSettings.GeoSeed = value;
         }
 
         public void ResetPlacements()

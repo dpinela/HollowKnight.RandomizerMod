@@ -300,8 +300,11 @@ namespace RandomizerLib.MultiWorld
 
             Dictionary<MWItem, int> allModifiedCosts = new Dictionary<MWItem, int>();
 
+            int geoSeed = settings[0].Seed;
+
             for (int i = 0; i < players; i++)
             {
+                geoSeed += settings[i].GetSettingsSeed();
                 foreach (var kvp in modifiedCosts[i])
                 {
                     allModifiedCosts.Add(new MWItem(i, kvp.Key), kvp.Value);
@@ -318,6 +321,7 @@ namespace RandomizerLib.MultiWorld
                 result.randoId = randoId;
                 result.settings = settings[i];
                 result.settings.Seed = settings[0].Seed;
+                result.settings.GeoSeed = geoSeed;
                 result.startItems = startItems[i];
                 result.transitionPlacements = transitionPlacements[i];
                 result.variableCosts = allModifiedCosts;
