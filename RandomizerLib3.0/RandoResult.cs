@@ -22,6 +22,7 @@ namespace RandomizerLib
         public Dictionary<MWItem, int> shopCosts;               // MWItem (in shop) -> shop cost
         public Dictionary<MWItem, int> variableCosts;           // grub/essence location -> randomized grub/essence count
         public List<string> nicknames;
+        public string itemsSpoiler;
 
         public RandoResult()
         {
@@ -34,6 +35,7 @@ namespace RandomizerLib
             transitionPlacements = new Dictionary<string, string>();
             shopCosts = new Dictionary<MWItem, int>();
             variableCosts = new Dictionary<MWItem, int>();
+            itemsSpoiler = "";
         }
     }
 }
