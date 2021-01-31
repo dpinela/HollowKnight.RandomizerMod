@@ -619,34 +619,39 @@ namespace MultiWorldServer
 
         private void FilterRandoResult(RandoResult result)
         {
-            result.locationOrder = new Dictionary<MWItem, int>();
+            FilterResultLocationOrder(result);
             FilterResultItemPlacements(result);
             FilterResultShopCosts(result);
             FilterResultVariableCosts(result);
         }
 
+        private void FilterResultLocationOrder(RandoResult result)
+        {
+            Dictionary<MWItem, int> relevantLocationOrder = new Dictionary<MWItem, int>();
+            foreach (var locationOrder in result.locationOrder.Where(kvp => kvp.Key.PlayerId == result.playerId))
+            {
+                relevantLocationOrder.Add(locationOrder.Key, locationOrder.Value);
+            }
+            result.locationOrder = relevantLocationOrder;
+        }
+
         private void FilterResultShopCosts(RandoResult result)
         {
             Dictionary<MWItem, int> relevantShopCosts = new Dictionary<MWItem, int>();
-            foreach (var itemPlacement in result.shopCosts)
+            foreach (var shopCost in result.shopCosts.Where(kvp => result.itemPlacements.ContainsKey(kvp.Key) && result.itemPlacements[kvp.Key].PlayerId == result.playerId))
             {
-                if (itemPlacement.Key.PlayerId == result.playerId)
-                {
-                    relevantShopCosts.Add(itemPlacement.Key, itemPlacement.Value);
-                }
+                relevantShopCosts.Add(shopCost.Key, shopCost.Value);
             }
+
             result.shopCosts = relevantShopCosts;
         }
 
         private void FilterResultVariableCosts(RandoResult result) 
         { 
             Dictionary<MWItem, int> relevantVariableCosts = new Dictionary<MWItem, int>();
-            foreach (var itemPlacement in result.variableCosts)
+            foreach (var variableCost in result.variableCosts.Where(kvp => kvp.Value != 0 && kvp.Key.PlayerId == result.playerId))
             {
-                if (itemPlacement.Key.PlayerId == result.playerId)
-                {
-                    relevantVariableCosts.Add(itemPlacement.Key, itemPlacement.Value);
-                }
+                relevantVariableCosts.Add(variableCost.Key, variableCost.Value);
             }
             result.variableCosts = relevantVariableCosts;
         }
@@ -654,12 +659,9 @@ namespace MultiWorldServer
         private void FilterResultItemPlacements(RandoResult result)
         {
             Dictionary<MWItem, MWItem> relevantItemPlacements = new Dictionary<MWItem, MWItem>();
-            foreach (var itemPlacement in result.itemPlacements)
+            foreach (var itemPlacement in result.itemPlacements.Where(kvp => kvp.Value.PlayerId == result.playerId))
             {
-                if (itemPlacement.Key.PlayerId == result.playerId || itemPlacement.Value.PlayerId == result.playerId)
-                {
-                    relevantItemPlacements.Add(itemPlacement.Key, itemPlacement.Value);
-                }
+                relevantItemPlacements.Add(itemPlacement.Key, itemPlacement.Value);
             }
             result.itemPlacements = relevantItemPlacements;
         }
