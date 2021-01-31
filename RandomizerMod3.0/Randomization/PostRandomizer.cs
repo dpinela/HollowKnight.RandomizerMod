@@ -8,6 +8,9 @@ using RandomizerLib;
 using RandomizerLib.MultiWorld;
 using Newtonsoft.Json;
 using RandomizerMod.Actions;
+using RandomizerLib.Logging;
+using System.IO;
+using UnityEngine;
 
 namespace RandomizerMod.Randomization
 {
@@ -24,7 +27,13 @@ namespace RandomizerMod.Randomization
             LanguageStringManager.SetMWNames(result.nicknames);
 
             SaveAllPlacements(result);
-            if (RandomizerMod.Instance.Settings.CreateSpoilerLog) RandoLogger.LogAllToSpoiler(result);
+            if (RandomizerMod.Instance.Settings.CreateSpoilerLog)
+            {
+                RandomizerMod.Instance.Log("Generating spoiler log...");
+                SpoilerLogger spoilerLogger = new SpoilerLogger(Path.Combine(Application.persistentDataPath, "RandomizerSpoilerLog.txt"));
+                spoilerLogger.InitializeSpoiler(result);
+                spoilerLogger.LogAllToSpoiler(result);
+            }
 
             RandomizerAction.CreateActions(RandomizerMod.Instance.Settings.ItemPlacements, RandomizerMod.Instance.Settings);
 

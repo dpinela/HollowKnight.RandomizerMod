@@ -165,7 +165,6 @@ namespace RandomizerMod
                 {
                     if (result == null) return;
                     RandoLogger.InitializeTracker(result);
-                    RandoLogger.InitializeSpoiler(result);
 
                     PostRandomizationTasks(result);
 
@@ -192,7 +191,6 @@ namespace RandomizerMod
                     }
 
                     RandoLogger.InitializeTracker(result);
-                    RandoLogger.InitializeSpoiler(result);
 
                     PostRandomizationTasks(result);
 
