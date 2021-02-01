@@ -622,7 +622,6 @@ namespace MultiWorldServer
             List<RandoResult> results = randomizer.RandomizeMW(nicknames);
             Log("Done randomization");
 
-
             Dictionary<string, RandoResult> clientsResults = new Dictionary<string, RandoResult>();
             for (int i=0; i < results.Count; i++)
             {
@@ -630,7 +629,6 @@ namespace MultiWorldServer
             }
             unsavedResults[room] = clientsResults;
             
-
             string spoilerLocalPath = $"Spoilers/{results[0].randoId}.txt";
             string itemsSpoiler = SpoilerLogger.GetItemSpoiler(results[0]);
             SaveItemSpoilerFile(results[0], spoilerLocalPath, itemsSpoiler);
@@ -641,7 +639,6 @@ namespace MultiWorldServer
                 if (results[i].settings.CreateSpoilerLog) results[i].itemsSpoiler = itemsSpoiler;
                 FilterRandoResult(results[i]);
             }
-
 
             Log("Sending to players...");
             for (int i = 0; i < results.Count; i++)
