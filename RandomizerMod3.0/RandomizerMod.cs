@@ -24,7 +24,6 @@ using RandomizerLib.Logging;
 using Object = UnityEngine.Object;
 using Newtonsoft.Json;
 using RandomizerMod.Components;
-using GlobalEnums;
 
 namespace RandomizerMod
 {
@@ -204,6 +203,10 @@ namespace RandomizerMod
                     PostRandomizationTasks(result);
 
                     RandoLogger.UpdateHelperLog();
+
+                    RecentItems.Create();
+                    RecentItems.Show();
+
                     Ref.UI.StartNewGame(bossRush: true);
                 }
             }

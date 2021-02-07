@@ -3,5 +3,3 @@
 - condensed spoiler logs
 - Fix ready list not showing up (can't reproduce?)
 - have an eject button that just releases all your items to other players
-- Lock seed when readied
-- Fix starting geo

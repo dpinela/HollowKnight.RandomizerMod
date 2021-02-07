@@ -185,6 +185,7 @@ namespace RandomizerLib
 
         public int GetSettingsSeed()
         {
+            // TODO: Use some kind of bitmask class for this to make it neater?
             int settingsSeed = 0;
             if (RandomizeDreamers) settingsSeed += 1;
             settingsSeed = settingsSeed << 1;

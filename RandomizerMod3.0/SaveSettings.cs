@@ -48,7 +48,7 @@ namespace RandomizerMod
 
         public bool RandomizeTransitions => RandomizeAreas || RandomizeRooms;
 
-        public bool IsMW => MWNumPlayers > 1;
+        public bool IsMW => MWNumPlayers >= 1;
 
         public string[] UnconfirmedItems => _sentItems.Where(kvp => !kvp.Value).Select(kvp => kvp.Key).ToArray();
 
@@ -566,6 +566,21 @@ namespace RandomizerMod
                 _additiveCounts.Add(additiveSet[0], 0);
             }
             _additiveCounts[additiveSet[0]]++;
+        }
+
+        public string GetCurrentAdditiveItem(string item)
+        {
+            string[] itemSet = LogicManager.AdditiveItemSets.FirstOrDefault(set => set.Contains(item));
+
+            if (itemSet != null)
+            {
+                int current = GetAdditiveCount(item);
+                int max = LogicManager.GetMaxAdditiveLevel(item);
+                int next = Math.Min(current + 1, max);
+                item = itemSet[next - 1];
+            }
+
+            return item;
         }
 
         internal void SetMWNames(List<string> nicknames)

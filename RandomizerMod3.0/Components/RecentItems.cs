@@ -11,7 +11,7 @@ namespace RandomizerMod.Components
     {
         public static int MaxItems = 5;
 
-        private static List<GameObject> items = new List<GameObject>();
+        private static Queue<GameObject> items = new Queue<GameObject>();
 
         private static GameObject canvas;
         public static void Create()
@@ -23,7 +23,7 @@ namespace RandomizerMod.Components
 
             CanvasUtil.CreateTextPanel(canvas, "Recent Items", 24, TextAnchor.MiddleCenter,
                 new CanvasUtil.RectData(new Vector2(200, 100), Vector2.zero,
-                new Vector2(0.9f, 0.95f), new Vector2(0.9f, 0.95f)));
+                new Vector2(0.87f, 0.95f), new Vector2(0.87f, 0.95f)));
 
             canvas.SetActive(true);
         }
@@ -41,11 +41,21 @@ namespace RandomizerMod.Components
             items.Clear();
         }
 
-        public static void AddItem(string item, string from)
+        public static void AddItem(string item, string msg)
         {
             if (canvas == null)
             {
                 Create();
+            }
+
+            string name = LanguageStringManager.GetLanguageString(LogicManager.GetItemDef(item).nameKey, "UI");
+            if (msg != "")
+            {
+                msg = $"{name}\n{msg}";
+            }
+            else
+            {
+                msg = name;
             }
 
             GameObject basePanel = CanvasUtil.CreateBasePanel(canvas,
@@ -56,16 +66,15 @@ namespace RandomizerMod.Components
             CanvasUtil.CreateImagePanel(basePanel, RandomizerMod.GetSprite(spriteKey),
                 new CanvasUtil.RectData(new Vector2(50, 50), Vector2.zero, new Vector2(0f, 0.5f),
                     new Vector2(0f, 0.5f)));
-            CanvasUtil.CreateTextPanel(basePanel, $"from {from}", 24, TextAnchor.MiddleLeft,
+            CanvasUtil.CreateTextPanel(basePanel, msg, 24, TextAnchor.MiddleLeft,
                 new CanvasUtil.RectData(new Vector2(400, 100), Vector2.zero,
                 new Vector2(1.2f, 0.5f), new Vector2(1.2f, 0.5f)),
                 CanvasUtil.GetFont("Perpetua"));
 
-            items.Insert(0, basePanel);
+            items.Enqueue(basePanel);
             if (items.Count > MaxItems)
             {
-                Object.DestroyImmediate(items[items.Count - 1]);
-                items.RemoveAt(items.Count - 1);
+                Object.DestroyImmediate(items.Dequeue());
             }
 
             UpdatePositions();
@@ -73,29 +82,24 @@ namespace RandomizerMod.Components
 
         private static void UpdatePositions()
         {
-            for (int i = 0; i < items.Count; i++)
+            int i = items.Count - 1;
+            foreach (GameObject item in items)
             {
-                Vector2 newPos = new Vector2(0.9f, 0.9f - 0.05f * i);
-                items[i].GetComponent<RectTransform>().anchorMin = newPos;
-                items[i].GetComponent<RectTransform>().anchorMax = newPos;
+                Vector2 newPos = new Vector2(0.9f, 0.9f - 0.06f * i--);
+                item.GetComponent<RectTransform>().anchorMin = newPos;
+                item.GetComponent<RectTransform>().anchorMax = newPos;
             }
         }
 
         public static void Show()
         {
-            if (canvas == null)
-            {
-                Create();
-            }
+            if (canvas == null) return;
             canvas.SetActive(true);
         }
 
         public static void Hide()
         {
-            if (canvas == null)
-            {
-                Create();
-            }
+            if (canvas == null) return;
             canvas.SetActive(false);
         }
     }
