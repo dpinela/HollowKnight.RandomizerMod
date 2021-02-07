@@ -11,6 +11,7 @@ using MultiWorldProtocol.Messaging.Definitions.Messages;
 using RandomizerLib;
 using RandomizerMod.MultiWorld;
 using RandomizerLib.MultiWorld;
+using RandomizerMod.Components;
 
 namespace RandomizerMod
 {
@@ -98,7 +99,13 @@ namespace RandomizerMod
             item = LogicManager.RemovePrefixSuffix(item);
 
             // If we received this from MW, display a relic message so the player knows they got an item
-            if (remote) ShowRelic(item, from);
+            string displayItem = RandomizerMod.Instance.Settings.GetCurrentAdditiveItem(item);
+
+            if (RandomizerMod.Instance.Settings.IsMW)
+            {
+                if (remote) ShowRelic(displayItem, from);
+                RecentItems.AddItem(displayItem, remote ? $"from {from}" : "");
+            }
 
             GiveItem(convertGiveAction(action), item, location, geo);
 
@@ -121,15 +128,6 @@ namespace RandomizerMod
 
         public static void ShowRelic(string item, string from)
         {
-            string[] itemSet = LogicManager.AdditiveItemSets.FirstOrDefault(set => set.Contains(item));
-
-            if (itemSet != null)
-            {
-                int current = RandomizerMod.Instance.Settings.GetAdditiveCount(item);
-                int max = LogicManager.GetMaxAdditiveLevel(item);
-                int next = Math.Min(current + 1, max);
-                item = itemSet[next - 1];
-            }
             RelicMsg.ShowRelicItem(item, from);
         }
 

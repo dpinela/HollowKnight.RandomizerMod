@@ -714,6 +714,10 @@ namespace RandomizerMod
 
             void LockAll()
             {
+                seedInput.enabled = false;
+                nicknameInput.enabled = false;
+                roomInput.enabled = false;
+
                 presetPoolsBtn.Lock();
                 RandoDreamersBtn.Lock();
                 RandoSkillsBtn.Lock();
@@ -764,6 +768,10 @@ namespace RandomizerMod
 
             void UnlockAll()
             {
+                seedInput.enabled = true;
+                nicknameInput.enabled = true;
+                roomInput.enabled = true;
+
                 presetPoolsBtn.Unlock();
                 RandoDreamersBtn.Unlock();
                 RandoSkillsBtn.Unlock();

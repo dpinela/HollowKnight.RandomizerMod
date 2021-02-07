@@ -46,7 +46,7 @@ namespace RandomizerLib.Logging
             {
                 Stopwatch spoilerWatch = new Stopwatch();
                 spoilerWatch.Start();
-                string log = SpoilerLogger.GenerateSpoilerLog(result);
+                string log = GenerateSpoilerLog(result);
 
                 spoilerWatch.Stop();
                 LogSpoiler(log);

@@ -8,6 +8,7 @@ using static RandomizerMod.LogHelper;
 
 using RandomizerLib;
 using System;
+using RandomizerMod.Components;
 
 namespace RandomizerMod
 {
@@ -414,6 +415,11 @@ namespace RandomizerMod
             get => _randoSettings.Seed;
             set => _randoSettings.Seed = value;
         }
+        public int GeoSeed
+        {
+            get => _randoSettings.GeoSeed;
+            set => _randoSettings.GeoSeed = value;
+        }
 
         public void ResetPlacements()
         {
@@ -560,6 +566,21 @@ namespace RandomizerMod
                 _additiveCounts.Add(additiveSet[0], 0);
             }
             _additiveCounts[additiveSet[0]]++;
+        }
+
+        public string GetCurrentAdditiveItem(string item)
+        {
+            string[] itemSet = LogicManager.AdditiveItemSets.FirstOrDefault(set => set.Contains(item));
+
+            if (itemSet != null)
+            {
+                int current = GetAdditiveCount(item);
+                int max = LogicManager.GetMaxAdditiveLevel(item);
+                int next = Math.Min(current + 1, max);
+                item = itemSet[next - 1];
+            }
+
+            return item;
         }
 
         internal void SetMWNames(List<string> nicknames)

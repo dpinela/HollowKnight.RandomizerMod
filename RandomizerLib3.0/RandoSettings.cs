@@ -77,6 +77,7 @@ namespace RandomizerLib
         // Seed
 
         public int Seed = -1;
+        public int GeoSeed = -1;
         public bool GetRandomizeByPool(string pool)
         {
             switch (pool)
@@ -177,8 +178,75 @@ namespace RandomizerLib
             result.FireballSkips = FireballSkips;
             result.DarkRooms = DarkRooms;
             result.Seed = Seed;
+            result.GeoSeed = GeoSeed;
 
             return result;
+        }
+
+        public int GetSettingsSeed()
+        {
+            // TODO: Use some kind of bitmask class for this to make it neater?
+            int settingsSeed = 0;
+            if (RandomizeDreamers) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeSkills) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeCharms) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeKeys) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeGeoChests) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeMaskShards) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeVesselFragments) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeCharmNotches) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizePaleOre) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeRancidEggs) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeRelics) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeMaps) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeStags) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeGrubs) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeWhisperingRoots) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeRocks) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeSoulTotems) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizePalaceTotems) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeLoreTablets) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (RandomizeLifebloodCocoons) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            /*if (RandomizeGrimmkinFlames) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;*/
+            if (DuplicateMajorItems) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (ShadeSkips) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (AcidSkips) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (SpikeTunnels) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (MildSkips) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (SpicySkips) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (FireballSkips) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+            if (DarkRooms) settingsSeed += 1;
+            settingsSeed = settingsSeed << 1;
+
+            return settingsSeed;
         }
     }
 }
