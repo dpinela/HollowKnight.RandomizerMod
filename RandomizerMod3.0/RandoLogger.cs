@@ -366,7 +366,7 @@ namespace RandomizerMod
 
             LogTracker(message);
         }
-        public static void LogItemToTracker(string item, string location)
+        public static void LogItemToTracker(string item, string location, string prefix)
         {
             // don't spoil duplicate items!
             if (LogicManager.GetItemDef(item).majorItem && RandomizerMod.Instance.Settings.DuplicateMajorItems)
@@ -374,7 +374,7 @@ namespace RandomizerMod
                 item = LogicManager.RemoveSuffix(item) + $"({new System.Random().Next(10)}?)";
             }
 
-            string message = $"ITEM --- {{{item}}} at {{{location}}}";
+            string message = $"ITEM --- {prefix}-{item} at {location}";
             LogTracker(message);
         }
 

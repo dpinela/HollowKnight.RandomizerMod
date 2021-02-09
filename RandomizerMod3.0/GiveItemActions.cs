@@ -73,16 +73,16 @@ namespace RandomizerMod
             {
                 string loc = location;
                 if (remote) loc = $"{from}-{location}";
-                string it = item;
+                string prefix = "";
                 if (player != RandomizerMod.Instance.Settings.MWPlayerId)
                 {
-                    it = $"{LanguageStringManager.GetMWPlayerName(player)}-{item}";
+                    prefix = LanguageStringManager.GetMWPlayerName(player);
                 }
-                LogItemToTracker(it, loc);
+                LogItemToTracker(item, loc, prefix);
             }
             else
             {
-                LogItemToTracker(item, location);
+                LogItemToTracker(item, location, "");
             }
 
             if (!remote && RandomizerMod.Instance.Settings.IsMW && player >= 0 && player != RandomizerMod.Instance.Settings.MWPlayerId)
