@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
-using SeanprCore;
+using SereCore;
 using static RandomizerLib.Logging.LogHelper;
 using System.Text.RegularExpressions;
 using GlobalEnums;

@@ -1,6 +1,6 @@
 ﻿using System;
 using RandomizerMod.Extensions;
-using SeanprCore;
+using SereCore;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

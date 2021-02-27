@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RandomizerMod.Randomization;
-using SeanprCore;
+using SereCore;
 using UnityEngine;
 using static RandomizerMod.LogHelper;
 using static RandomizerMod.GiveItemActions;

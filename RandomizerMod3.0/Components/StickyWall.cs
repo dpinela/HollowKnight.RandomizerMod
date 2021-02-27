@@ -4,7 +4,7 @@ using GlobalEnums;
 using Modding;
 using MonoMod.Utils;
 using RandomizerMod.Extensions;
-using SeanprCore;
+using SereCore;
 using UnityEngine;
 
 // ReSharper disable file UnusedMember.Global

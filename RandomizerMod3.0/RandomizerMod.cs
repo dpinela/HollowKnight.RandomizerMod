@@ -8,7 +8,7 @@ using System.Threading;
 using Modding;
 using RandomizerMod.Actions;
 using RandomizerMod.Randomization;
-using SeanprCore;
+using SereCore;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static RandomizerMod.GiveItemActions;

@@ -7,7 +7,7 @@ using HutongGames.PlayMaker.Actions;
 using Modding;
 using RandomizerMod.Components;
 using RandomizerMod.FsmStateActions;
-using SeanprCore;
+using SereCore;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = System.Random;
