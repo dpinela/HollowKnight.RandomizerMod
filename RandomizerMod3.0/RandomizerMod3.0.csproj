@@ -381,6 +381,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy RandomizerMod3.0.dll "C:\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\Mods"
-zip RandomizerModMW.zip MultiWorldProtocol.dll RandomizerLib3.0.dll RandomizerMod3.0.dll</PostBuildEvent>
+
+7z a -tzip RandomizerModMW.zip MultiWorldProtocol.dll RandomizerLib3.0.dll RandomizerMod3.0.dll</PostBuildEvent>
   </PropertyGroup>
 </Project>

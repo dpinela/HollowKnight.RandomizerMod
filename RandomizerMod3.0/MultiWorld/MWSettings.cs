@@ -10,6 +10,12 @@ namespace RandomizerMod.MultiWorld
             set => SetString(value);
         }
 
+        public int LastReadyID
+        {
+            get => GetInt(-1);
+            set => SetInt(value);
+        }
+
         public int Port
         {
             get => GetInt(38281);

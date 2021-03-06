@@ -62,6 +62,13 @@ namespace RandomizerMod
             startRandoBtn.transform.localScale = new Vector2(0.75f, 0.75f);
             Object.Destroy(startRandoBtn.GetComponent<StartGameEventTrigger>());
             MenuButton backBtn = back.Clone("Back", MenuButton.MenuButtonType.Proceed, new Vector2(0, -100), "Back");
+            MenuButton rejoinBtn = back.Clone("Rejoin", MenuButton.MenuButtonType.Proceed, new Vector2(0, 320), "Rejoin");
+            rejoinBtn.ClearEvents();
+            rejoinBtn.AddEvent(EventTriggerType.Submit, (data) =>
+            {
+                RandomizerMod.Instance.mwConnection.RejoinGame();
+            });
+            rejoinBtn.gameObject.SetActive(false);
 
             //RandoMenuItem<string> gameTypeBtn = new RandoMenuItem<string>(back, new Vector2(0, 600), "Game Type", "Normal", "Steel Soul");
 
@@ -861,7 +868,7 @@ namespace RandomizerMod
                         /*RandomizerMod.Instance.mwConnection.Disconnect();
                         RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();*/
                         RandomizerMod.Instance.mwConnection.Connect();
-                        RandomizerMod.Instance.mwConnection.NumReadyReceived += UpdateReady;
+                        RandomizerMod.Instance.mwConnection.ReadyConfirmReceived += UpdateReady;
                         item.SetSelection("Yes");
                     }
                     catch
@@ -889,6 +896,7 @@ namespace RandomizerMod
                     readyPlayers.transform.Find("Text").GetComponent<Text>().text = "";
 
                     startRandoBtn.gameObject.SetActive(false);
+                    rejoinBtn.gameObject.SetActive(true);
                 }
                 else
                 {
@@ -910,6 +918,7 @@ namespace RandomizerMod
                     readyPlayers.transform.Find("Text").GetComponent<Text>().text = "";
 
                     startRandoBtn.gameObject.SetActive(true);
+                    rejoinBtn.gameObject.SetActive(false);
                     UnlockAll();
 
                     RandomizerMod.Instance.mwConnection.Disconnect();
@@ -924,12 +933,14 @@ namespace RandomizerMod
                     CopySettings(true);
                     RandomizerMod.Instance.mwConnection.ReadyUp(roomInput.text);
                     startRandoBtn.gameObject.SetActive(true);
+                    rejoinBtn.gameObject.SetActive(false);
                 }
                 else
                 {
                     UnlockAll();
                     RandomizerMod.Instance.mwConnection.Unready();
                     startRandoBtn.gameObject.SetActive(false);
+                    rejoinBtn.gameObject.SetActive(true);
                     multiworldReadyBtn.SetName("Ready");
                     readyPlayers.transform.Find("Text").GetComponent<Text>().text = "";
                 }
