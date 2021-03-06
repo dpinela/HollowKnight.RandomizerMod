@@ -404,10 +404,6 @@ namespace RandomizerMod
                         DuplicateBtn.SetSelection(true);
                         HandleProgressionLock();
 
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -429,10 +425,6 @@ namespace RandomizerMod
                         DuplicateBtn.SetSelection(true);
                         HandleProgressionLock();
 
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
                         RandoGeoChestsBtn.SetSelection(false);
                         RandoMaskBtn.SetSelection(false);
                         RandoVesselBtn.SetSelection(false);
@@ -454,10 +446,6 @@ namespace RandomizerMod
                         DuplicateBtn.SetSelection(true);
                         HandleProgressionLock();
 
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -479,10 +467,6 @@ namespace RandomizerMod
                         DuplicateBtn.SetSelection(true);
                         HandleProgressionLock();
 
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -504,10 +488,6 @@ namespace RandomizerMod
                         DuplicateBtn.SetSelection(true);
                         HandleProgressionLock();
 
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -529,10 +509,6 @@ namespace RandomizerMod
                         DuplicateBtn.SetSelection(true);
                         HandleProgressionLock();
 
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -554,10 +530,6 @@ namespace RandomizerMod
                         DuplicateBtn.SetSelection(true);
                         HandleProgressionLock();
 
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -579,10 +551,6 @@ namespace RandomizerMod
                         DuplicateBtn.SetSelection(true);
                         HandleProgressionLock();
 
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -604,10 +572,6 @@ namespace RandomizerMod
                         DuplicateBtn.SetSelection(true);
                         HandleProgressionLock();
 
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -629,10 +593,6 @@ namespace RandomizerMod
                         DuplicateBtn.SetSelection(true);
                         HandleProgressionLock();
 
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
