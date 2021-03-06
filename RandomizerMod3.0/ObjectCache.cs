@@ -2,7 +2,7 @@
 using Modding;
 using UnityEngine;
 using static RandomizerMod.LogHelper;
-using SeanprCore;
+using SereCore;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 

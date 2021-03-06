@@ -1,5 +1,5 @@
 ﻿using On.HutongGames.PlayMaker.Actions;
-using SeanprCore;
+using SereCore;
 
 namespace RandomizerMod
 {

@@ -1,5 +1,5 @@
-using HutongGames.PlayMaker;
-using SeanprCore;
+﻿using HutongGames.PlayMaker;
+using SereCore;
 using UnityEngine;
 using Random = System.Random;
 using static RandomizerMod.LogHelper;

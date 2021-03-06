@@ -6,7 +6,7 @@ using Modding;
 using UnityEngine.SceneManagement;
 using RandomizerMod.Extensions;
 using RandomizerMod.FsmStateActions;
-using SeanprCore;
+using SereCore;
 using UnityEngine;
 using static RandomizerMod.LogHelper;
 

@@ -1,4 +1,4 @@
-﻿using SeanprCore;
+﻿using SereCore;
 
 namespace RandomizerMod.MultiWorld
 {

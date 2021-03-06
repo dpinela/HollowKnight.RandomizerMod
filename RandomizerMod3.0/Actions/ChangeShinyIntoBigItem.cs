@@ -2,7 +2,7 @@
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.Components;
 using RandomizerMod.FsmStateActions;
-using SeanprCore;
+using SereCore;
 using UnityEngine;
 using static RandomizerMod.GiveItemActions;
 using System.Collections;

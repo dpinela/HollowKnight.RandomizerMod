@@ -4,7 +4,7 @@ using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using RandomizerMod.FsmStateActions;
 using RandomizerMod.Extensions;
-using SeanprCore;
+using SereCore;
 using UnityEngine;
 using static RandomizerMod.GiveItemActions;
 
