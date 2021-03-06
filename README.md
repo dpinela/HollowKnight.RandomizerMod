@@ -30,7 +30,7 @@ This is all that is needed in terms of setup. To play multiworld:
 7. Once everyone you are playing with is connected and readied up, one player should click start, and this will begin the randomizer for everyone. The player who clicks start will be marked as "Player 1", and their seed will be used for all randomization.
 
 ## Rejoining a Game
-If you start a Multiworld, but 1 or more players crash before saving their game, you no longer need to remake the entire game. For players who no longer have the save file, simply go to the file creation screen, connect to the same Multiworld server, and click "Rejoin". This will send the item placements again, and allow you to continue playing as normal.
+If you start a Multiworld, but one or more players crash before saving their game, you no longer need to remake the entire game. For players who no longer have the save file, simply go to the file creation screen, connect to the same Multiworld server, and click "Rejoin". This will send the item placements again, and allow you to continue playing as normal.
 
 To avoid this happening, I recommend benchwarping immediately once you load in, because this will save and ensure the file is created.
 
@@ -58,7 +58,5 @@ A few useful commands are implemented on the server:
 
 ## Future Plans/Known Issues
 - Item placements are currently not validated for feasibility. In theory, they should be correct as they are placed, but if there are bugs an impossible seed may be generated
-- If you have an issue with Grimmchild not spawning for Grimm, then quitting out will quit without saving, potentially losing recent items. So, make sure to use Benchwarp to make Grimmchild appear before trying to fight Grimm.
-- In the future, I will hopefully store all items on the server and use that to restore players when joining
 - Currently, grubs and essence aren't properly shown on the helper log
 - There is no indicator in-game if you disconnect from the server. I plan to hopefully add better UI for managing and surfacing server connections
