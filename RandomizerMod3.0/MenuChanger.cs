@@ -401,10 +401,9 @@ namespace RandomizerMod
                 switch (item.CurrentSelection)
                 {
                     case "Mini Super Junk Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -423,10 +422,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Basic":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(false);
                         RandoMaskBtn.SetSelection(false);
                         RandoVesselBtn.SetSelection(false);
@@ -445,10 +443,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Completionist":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -467,10 +464,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Junk Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -489,10 +485,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Super Junk Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -511,10 +506,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Mini Super Geo Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -533,10 +527,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Super Geo Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -555,10 +548,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Mini Super Totem Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -577,10 +569,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Super Totem Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -599,10 +590,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "EVERYTHING":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -621,6 +611,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Vanilla":
+                        DuplicateBtn.SetSelection(false);
+                        HandleProgressionLock();
+
                         RandoDreamersBtn.SetSelection(false);
                         RandoSkillsBtn.SetSelection(false);
                         RandoCharmsBtn.SetSelection(false);
