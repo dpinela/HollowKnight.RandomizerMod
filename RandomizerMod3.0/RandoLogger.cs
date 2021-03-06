@@ -374,7 +374,7 @@ namespace RandomizerMod
                 item = LogicManager.RemoveSuffix(item) + $"({new System.Random().Next(10)}?)";
             }
 
-            string message = $"ITEM --- {prefix}-{item} at {location}";
+            string message = $"ITEM --- {prefix}{item} at {location}";
             LogTracker(message);
         }
 

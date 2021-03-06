@@ -76,7 +76,7 @@ namespace RandomizerMod
                 string prefix = "";
                 if (player != RandomizerMod.Instance.Settings.MWPlayerId)
                 {
-                    prefix = LanguageStringManager.GetMWPlayerName(player);
+                    prefix = $"{LanguageStringManager.GetMWPlayerName(player)}-";
                 }
                 LogItemToTracker(item, loc, prefix);
             }
