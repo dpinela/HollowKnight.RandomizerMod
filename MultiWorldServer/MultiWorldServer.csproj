@@ -66,6 +66,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>7z a -tzip MultiWorldServer.zip Assembly-CSharp.dll SeanprCore.dll MultiWorldProtocol.dll RandomizerLib3.0.dll MultiWorldServer.exe</PostBuildEvent>
+    <PostBuildEvent>7z a -tzip MultiWorldServer.zip Assembly-CSharp.dll SereCore.dll MultiWorldProtocol.dll RandomizerLib3.0.dll MultiWorldServer.exe</PostBuildEvent>
   </PropertyGroup>
 </Project>
