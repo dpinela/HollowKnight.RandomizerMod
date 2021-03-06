@@ -35,7 +35,10 @@ namespace RandomizerMod.Randomization
                 spoilerLogger.LogAllToSpoiler(result);
             }
 
-            RandomizerAction.CreateActions(RandomizerMod.Instance.Settings.ItemPlacements, RandomizerMod.Instance.Settings);
+            List<(string, string)> allItemPlacements = VanillaManager.ItemPlacements;
+            allItemPlacements.AddRange(RandomizerMod.Instance.Settings.ItemPlacements);
+            
+            RandomizerAction.CreateActions(allItemPlacements.ToArray(), RandomizerMod.Instance.Settings);
 
             if (RandomizerMod.Instance.Settings.IsMW)
             {
