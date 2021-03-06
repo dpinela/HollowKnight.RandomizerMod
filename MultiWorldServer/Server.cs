@@ -31,8 +31,8 @@ namespace MultiWorldServer
         private readonly object _clientLock = new object();
         private readonly Dictionary<ulong, Client> Clients = new Dictionary<ulong, Client>();
         private readonly Dictionary<int, GameSession> GameSessions = new Dictionary<int, GameSession>();
-        private readonly Dictionary<string, Dictionary<ulong, RandoSettings>> ready = new Dictionary<string, Dictionary<ulong, RandoSettings>>();
-        private readonly Dictionary<string, Dictionary<string, RandoResult>> unsavedResults = new Dictionary<string, Dictionary<string, RandoResult>>();
+        private readonly Dictionary<string, Dictionary<ulong, (int, RandoSettings)>> ready = new Dictionary<string, Dictionary<ulong, (int, RandoSettings)>>();
+        private readonly Dictionary<int, RandoResult> unsavedResults = new Dictionary<int, RandoResult>();
         private TcpListener _server;
         private readonly Timer ResendTimer;
 
@@ -120,12 +120,7 @@ namespace MultiWorldServer
             LogToConsole($"{ready.Count} current lobbies");
             foreach (var kvp in ready)
             {
-                string playerString = "";
-                foreach (var kvp2 in kvp.Value)
-                {
-                    playerString += $"{Clients[kvp2.Key].Nickname}, ";
-                }
-                if (playerString != "") playerString = playerString.Substring(0, playerString.Length - 2);
+                string playerString = string.Join(", ", kvp.Value.Keys.Select((uid) => Clients[uid].Nickname).ToArray());
                 LogToConsole($"Room: {kvp.Key} players: {playerString}");
             }
         }
@@ -392,6 +387,9 @@ namespace MultiWorldServer
                 case MWMessageType.ReadyMessage:
                     HandleReadyMessage(sender, (MWReadyMessage)message);
                     break;
+                case MWMessageType.RejoinMessage:
+                    HandleRejoinMessage(sender, (MWRejoinMessage)message);
+                    break;
                 case MWMessageType.UnreadyMessage:
                     HandleUnreadyMessage(sender, (MWUnreadyMessage)message);
                     break;
@@ -473,38 +471,22 @@ namespace MultiWorldServer
             sender.Room = message.Room;
             lock (_clientLock)
             {
-                if (unsavedResults.ContainsKey(sender.Room) && !unsavedResults[sender.Room].ContainsKey(sender.Nickname))
-                {
-                    // Room has started & still open to make sure nobody loses their save & sender wasn't in room originally
-                    SendMessage(new MWNumReadyMessage { Ready = -1, Names = "Could not ready, please change room name" }, sender);
-                    return;
-                }
-
                 if (!ready.ContainsKey(sender.Room))
                 {
-                    ready[sender.Room] = new Dictionary<ulong, RandoSettings>();
-                } 
-                
-                ready[sender.Room][sender.UID] = message.Settings;
+                    ready[sender.Room] = new Dictionary<ulong, (int, RandoSettings)>();
+                }
+
+                int readyId = (new Random()).Next();
+                ready[sender.Room][sender.UID] = (readyId, message.Settings);
 
                 string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
                 Log($"{sender.Nickname} (UID {sender.UID}) readied up in {roomText} ({ready[sender.Room].Count} readied)");
 
-                string names = "";
-                foreach (ulong uid in ready[sender.Room].Keys)
-                {
-                    names += Clients[uid].Nickname;
-                    names += ", ";
-                }
-
-                if (names.Length >= 2)
-                {
-                    names = names.Substring(0, names.Length - 2);
-                }
+                string names = string.Join(", ", ready[sender.Room].Keys.Select((uid) => Clients[uid].Nickname).ToArray());
 
                 foreach (ulong uid in ready[sender.Room].Keys)
                 {
-                    SendMessage(new MWNumReadyMessage { Ready = ready[sender.Room].Count, Names = names }, Clients[uid]);
+                    SendMessage(new MWReadyConfirmMessage { Ready = ready[sender.Room].Count, Names = names, ReadyID = readyId }, Clients[uid]);
                 }
             }
         }
@@ -538,10 +520,10 @@ namespace MultiWorldServer
                     names = names.Substring(0, names.Length - 2);
                 }
 
-                foreach (ulong uid2 in ready[c.Room].Keys)
+                foreach (var kvp in ready[c.Room])
                 {
-                    if (!Clients.ContainsKey(uid2)) continue;
-                    SendMessage(new MWNumReadyMessage { Ready = ready[c.Room].Count, Names = names }, Clients[uid2]);
+                    if (!Clients.ContainsKey(kvp.Key)) continue;
+                    SendMessage(new MWReadyConfirmMessage { Ready = ready[c.Room].Count, Names = names, ReadyID = kvp.Value.Item1 }, Clients[kvp.Key]);
                 }
             }
         }
@@ -553,18 +535,9 @@ namespace MultiWorldServer
 
         private void HandleSaveMessage(Client sender, MWSaveMessage message)
         {
-            if (sender.Room != null)
+            if (unsavedResults.ContainsKey(message.ReadyID))
             {
-                if (unsavedResults.ContainsKey(sender.Room) && unsavedResults[sender.Room].ContainsKey(sender.Nickname))
-                {
-                    unsavedResults[sender.Room].Remove(sender.Nickname);
-                    if (unsavedResults[sender.Room].Count == 0)
-                    {
-                        Log($"Everyone in {sender.Room} has saved, freeing room name");
-                        ready.Remove(sender.Room);
-                        unsavedResults.Remove(sender.Room);
-                    }
-                }
+                unsavedResults.Remove(message.ReadyID);
             }
 
             if (sender.Session == null) return;
@@ -572,9 +545,22 @@ namespace MultiWorldServer
             GameSessions[sender.Session.randoId].Save(sender.Session.playerId);
         }
 
+        private void HandleRejoinMessage(Client sender, MWRejoinMessage message)
+        {
+            if (!unsavedResults.ContainsKey(message.ReadyID))
+            {
+                Log($"Bad rejoin attempt (readyId = {message.ReadyID}, UID = {sender.UID})");
+            }
+            else
+            {
+                SendMessage(new MWResultMessage { Result = unsavedResults[message.ReadyID] }, sender);
+            }
+        }
+
         private void HandleStartMessage(Client sender, MWStartMessage message)
         {
             List<Client> clients = new List<Client>();
+            List<int> readyIds = new List<int>();
             List<RandoSettings> settings = new List<RandoSettings>();
             List<string> nicknames = new List<string>();
 
@@ -583,14 +569,6 @@ namespace MultiWorldServer
             string room = sender.Room;
 
             if (!ready.ContainsKey(room)) return;
-            if (unsavedResults.ContainsKey(sender.Room) && !unsavedResults[sender.Room].ContainsKey(sender.Nickname)) return;
-
-            if (unsavedResults.ContainsKey(room) && unsavedResults[room].ContainsKey(sender.Nickname))
-            {
-                Log($"Sending unsaved result to {sender.Nickname}");
-                SendMessage(new MWResultMessage { Result = unsavedResults[room][sender.Nickname] }, sender);
-                return;
-            }
 
             string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
             Log($"Starting MW for {roomText} at request of {sender.Nickname}");
@@ -601,7 +579,8 @@ namespace MultiWorldServer
 
                 // Ensure the person who called this is first, so their seed is used
                 clients.Add(sender);
-                settings.Add(ready[room][sender.UID]);
+                readyIds.Add(ready[room][sender.UID].Item1);
+                settings.Add(ready[room][sender.UID].Item2);
                 nicknames.Add(sender.Nickname);
 
                 ready[room].Remove(sender.UID);
@@ -609,7 +588,8 @@ namespace MultiWorldServer
                 foreach (var kvp in ready[room])
                 {
                     clients.Add(Clients[kvp.Key]);
-                    settings.Add(kvp.Value);
+                    readyIds.Add(kvp.Value.Item1);
+                    settings.Add(kvp.Value.Item2);
                     nicknames.Add(Clients[kvp.Key].Nickname);
                 }
             }
@@ -630,7 +610,6 @@ namespace MultiWorldServer
             {
                 clientsResults.Add(clients[i].Nickname, results[i]);
             }
-            unsavedResults[room] = clientsResults;
             
             string spoilerLocalPath = $"Spoilers/{results[0].randoId}.txt";
             string itemsSpoiler = SpoilerLogger.GetItemSpoiler(results[0]);
@@ -646,6 +625,7 @@ namespace MultiWorldServer
             Log("Sending to players...");
             for (int i = 0; i < results.Count; i++)
             {
+                unsavedResults[readyIds[i]] = results[i];
                 Log($"Sending to player {i + 1}");
                 SendMessage(new MWResultMessage { Result = results[i] }, clients[i]);
             }

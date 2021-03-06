@@ -27,13 +27,13 @@ namespace RandomizerMod.MultiWorld
         private Thread ReadThread;
 
         // TODO use these to make this class nicer
-        public delegate void NumReadyEvent(int num, string players);
+        public delegate void ReadyConfirmEvent(int num, string players);
         public delegate void DisconnectEvent();
         public delegate void ConnectEvent(ulong uid);
         public delegate void JoinEvent();
         public delegate void LeaveEvent();
 
-        public event NumReadyEvent NumReadyReceived;
+        public event ReadyConfirmEvent ReadyConfirmReceived;
         public event DisconnectEvent OnDisconnect;
         public event ConnectEvent OnConnect;
         public event JoinEvent OnJoin;
@@ -345,9 +345,8 @@ namespace RandomizerMod.MultiWorld
                 case MWMessageType.PingMessage:
                     State.LastPing = DateTime.Now;
                     break;
-                case MWMessageType.NumReadyMessage:
-                    MWNumReadyMessage msg = message as MWNumReadyMessage;
-                    NumReadyReceived?.Invoke(msg.Ready, msg.Names);
+                case MWMessageType.ReadyConfirmMessage:
+                    HandleReadyConfirm((MWReadyConfirmMessage)message);
                     break;
                 case MWMessageType.ResultMessage:
                     HandleResult((MWResultMessage)message);
@@ -417,6 +416,12 @@ namespace RandomizerMod.MultiWorld
             }
         }
 
+        private void HandleReadyConfirm(MWReadyConfirmMessage message)
+        {
+            ReadyConfirmReceived?.Invoke(message.Ready, message.Names);
+            RandomizerMod.Instance.MWSettings.LastReadyID = message.ReadyID;
+        }
+
         private void HandleItemReceive(MWItemReceiveMessage message)
         {
             lock (messageEventQueue)
@@ -457,6 +462,11 @@ namespace RandomizerMod.MultiWorld
             SendMessage(new MWStartMessage());
         }
 
+        public void RejoinGame()
+        {
+            SendMessage(new MWRejoinMessage { ReadyID = RandomizerMod.Instance.MWSettings.LastReadyID });
+        }
+
         public void SendItem(string loc, string item, int playerId)
         {
             Log($"Sending item {item} to {playerId}");
@@ -467,7 +477,8 @@ namespace RandomizerMod.MultiWorld
 
         public void NotifySave()
         {
-            SendMessage(new MWSaveMessage());
+            SendMessage(new MWSaveMessage { ReadyID = RandomizerMod.Instance.MWSettings.LastReadyID });
+            RandomizerMod.Instance.MWSettings.LastReadyID = -1;
         }
 
         public bool IsConnected()

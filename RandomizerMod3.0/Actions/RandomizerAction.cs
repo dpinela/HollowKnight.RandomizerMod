@@ -34,7 +34,7 @@ namespace RandomizerMod.Actions
         public static void CreateActions((string, string)[] items, SaveSettings settings)
         {
             ClearActions();
-            
+
             ShopItemBoolNames = new Dictionary<(string, string), string>();
             AdditiveBoolNames = new Dictionary<string, string>();
 
@@ -49,32 +49,34 @@ namespace RandomizerMod.Actions
                 ReqDef oldItem = LogicManager.GetItemDef(location);
                 ReqDef newItem = LogicManager.GetItemDef(newItemName);
 
-                // Disable this for multiworld, since we might have items from other people's worlds
-
-                /*if (!settings.RandomizeMaps && newItem.pool == "Map")
+                // In MW, we only want to skip these when they are our own items
+                if (playerId < 0 || playerId == settings.MWPlayerId)
                 {
-                    continue;
+                    if (!settings.RandomizeMaps && newItem.pool == "Map")
+                    {
+                        continue;
+                    }
+                    if (!settings.RandomizeStags && newItem.pool == "Stag")
+                    {
+                        continue;
+                    }
+                    if (!settings.RandomizeRocks && newItem.pool == "Rock")
+                    {
+                        continue;
+                    }
+                    if (!settings.RandomizeSoulTotems && newItem.pool == "Soul")
+                    {
+                        continue;
+                    }
+                    if (!settings.RandomizePalaceTotems && newItem.pool == "PalaceSoul")
+                    {
+                        continue;
+                    }
+                    if (!settings.RandomizeLoreTablets && newItem.pool == "Lore")
+                    {
+                        continue;
+                    }
                 }
-                if (!settings.RandomizeStags && newItem.pool == "Stag") 
-                {
-                    continue;
-                }
-                if (!settings.RandomizeRocks && newItem.pool == "Rock") 
-                {
-                    continue;
-                }
-                if (!settings.RandomizeSoulTotems && newItem.pool == "Soul") 
-                {
-                    continue;
-                }
-                if (!settings.RandomizePalaceTotems && newItem.pool == "PalaceSoul") 
-                {
-                    continue;
-                }
-                if (!settings.RandomizeLoreTablets && newItem.pool == "Lore") 
-                {
-                    continue;
-                }*/
 
                 if (oldItem.replace)
                 {

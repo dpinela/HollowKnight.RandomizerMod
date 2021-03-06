@@ -62,6 +62,13 @@ namespace RandomizerMod
             startRandoBtn.transform.localScale = new Vector2(0.75f, 0.75f);
             Object.Destroy(startRandoBtn.GetComponent<StartGameEventTrigger>());
             MenuButton backBtn = back.Clone("Back", MenuButton.MenuButtonType.Proceed, new Vector2(0, -100), "Back");
+            MenuButton rejoinBtn = back.Clone("Rejoin", MenuButton.MenuButtonType.Proceed, new Vector2(0, 320), "Rejoin");
+            rejoinBtn.ClearEvents();
+            rejoinBtn.AddEvent(EventTriggerType.Submit, (data) =>
+            {
+                RandomizerMod.Instance.mwConnection.RejoinGame();
+            });
+            rejoinBtn.gameObject.SetActive(false);
 
             //RandoMenuItem<string> gameTypeBtn = new RandoMenuItem<string>(back, new Vector2(0, 600), "Game Type", "Normal", "Steel Soul");
 
@@ -394,10 +401,9 @@ namespace RandomizerMod
                 switch (item.CurrentSelection)
                 {
                     case "Mini Super Junk Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -416,10 +422,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Basic":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(false);
                         RandoMaskBtn.SetSelection(false);
                         RandoVesselBtn.SetSelection(false);
@@ -438,10 +443,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Completionist":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -460,10 +464,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Junk Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -482,10 +485,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Super Junk Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -504,10 +506,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Mini Super Geo Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -526,10 +527,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Super Geo Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -548,10 +548,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Mini Super Totem Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -570,10 +569,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Super Totem Pit":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -592,10 +590,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "EVERYTHING":
-                        RandoDreamersBtn.SetSelection(true);
-                        RandoSkillsBtn.SetSelection(true);
-                        RandoCharmsBtn.SetSelection(true);
-                        RandoKeysBtn.SetSelection(true);
+                        DuplicateBtn.SetSelection(true);
+                        HandleProgressionLock();
+
                         RandoGeoChestsBtn.SetSelection(true);
                         RandoMaskBtn.SetSelection(true);
                         RandoVesselBtn.SetSelection(true);
@@ -614,6 +611,9 @@ namespace RandomizerMod
                         //RandoLoreTabletsBtn.SetSelection(false);
                         break;
                     case "Vanilla":
+                        DuplicateBtn.SetSelection(false);
+                        HandleProgressionLock();
+
                         RandoDreamersBtn.SetSelection(false);
                         RandoSkillsBtn.SetSelection(false);
                         RandoCharmsBtn.SetSelection(false);
@@ -861,7 +861,7 @@ namespace RandomizerMod
                         /*RandomizerMod.Instance.mwConnection.Disconnect();
                         RandomizerMod.Instance.mwConnection = new MultiWorld.ClientConnection();*/
                         RandomizerMod.Instance.mwConnection.Connect();
-                        RandomizerMod.Instance.mwConnection.NumReadyReceived += UpdateReady;
+                        RandomizerMod.Instance.mwConnection.ReadyConfirmReceived += UpdateReady;
                         item.SetSelection("Yes");
                     }
                     catch
@@ -889,6 +889,7 @@ namespace RandomizerMod
                     readyPlayers.transform.Find("Text").GetComponent<Text>().text = "";
 
                     startRandoBtn.gameObject.SetActive(false);
+                    rejoinBtn.gameObject.SetActive(true);
                 }
                 else
                 {
@@ -910,6 +911,7 @@ namespace RandomizerMod
                     readyPlayers.transform.Find("Text").GetComponent<Text>().text = "";
 
                     startRandoBtn.gameObject.SetActive(true);
+                    rejoinBtn.gameObject.SetActive(false);
                     UnlockAll();
 
                     RandomizerMod.Instance.mwConnection.Disconnect();
@@ -924,12 +926,14 @@ namespace RandomizerMod
                     CopySettings(true);
                     RandomizerMod.Instance.mwConnection.ReadyUp(roomInput.text);
                     startRandoBtn.gameObject.SetActive(true);
+                    rejoinBtn.gameObject.SetActive(false);
                 }
                 else
                 {
                     UnlockAll();
                     RandomizerMod.Instance.mwConnection.Unready();
                     startRandoBtn.gameObject.SetActive(false);
+                    rejoinBtn.gameObject.SetActive(true);
                     multiworldReadyBtn.SetName("Ready");
                     readyPlayers.transform.Find("Text").GetComponent<Text>().text = "";
                 }
