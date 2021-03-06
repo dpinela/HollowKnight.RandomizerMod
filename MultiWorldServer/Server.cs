@@ -120,12 +120,7 @@ namespace MultiWorldServer
             LogToConsole($"{ready.Count} current lobbies");
             foreach (var kvp in ready)
             {
-                string playerString = "";
-                foreach (var key in kvp.Value.Keys)
-                {
-                    playerString += $"{Clients[key].Nickname}, ";
-                }
-                if (playerString != "") playerString = playerString.Substring(0, playerString.Length - 2);
+                string playerString = string.Join(", ", kvp.Value.Keys.Select((uid) => Clients[uid].Nickname).ToArray());
                 LogToConsole($"Room: {kvp.Key} players: {playerString}");
             }
         }
@@ -487,17 +482,7 @@ namespace MultiWorldServer
                 string roomText = string.IsNullOrEmpty(sender.Room) ? "default room" : $"room \"{sender.Room}\"";
                 Log($"{sender.Nickname} (UID {sender.UID}) readied up in {roomText} ({ready[sender.Room].Count} readied)");
 
-                string names = "";
-                foreach (ulong uid in ready[sender.Room].Keys)
-                {
-                    names += Clients[uid].Nickname;
-                    names += ", ";
-                }
-
-                if (names.Length >= 2)
-                {
-                    names = names.Substring(0, names.Length - 2);
-                }
+                string names = string.Join(", ", ready[sender.Room].Keys.Select((uid) => Clients[uid].Nickname).ToArray());
 
                 foreach (ulong uid in ready[sender.Room].Keys)
                 {
@@ -565,7 +550,6 @@ namespace MultiWorldServer
             if (!unsavedResults.ContainsKey(message.ReadyID))
             {
                 Log($"Bad rejoin attempt (readyId = {message.ReadyID}, UID = {sender.UID})");
-                return;
             }
             else
             {

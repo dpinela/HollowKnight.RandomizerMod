@@ -477,10 +477,7 @@ namespace RandomizerMod.MultiWorld
 
         public void NotifySave()
         {
-            if (RandomizerMod.Instance.MWSettings.LastReadyID != -1)
-            {
-                SendMessage(new MWSaveMessage { ReadyID = RandomizerMod.Instance.MWSettings.LastReadyID });
-            }
+            SendMessage(new MWSaveMessage { ReadyID = RandomizerMod.Instance.MWSettings.LastReadyID });
             RandomizerMod.Instance.MWSettings.LastReadyID = -1;
         }
 
