@@ -553,14 +553,17 @@ namespace MultiWorldServer
 
         private void HandleSaveMessage(Client sender, MWSaveMessage message)
         {
-            if (unsavedResults.ContainsKey(sender.Room) && unsavedResults[sender.Room].ContainsKey(sender.Nickname))
+            if (sender.Room != null)
             {
-                unsavedResults[sender.Room].Remove(sender.Nickname);
-                if (unsavedResults[sender.Room].Count == 0)
+                if (unsavedResults.ContainsKey(sender.Room) && unsavedResults[sender.Room].ContainsKey(sender.Nickname))
                 {
-                    Log($"Everyone in {sender.Room} has saved, freeing room name");
-                    ready.Remove(sender.Room);
-                    unsavedResults.Remove(sender.Room);
+                    unsavedResults[sender.Room].Remove(sender.Nickname);
+                    if (unsavedResults[sender.Room].Count == 0)
+                    {
+                        Log($"Everyone in {sender.Room} has saved, freeing room name");
+                        ready.Remove(sender.Room);
+                        unsavedResults.Remove(sender.Room);
+                    }
                 }
             }
 
