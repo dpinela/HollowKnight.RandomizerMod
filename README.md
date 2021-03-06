@@ -29,6 +29,11 @@ This is all that is needed in terms of setup. To play multiworld:
 6. Click "Ready" to toggle your ready status. The buttton will show how many players in the room are currently ready, and this will lock your settings in. If you would like to change settings, click again to become unready
 7. Once everyone you are playing with is connected and readied up, one player should click start, and this will begin the randomizer for everyone. The player who clicks start will be marked as "Player 1", and their seed will be used for all randomization.
 
+## Rejoining a Game
+If you start a Multiworld, but 1 or more players crash before saving their game, you no longer need to remake the entire game. For players who no longer have the save file, simply go to the file creation screen, connect to the same Multiworld server, and click "Rejoin". This will send the item placements again, and allow you to continue playing as normal.
+
+To avoid this happening, I recommend benchwarping immediately once you load in, because this will save and ensure the file is created.
+
 ## Setting up a Server
 Currently, I have an instance of the server running at 3.96.213.176. If you want to host your own server, follow these instructions:
 
