@@ -47,7 +47,7 @@ namespace RandomizerMod
 
             string itemName = LanguageStringManager.GetLanguageString(LogicManager.GetItemDef(item).nameKey, "UI");
             string areaName = LogicManager.ShopNames.Contains(location)
-                ? location
+                ? location.Replace('_', ' ')
                 : RandoLogger.CleanAreaName(LogicManager.GetItemDef(location).areaName);
 
             string msg = showArea ? itemName + "\nfrom " + areaName : itemName;

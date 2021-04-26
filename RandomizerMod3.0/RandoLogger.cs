@@ -999,7 +999,7 @@ namespace RandomizerMod
                     newName = "Beast's Den";
                     break;
                 case "Spirits Glade":
-                    newName = "Spirit's Glade";
+                    newName = "Spirits' Glade";
                     break;
                 case "Ismas Grove":
                     newName = "Isma's Grove";
