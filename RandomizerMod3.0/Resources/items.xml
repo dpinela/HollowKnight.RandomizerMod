@@ -4831,9 +4831,9 @@
     <objectName>Grub Bottle</objectName>
     <replace>true</replace>
     <elevation>0.1</elevation>
-    <itemLogic>Far_Queen's_Gardens + (FULLCLAW + SUPERDASH) | (AIRSTALL + WINGS + ((LEFTCLAW + LEFTSHADOWDASH) | (FULLCLAW + LEFTDASH)))</itemLogic>
-    <areaLogic>Far_Queen's_Gardens + (FULLCLAW + SUPERDASH) | (AIRSTALL + WINGS + ((LEFTCLAW + LEFTSHADOWDASH) | (FULLCLAW + LEFTDASH)))</areaLogic>
-    <roomLogic>Fungus3_22 + (FULLCLAW + SUPERDASH) | (AIRSTALL + WINGS + ((LEFTCLAW + LEFTSHADOWDASH) | (FULLCLAW + LEFTDASH)))</roomLogic>
+    <itemLogic>Far_Queen's_Gardens + ((FULLCLAW + SUPERDASH) | (AIRSTALL + WINGS + ((LEFTCLAW + LEFTSHARPSHADOW + SPICYSKIPS) | (FULLCLAW + LEFTDASH + (SPICYSKIPS | LEFTSHARPSHADOW)))))</itemLogic>
+    <areaLogic>Far_Queen's_Gardens + ((FULLCLAW + SUPERDASH) | (AIRSTALL + WINGS + ((LEFTCLAW + LEFTSHARPSHADOW + SPICYSKIPS) | (FULLCLAW + LEFTDASH + (SPICYSKIPS | LEFTSHARPSHADOW)))))</areaLogic>
+    <roomLogic>Fungus3_22 + ((FULLCLAW + SUPERDASH) | (AIRSTALL + WINGS + ((LEFTCLAW + LEFTSHARPSHADOW + SPICYSKIPS) | (FULLCLAW + LEFTDASH + (SPICYSKIPS | LEFTSHARPSHADOW)))))</roomLogic>
     <type>Trinket</type>
     <action>Grub</action>
     <pool>Grub</pool>
