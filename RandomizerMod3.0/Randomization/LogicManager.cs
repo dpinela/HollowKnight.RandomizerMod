@@ -75,10 +75,10 @@ namespace RandomizerMod.Randomization
         // This value is calculated as
         // (Y coordinate of this object) - (Y coordinate of the Knight when
         // standing on the ground next to or beneath it).
-        // It is used when replacing objects with grub jars so that the jar
-        // is always placed on the ground.
-        // If this is zero, the check will not be replaced by a grub jar
-        // even if it is a grub.
+        // It is used when replacing objects with grub jars or geo rocks so
+        // that the replacement object is always placed on the ground.
+        // If this is zero, the check will not be replaced by a jar/rock
+        // even if it is a grub/geo rock.
         public float elevation;
 
         // charm variables
